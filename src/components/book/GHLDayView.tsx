@@ -32,8 +32,8 @@ const ORANGE = "#E8670A";
 const ORANGE_SOFT = "#FFF1E6";
 
 // Business hours
-const HOUR_MIN = 8;   // 8 AM
-const HOUR_MAX = 17;  // 5 PM (exclusive at 5:00)
+const HOUR_MIN = 8;   // 8 AM ET
+const HOUR_MAX = 18;  // exclusive — last slot is 5 PM (17:00)
 
 const ymd = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
