@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalSchema } from "@/components/GlobalSchema";
 import NotFound from "./pages/NotFound";
 import NewLandingPage from "./pages/NewLandingPage";
-import BookingFunnel from "./pages/BookingFunnel";
 import BookSymptom from "./pages/book/BookSymptom";
 import BookDuration from "./pages/book/BookDuration";
 import BookSchedule from "./pages/book/BookSchedule";
