@@ -46,11 +46,6 @@ const BookDuration = () => {
 
   return (
     <BookLayout page="duration" title="How long has this been going on? | Men's Wellness Centers">
-      {!state.symptom && (
-        <div className="px-4 md:px-6 pt-6">
-          <MissingParamBanner />
-        </div>
-      )}
       <SurveyCard
         progressLabel="Almost done. 2 quick questions"
         filledSegments={2}
