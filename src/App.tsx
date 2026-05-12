@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalSchema } from "@/components/GlobalSchema";
 import NotFound from "./pages/NotFound";
 import NewLandingPage from "./pages/NewLandingPage";
-import BookingFunnel from "./pages/BookingFunnel";
 import BookSymptom from "./pages/book/BookSymptom";
 import BookDuration from "./pages/book/BookDuration";
 import BookSchedule from "./pages/book/BookSchedule";
@@ -26,7 +25,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Navigate to="/new" replace />} />
           <Route path="/new" element={<NewLandingPage />} />
-          <Route path="/book" element={<BookingFunnel />} />
+          <Route path="/book" element={<Navigate to="/book/symptom" replace />} />
           <Route path="/book/symptom" element={<BookSymptom />} />
           <Route path="/book/duration" element={<BookDuration />} />
           <Route path="/book/schedule" element={<BookSchedule />} />
