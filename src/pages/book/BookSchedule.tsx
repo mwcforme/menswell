@@ -1,8 +1,10 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Phone } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import MissingParamBanner from "@/components/book/MissingParamBanner";
 import GHLLiveCalendar from "@/components/book/GHLLiveCalendar";
+import GHLDayView from "@/components/book/GHLDayView";
 import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
 import { CENTER_CALENDARS, type LocationKey } from "@/lib/ghlCalendars";
 
