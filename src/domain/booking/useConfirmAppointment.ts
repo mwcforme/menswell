@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServices } from "@/app/providers/ServicesProvider";
 import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
 import { confirmLeadSchema, type ConfirmLeadInput } from "@/domain/leads/leadFormSchema";
@@ -17,11 +17,24 @@ export interface ConfirmInput {
 
 export type ConfirmStatus = "idle" | "submitting" | "success" | "error";
 
+export interface RedirectState {
+  /** Where the user is being sent. */
+  url: string;
+  /** Total countdown duration in ms. */
+  totalMs: number;
+  /** Remaining ms (ticks every ~100ms). */
+  remainingMs: number;
+}
+
 export interface ConfirmAppointmentController {
   status: ConfirmStatus;
   error: string | null;
   isSubmitting: boolean;
+  /** Non-null when an automatic redirect is pending after an unrecoverable error. */
+  redirect: RedirectState | null;
   confirm: (input: ConfirmInput) => Promise<boolean>;
+  /** Cancel a pending redirect (e.g. when the user dismisses the modal). */
+  cancelRedirect: () => void;
   reset: () => void;
 }
 
