@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useServices } from "@/app/providers/ServicesProvider";
 import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
 import { confirmLeadSchema, type ConfirmLeadInput } from "@/domain/leads/leadFormSchema";
@@ -17,11 +17,24 @@ export interface ConfirmInput {
 
 export type ConfirmStatus = "idle" | "submitting" | "success" | "error";
 
+export interface RedirectState {
+  /** Where the user is being sent. */
+  url: string;
+  /** Total countdown duration in ms. */
+  totalMs: number;
+  /** Remaining ms (ticks every ~100ms). */
+  remainingMs: number;
+}
+
 export interface ConfirmAppointmentController {
   status: ConfirmStatus;
   error: string | null;
   isSubmitting: boolean;
+  /** Non-null when an automatic redirect is pending after an unrecoverable error. */
+  redirect: RedirectState | null;
   confirm: (input: ConfirmInput) => Promise<boolean>;
+  /** Cancel a pending redirect (e.g. when the user dismisses the modal). */
+  cancelRedirect: () => void;
   reset: () => void;
 }
 
@@ -48,15 +61,62 @@ export function useConfirmAppointment(opts?: {
     persistToBookingState: false,
   });
 
+  const [redirect, setRedirect] = useState<RedirectState | null>(null);
+  const tickRef = useRef<number | null>(null);
+  const navTimerRef = useRef<number | null>(null);
+
+  const clearTimers = useCallback(() => {
+    if (tickRef.current !== null) {
+      window.clearInterval(tickRef.current);
+      tickRef.current = null;
+    }
+    if (navTimerRef.current !== null) {
+      window.clearTimeout(navTimerRef.current);
+      navTimerRef.current = null;
+    }
+  }, []);
+
+  const cancelRedirect = useCallback(() => {
+    clearTimers();
+    setRedirect(null);
+  }, [clearTimers]);
+
+  // Cleanup on unmount.
+  useEffect(() => () => clearTimers(), [clearTimers]);
+
+  const scheduleRedirect = useCallback(
+    (url: string, totalMs: number) => {
+      clearTimers();
+      const start = Date.now();
+      setRedirect({ url, totalMs, remainingMs: totalMs });
+      tickRef.current = window.setInterval(() => {
+        const elapsed = Date.now() - start;
+        const remainingMs = Math.max(0, totalMs - elapsed);
+        setRedirect({ url, totalMs, remainingMs });
+        if (remainingMs <= 0 && tickRef.current !== null) {
+          window.clearInterval(tickRef.current);
+          tickRef.current = null;
+        }
+      }, 100);
+      navTimerRef.current = window.setTimeout(() => {
+        window.location.href = url;
+      }, totalMs);
+    },
+    [clearTimers],
+  );
+
   const reset = useCallback(() => {
+    clearTimers();
+    setRedirect(null);
     setStatus("idle");
     setError(null);
     lead.reset();
-  }, [lead]);
+  }, [clearTimers, lead]);
 
   const confirm = useCallback(
     async (input: ConfirmInput): Promise<boolean> => {
       if (status === "submitting") return false;
+      cancelRedirect();
       setStatus("submitting");
       setError(null);
 
@@ -127,20 +187,21 @@ export function useConfirmAppointment(opts?: {
           "That time was just taken. We'll have a coordinator call you to confirm another slot.",
         );
         setStatus("error");
-        setTimeout(() => {
-          window.location.href = "/book/lets-talk";
-        }, 1800);
+        scheduleRedirect("/book/lets-talk", 4000);
         return false;
       }
     },
-    [booking, lead, opts, status],
+    [booking, cancelRedirect, lead, opts, scheduleRedirect, status],
   );
 
   return {
     status,
     error,
+    redirect,
     isSubmitting: status === "submitting",
     confirm,
+    cancelRedirect,
     reset,
   };
 }
+

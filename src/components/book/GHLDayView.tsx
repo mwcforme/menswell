@@ -611,8 +611,71 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
 
           {submitError && (
-            <div style={{ marginTop: 12, padding: "10px 12px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, color: "#B91C1C", fontSize: 13 }}>
-              {submitError}
+            <div
+              role="alert"
+              aria-live="assertive"
+              style={{
+                marginTop: 12,
+                padding: "12px 14px",
+                background: "#FEF2F2",
+                border: "1px solid #FECACA",
+                borderRadius: 8,
+                color: "#B91C1C",
+                fontSize: 13,
+                lineHeight: 1.5,
+              }}
+            >
+              <div style={{ fontWeight: 600 }}>{submitError}</div>
+              {confirmCtl.redirect && (
+                <>
+                  <div style={{ marginTop: 8, fontSize: 12, color: "#7F1D1D", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                    <span>
+                      Connecting you with a coordinator in{" "}
+                      <strong>{Math.max(1, Math.ceil(confirmCtl.redirect.remainingMs / 1000))}s</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={confirmCtl.cancelRedirect}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid #FCA5A5",
+                        color: "#7F1D1D",
+                        borderRadius: 6,
+                        padding: "4px 10px",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <div
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={confirmCtl.redirect.totalMs}
+                    aria-valuenow={confirmCtl.redirect.totalMs - confirmCtl.redirect.remainingMs}
+                    style={{
+                      marginTop: 8,
+                      height: 4,
+                      background: "#FECACA",
+                      borderRadius: 999,
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: "100%",
+                        width: `${Math.min(100, ((confirmCtl.redirect.totalMs - confirmCtl.redirect.remainingMs) / confirmCtl.redirect.totalMs) * 100)}%`,
+                        background: "#B91C1C",
+                        transition: "width 100ms linear",
+                      }}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -620,13 +683,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             <button
               type="button"
               onClick={handleFinalConfirm}
-              disabled={submitting}
+              disabled={submitting || !!confirmCtl.redirect}
               style={{
                 width: "100%", minHeight: 52,
                 background: ORANGE, color: "#FFFFFF",
                 border: 0, borderRadius: 12, fontSize: 15, fontWeight: 700,
                 letterSpacing: "0.06em", textTransform: "uppercase",
-                cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.85 : 1,
+                cursor: submitting || confirmCtl.redirect ? "wait" : "pointer",
+                opacity: submitting || confirmCtl.redirect ? 0.6 : 1,
                 fontFamily: "Oswald, Inter, sans-serif",
                 display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
                 boxShadow: "0 10px 24px -10px rgba(232,103,10,0.55)",
@@ -637,7 +701,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </button>
             <button
               type="button"
-              onClick={() => !submitting && setModalOpen(false)}
+              onClick={() => { if (!submitting) { confirmCtl.cancelRedirect(); setModalOpen(false); } }}
               style={{ width: "100%", minHeight: 44, background: "transparent", color: MUTED, border: 0, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
             >
               ← Change time
