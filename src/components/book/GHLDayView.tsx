@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, ChevronLeft, ChevronRight, Clock, MapPin, CalendarCheck, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -118,38 +118,28 @@ const isTodayET = (day: Date): boolean => {
   return today === ymd(day);
 };
 
-// Always render the full 8am–5pm ET hourly slate (overbooking model).
-// For today, omit hours that have already passed in ET.
-const buildFullDaySlots = (day: Date): string[] => {
-  const out: string[] = [];
-  const cutoffHour = isTodayET(day) ? etHourNow() : -1;
-  const dateStr = ymd(day);
-  for (let h = HOUR_MIN; h < HOUR_MAX; h++) {
-    if (h <= cutoffHour) continue;
-    out.push(etWallToDate(dateStr, h).toISOString());
+// Parse the GHL free-slots payload into a per-day map of ISO start times.
+// GHL returns shape: { "YYYY-MM-DD": { slots: [iso, iso, ...] }, traceId?: ... }
+const parseFreeSlots = (raw: unknown): Record<string, string[]> => {
+  const out: Record<string, string[]> = {};
+  if (!raw || typeof raw !== "object") return out;
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+    const slots = (v as { slots?: unknown })?.slots;
+    if (Array.isArray(slots)) {
+      out[k] = slots.filter((s): s is string => typeof s === "string");
+    }
   }
   return out;
 };
 
-// Days from today in ET (0 = today, 1 = tomorrow, etc). Returns -1 if past.
-const daysFromTodayET = (day: Date): number => {
-  const todayStr = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(new Date());
-  const [ty, tm, td] = todayStr.split("-").map(Number);
-  const todayUTC = Date.UTC(ty, tm - 1, td);
-  const [dy, dm, dd] = ymd(day).split("-").map(Number);
-  const dayUTC = Date.UTC(dy, dm - 1, dd);
-  return Math.round((dayUTC - todayUTC) / 86_400_000);
+// Filter out slots that are already in the past (relative to current ET hour on today).
+const dropPastSlots = (day: Date, slots: string[]): string[] => {
+  if (!isTodayET(day)) return slots;
+  const cutoffMs = Date.now();
+  return slots.filter((iso) => new Date(iso).getTime() > cutoffMs);
 };
 
-// Artificial scarcity badge count: today/tomorrow/day-after show "2 OPEN".
-// This is display-only; the actual time grid still shows every 8a–5p slot.
-const scarcityDisplayCount = (day: Date, actualCount: number): number => {
-  const offset = daysFromTodayET(day);
-  if (offset < 0 || offset > 2) return actualCount;
-  return Math.min(2, actualCount);
-};
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
@@ -163,6 +153,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const lastUpdatedRef = useRef<Date | null>(null);
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
@@ -195,33 +186,49 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
-      // Always show the full 8a–5p hourly slate per future day (overbook model).
-      // The API call still runs so the "last updated" indicator stays meaningful.
       return getFreeSlots(location, start, end)
-        .then(() => {
+        .then((raw) => {
           if (cancelled) return;
+          const parsed = parseFreeSlots(raw);
           const out: Record<string, string[]> = {};
           days.forEach((d) => {
-            const slate = buildFullDaySlots(d);
-            if (slate.length > 0) out[ymd(d)] = slate;
+            const key = ymd(d);
+            const slots = dropPastSlots(d, parsed[key] || []);
+            if (slots.length > 0) out[key] = slots;
           });
           setSlotsByDay(out);
-          setLastUpdated(new Date());
+          const now = new Date();
+          setLastUpdated(now);
+          lastUpdatedRef.current = now;
           setLastReason(reason);
           setNowTick(Date.now());
           if (isInitial) {
             const firstWith = days.find((d) => out[ymd(d)]?.length);
             setSelectedDay(firstWith ? ymd(firstWith) : null);
+          } else if (selectedDay && !out[selectedDay]) {
+            // selected day no longer has slots after refresh — fall back gracefully
+            const firstWith = days.find((d) => out[ymd(d)]?.length);
+            setSelectedDay(firstWith ? ymd(firstWith) : null);
+            setSelectedSlot(null);
+          } else if (selectedSlot && selectedDay && !out[selectedDay]?.includes(selectedSlot)) {
+            // selected slot got booked by someone else — drop it
+            setSelectedSlot(null);
           }
         })
         .catch((e: Error) => { if (!cancelled && isInitial) setLoadError(e.message || "Could not load times."); })
         .finally(() => { if (!cancelled && isInitial) setLoading(false); });
     };
 
+
     load(refreshNonce > 0 ? "manual" : "initial");
-    // Realtime refresh every 30 min, plus on tab focus
+    // Auto-refresh every 30 min. On tab focus, only refresh if data is >5 min old.
     const interval = window.setInterval(() => load("timer"), 30 * 60 * 1000);
-    const onFocus = () => load("focus");
+    const onFocus = () => {
+      // Read freshest lastUpdated from closure-safe ref via state setter pattern
+      // (acceptable here: at worst we refresh once when not strictly needed)
+      const last = lastUpdatedRef.current;
+      if (!last || Date.now() - last.getTime() > 5 * 60 * 1000) load("focus");
+    };
     window.addEventListener("focus", onFocus);
 
     return () => {
@@ -247,9 +254,24 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         phone: phone || undefined,
         source: source || "mwc-book-funnel",
       });
-      await bookAppointment({ location, contactId, startTime: selectedSlot, notes });
-      setModalOpen(false);
-      onBooked?.(selectedSlot);
+      try {
+        await bookAppointment({ location, contactId, startTime: selectedSlot, notes });
+        setModalOpen(false);
+        onBooked?.(selectedSlot);
+      } catch (bookErr) {
+        // Slot may have been taken between rendering and booking. Persist intent
+        // so a human can follow up, then bounce to lets-talk.
+        try {
+          sessionStorage.setItem("mwc_booking_failed_intent_v1", JSON.stringify({
+            contactId, location, startTime: selectedSlot,
+            firstName, lastName, email, phone,
+            failedAt: new Date().toISOString(),
+            error: (bookErr as Error).message,
+          }));
+        } catch { /* ignore */ }
+        setSubmitError("That time was just taken. We'll have a coordinator call you to confirm another slot.");
+        setTimeout(() => { window.location.href = "/book/lets-talk"; }, 1800);
+      }
     } catch (e) {
       setSubmitError((e as Error).message || "Booking failed. Please try another time.");
     } finally { setSubmitting(false); }
@@ -353,7 +375,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
               {days.map((d) => {
                 const key = ymd(d);
                 const actualCount = slotsByDay[key]?.length || 0;
-                const count = scarcityDisplayCount(d, actualCount);
+                const count = actualCount;
                 const available = actualCount > 0;
                 const selected = selectedDay === key;
                 const isToday = ymd(today) === key;

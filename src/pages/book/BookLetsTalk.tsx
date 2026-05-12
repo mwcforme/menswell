@@ -26,13 +26,15 @@ const BookLetsTalk = () => {
   useBookingSync();
 
   const trackCallClick = () => {
-    if (typeof window !== "undefined" && window.dataLayer) {
-      window.dataLayer.push({ event: "phone_click", page: "lets-talk" });
+    const dl = (window as unknown as { dataLayer?: unknown[] }).dataLayer;
+    if (typeof window !== "undefined" && dl) {
+      dl.push({ event: "phone_click", page: "lets-talk" });
     }
   };
   const trackSmsClick = () => {
-    if (typeof window !== "undefined" && window.dataLayer) {
-      window.dataLayer.push({ event: "sms_click", page: "lets-talk" });
+    const dl = (window as unknown as { dataLayer?: unknown[] }).dataLayer;
+    if (typeof window !== "undefined" && dl) {
+      dl.push({ event: "sms_click", page: "lets-talk" });
     }
   };
 
