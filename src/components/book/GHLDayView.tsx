@@ -4,11 +4,38 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   CENTER_CALENDARS,
   TIMEZONE,
-  getFreeSlots,
   upsertContact,
   bookAppointment,
   type LocationKey,
 } from "@/lib/ghlCalendars";
+import { supabase } from "@/integrations/supabase/client";
+
+// Read free slots from the cached `ghl_free_slots` table (synced hourly from GHL).
+const fetchCachedSlots = async (
+  calendarId: string,
+  start: Date,
+  end: Date,
+): Promise<Record<string, string[]>> => {
+  const { data, error } = await supabase
+    .from("ghl_free_slots")
+    .select("slot_start")
+    .eq("calendar_id", calendarId)
+    .gte("slot_start", start.toISOString())
+    .lt("slot_start", end.toISOString())
+    .order("slot_start", { ascending: true })
+    .limit(1000);
+  if (error) throw new Error(error.message);
+  const out: Record<string, string[]> = {};
+  for (const row of data || []) {
+    const iso = row.slot_start as string;
+    // Bucket by ET calendar day
+    const key = new Intl.DateTimeFormat("en-CA", {
+      timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date(iso));
+    (out[key] ||= []).push(iso);
+  }
+  return out;
+};
 
 interface Props {
   location: LocationKey;
@@ -186,10 +213,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
-      return getFreeSlots(location, start, end)
-        .then((raw) => {
+      return fetchCachedSlots(cal.calendarId, start, end)
+        .then((parsed) => {
           if (cancelled) return;
-          const parsed = parseFreeSlots(raw);
           const out: Record<string, string[]> = {};
           days.forEach((d) => {
             const key = ymd(d);
