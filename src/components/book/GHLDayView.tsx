@@ -199,8 +199,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     };
 
     load(refreshNonce > 0 ? "manual" : "initial");
-    // Realtime refresh every 30s, plus on tab focus
-    const interval = window.setInterval(() => load("timer"), 30_000);
+    // Realtime refresh every 30 min, plus on tab focus
+    const interval = window.setInterval(() => load("timer"), 30 * 60 * 1000);
     const onFocus = () => load("focus");
     window.addEventListener("focus", onFocus);
 
@@ -345,16 +345,15 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                   <button
                     key={key}
                     type="button"
-                    disabled={!available}
                     aria-pressed={selected}
-                    aria-label={`${fmtFullDay(d)} — ${available ? `${count} times available` : "no times available"}`}
+                    aria-label={`${fmtFullDay(d)} — ${count} times available`}
                     onClick={() => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
                       background: selected ? INK : SURFACE,
-                      border: `1.5px solid ${selected ? INK : available ? LINE : "#ECEEF2"}`,
+                      border: `1.5px solid ${selected ? INK : LINE}`,
                       borderRadius: 12, padding: "12px 6px",
-                      color: selected ? "#FFFFFF" : available ? INK : "#A8AEB8",
-                      cursor: available ? "pointer" : "not-allowed",
+                      color: selected ? "#FFFFFF" : INK,
+                      cursor: "pointer",
                       textAlign: "center",
                       transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                       position: "relative",
@@ -419,7 +418,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             {(() => {
               const reasonLabel: Record<typeof lastReason, string> = {
                 initial: "first load",
-                timer: "30s auto-refresh",
+                timer: "30 min auto-refresh",
                 focus: "tab focus",
                 manual: "manual refresh",
               };
@@ -431,7 +430,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 else { const m = Math.floor(secs / 60); agoText = `${m}m ago`; }
               }
               const tooltip = lastUpdated
-                ? `Updated ${lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })} via ${reasonLabel[lastReason]}. Auto-refreshes every 30s and on tab focus.`
+                ? `Updated ${lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })} via ${reasonLabel[lastReason]}. Auto-refreshes every 30 min and on tab focus.`
                 : "Loading availability...";
               return (
                 <button
