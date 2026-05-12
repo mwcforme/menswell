@@ -118,38 +118,28 @@ const isTodayET = (day: Date): boolean => {
   return today === ymd(day);
 };
 
-// Always render the full 8am–5pm ET hourly slate (overbooking model).
-// For today, omit hours that have already passed in ET.
-const buildFullDaySlots = (day: Date): string[] => {
-  const out: string[] = [];
-  const cutoffHour = isTodayET(day) ? etHourNow() : -1;
-  const dateStr = ymd(day);
-  for (let h = HOUR_MIN; h < HOUR_MAX; h++) {
-    if (h <= cutoffHour) continue;
-    out.push(etWallToDate(dateStr, h).toISOString());
+// Parse the GHL free-slots payload into a per-day map of ISO start times.
+// GHL returns shape: { "YYYY-MM-DD": { slots: [iso, iso, ...] }, traceId?: ... }
+const parseFreeSlots = (raw: unknown): Record<string, string[]> => {
+  const out: Record<string, string[]> = {};
+  if (!raw || typeof raw !== "object") return out;
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) continue;
+    const slots = (v as { slots?: unknown })?.slots;
+    if (Array.isArray(slots)) {
+      out[k] = slots.filter((s): s is string => typeof s === "string");
+    }
   }
   return out;
 };
 
-// Days from today in ET (0 = today, 1 = tomorrow, etc). Returns -1 if past.
-const daysFromTodayET = (day: Date): number => {
-  const todayStr = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(new Date());
-  const [ty, tm, td] = todayStr.split("-").map(Number);
-  const todayUTC = Date.UTC(ty, tm - 1, td);
-  const [dy, dm, dd] = ymd(day).split("-").map(Number);
-  const dayUTC = Date.UTC(dy, dm - 1, dd);
-  return Math.round((dayUTC - todayUTC) / 86_400_000);
+// Filter out slots that are already in the past (relative to current ET hour on today).
+const dropPastSlots = (day: Date, slots: string[]): string[] => {
+  if (!isTodayET(day)) return slots;
+  const cutoffMs = Date.now();
+  return slots.filter((iso) => new Date(iso).getTime() > cutoffMs);
 };
 
-// Artificial scarcity badge count: today/tomorrow/day-after show "2 OPEN".
-// This is display-only; the actual time grid still shows every 8a–5p slot.
-const scarcityDisplayCount = (day: Date, actualCount: number): number => {
-  const offset = daysFromTodayET(day);
-  if (offset < 0 || offset > 2) return actualCount;
-  return Math.min(2, actualCount);
-};
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
