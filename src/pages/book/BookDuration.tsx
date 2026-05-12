@@ -19,9 +19,17 @@ const BookDuration = () => {
   const [selected, setSelected] = useState<string>(state.duration || "");
   const advanceTimer = useRef<number | null>(null);
 
+  useEffect(() => {
+    if (!state.symptom) {
+      navigate("/book/symptom", { replace: true });
+    }
+  }, [state.symptom, navigate]);
+
   useEffect(() => () => {
     if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
   }, []);
+
+  if (!state.symptom) return null;
 
   const handleSelect = (value: string, urgency: UrgencyTier) => {
     if (advanceTimer.current) return;
