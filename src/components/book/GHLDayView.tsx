@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, ChevronLeft, ChevronRight, Clock, MapPin, CalendarCheck } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Clock, MapPin, CalendarCheck, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   CENTER_CALENDARS,
@@ -83,6 +83,15 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
+  const [nowTick, setNowTick] = useState<number>(Date.now());
+
+  // Tick every 15s so the "X seconds ago" label stays fresh
+  useEffect(() => {
+    const t = window.setInterval(() => setNowTick(Date.now()), 15_000);
+    return () => window.clearInterval(t);
+  }, []);
 
   const cal = CENTER_CALENDARS[location];
 
@@ -93,6 +102,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       .filter((d) => d >= today);
   }, [weekStart, today]);
 
+  const [refreshNonce, setRefreshNonce] = useState(0);
+
   useEffect(() => {
     let cancelled = false;
     const start = new Date(weekStart);
@@ -100,7 +111,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const end = new Date(weekStart);
     end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
-    const load = (isInitial: boolean) => {
+    const load = (reason: "initial" | "timer" | "focus" | "manual") => {
+      const isInitial = reason === "initial";
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
@@ -119,6 +131,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             });
           }
           setSlotsByDay(out);
+          setLastUpdated(new Date());
+          setLastReason(reason);
+          setNowTick(Date.now());
           if (isInitial) {
             const firstWith = days.find((d) => out[ymd(d)]?.length);
             setSelectedDay(firstWith ? ymd(firstWith) : null);
@@ -134,10 +149,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         .finally(() => { if (!cancelled && isInitial) setLoading(false); });
     };
 
-    load(true);
+    load(refreshNonce > 0 ? "manual" : "initial");
     // Realtime refresh every 30s, plus on tab focus
-    const interval = window.setInterval(() => load(false), 30_000);
-    const onFocus = () => load(false);
+    const interval = window.setInterval(() => load("timer"), 30_000);
+    const onFocus = () => load("focus");
     window.addEventListener("focus", onFocus);
 
     return () => {
@@ -146,7 +161,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       window.removeEventListener("focus", onFocus);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weekStart, location]);
+  }, [weekStart, location, refreshNonce]);
 
   const times = selectedDay ? slotsByDay[selectedDay] || [] : [];
   const canConfirm = Boolean(selectedSlot);
@@ -352,6 +367,44 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 Times shown in clinic local time (ET).
               </div>
             </div>
+            {(() => {
+              const reasonLabel: Record<typeof lastReason, string> = {
+                initial: "first load",
+                timer: "30s auto-refresh",
+                focus: "tab focus",
+                manual: "manual refresh",
+              };
+              let agoText = "just now";
+              if (lastUpdated) {
+                const secs = Math.max(0, Math.round((nowTick - lastUpdated.getTime()) / 1000));
+                if (secs < 5) agoText = "just now";
+                else if (secs < 60) agoText = `${secs}s ago`;
+                else { const m = Math.floor(secs / 60); agoText = `${m}m ago`; }
+              }
+              const tooltip = lastUpdated
+                ? `Updated ${lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })} via ${reasonLabel[lastReason]}. Auto-refreshes every 30s and on tab focus.`
+                : "Loading availability...";
+              return (
+                <button
+                  type="button"
+                  title={tooltip}
+                  aria-label={tooltip}
+                  onClick={() => setRefreshNonce((n) => n + 1)}
+                  disabled={loading}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    background: SURFACE, border: `1px solid ${LINE}`,
+                    borderRadius: 999, padding: "6px 10px",
+                    fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
+                    color: INK_SOFT, cursor: loading ? "wait" : "pointer",
+                  }}
+                >
+                  <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+                  <span>Updated {agoText}</span>
+                  <span style={{ color: MUTED, fontWeight: 500 }}>· {reasonLabel[lastReason]}</span>
+                </button>
+              );
+            })()}
           </div>
 
           {!selectedDay ? (
