@@ -342,7 +342,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
               No times available on this day between 8 AM and 5 PM.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {times.map((iso) => {
                 const active = iso === selectedSlot;
                 const { time, ampm } = fmtTimeParts(iso);
