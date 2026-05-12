@@ -251,46 +251,65 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 const available = count > 0;
                 const selected = selectedDay === key;
                 const isToday = ymd(today) === key;
+                const badgeText = !loading
+                  ? available
+                    ? `${count} OPEN`
+                    : "FULL"
+                  : "···";
                 return (
                   <button
                     key={key}
                     type="button"
                     disabled={!available}
+                    aria-pressed={selected}
+                    aria-label={`${fmtFullDay(d)} — ${available ? `${count} times available` : "no times available"}`}
                     onClick={() => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
-                      background: selected ? INK : available ? SURFACE : CANVAS,
-                      border: `1px solid ${selected ? INK : LINE}`,
+                      background: selected ? INK : SURFACE,
+                      border: `1.5px solid ${selected ? INK : available ? LINE : "#ECEEF2"}`,
                       borderRadius: 12, padding: "12px 6px",
-                      color: selected ? "#FFFFFF" : available ? INK : "#C5CAD3",
+                      color: selected ? "#FFFFFF" : available ? INK : "#A8AEB8",
                       cursor: available ? "pointer" : "not-allowed",
                       textAlign: "center",
-                      transition: "background 120ms ease, transform 120ms ease",
+                      transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                       position: "relative",
+                      boxShadow: selected
+                        ? "0 8px 18px -10px rgba(11,16,41,0.45)"
+                        : available
+                          ? "0 1px 0 rgba(11,16,41,0.03)"
+                          : "inset 0 0 0 9999px rgba(11,16,41,0.015)",
+                      opacity: available || selected ? 1 : 0.85,
                     }}
                   >
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: selected ? "rgba(255,255,255,0.7)" : MUTED, marginBottom: 4 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: selected ? "rgba(255,255,255,0.75)" : MUTED, marginBottom: 4 }}>
                       {isToday ? "TODAY" : fmtDayShort(d)}
                     </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "0.02em" }}>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "0.02em", textDecoration: !available && !loading ? "line-through" : "none", textDecorationColor: "#D7DAE0" }}>
                       {fmtMonthDay(d)}
                     </div>
-                    {available && count <= 3 && (
-                      <div
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 700,
-                          color: selected ? "#FFFFFF" : ORANGE,
-                          background: selected ? "rgba(255,255,255,0.15)" : ORANGE_SOFT,
-                          marginTop: 6,
-                          letterSpacing: "0.06em",
-                          padding: "2px 6px",
-                          borderRadius: 999,
-                          display: "inline-block",
-                        }}
-                      >
-                        {count} LEFT
-                      </div>
-                    )}
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: selected
+                          ? "#FFFFFF"
+                          : available
+                            ? ORANGE
+                            : "#A8AEB8",
+                        background: selected
+                          ? "rgba(255,255,255,0.15)"
+                          : available
+                            ? ORANGE_SOFT
+                            : "#F1F2F5",
+                        marginTop: 6,
+                        letterSpacing: "0.06em",
+                        padding: "2px 6px",
+                        borderRadius: 999,
+                        display: "inline-block",
+                      }}
+                    >
+                      {badgeText}
+                    </div>
                   </button>
                 );
               })}
