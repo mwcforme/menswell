@@ -4,11 +4,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import {
   CENTER_CALENDARS,
   TIMEZONE,
-  upsertContact,
-  bookAppointment,
   type LocationKey,
 } from "@/lib/ghlCalendars";
 import { supabase } from "@/integrations/supabase/client";
+import { useConfirmAppointment } from "@/domain/booking/useConfirmAppointment";
 
 // Read free slots from the cached `ghl_free_slots` table (synced hourly from GHL).
 const fetchCachedSlots = async (
@@ -177,8 +176,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const confirmCtl = useConfirmAppointment({ onBooked: (slot) => onBooked?.(slot) });
+  const submitting = confirmCtl.isSubmitting;
+  const submitError = confirmCtl.error;
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const lastUpdatedRef = useRef<Date | null>(null);
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
@@ -271,36 +271,17 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
-    setSubmitting(true); setSubmitError(null);
-    try {
-      const contactId = await upsertContact({
-        firstName: firstName || "Guest",
-        lastName: lastName || undefined,
-        email: email || undefined,
-        phone: phone || undefined,
-        source: source || "mwc-book-funnel",
-      });
-      try {
-        await bookAppointment({ location, contactId, startTime: selectedSlot, notes });
-        setModalOpen(false);
-        onBooked?.(selectedSlot);
-      } catch (bookErr) {
-        // Slot may have been taken between rendering and booking. Persist intent
-        // so a human can follow up, then bounce to lets-talk.
-        try {
-          sessionStorage.setItem("mwc_booking_failed_intent_v1", JSON.stringify({
-            contactId, location, startTime: selectedSlot,
-            firstName, lastName, email, phone,
-            failedAt: new Date().toISOString(),
-            error: (bookErr as Error).message,
-          }));
-        } catch { /* ignore */ }
-        setSubmitError("That time was just taken. We'll have a coordinator call you to confirm another slot.");
-        setTimeout(() => { window.location.href = "/book/lets-talk"; }, 1800);
-      }
-    } catch (e) {
-      setSubmitError((e as Error).message || "Booking failed. Please try another time.");
-    } finally { setSubmitting(false); }
+    const ok = await confirmCtl.confirm({
+      slotIso: selectedSlot,
+      location,
+      firstName,
+      lastName,
+      email,
+      phone,
+      notes,
+      source,
+    });
+    if (ok) setModalOpen(false);
   };
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
