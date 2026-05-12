@@ -65,10 +65,11 @@ const fmtTimeParts = (iso: string) => {
 const fmtFullDay = (d: Date) =>
   d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
 
-// Filter to business hours 8a–5p
+// Filter to business hours 8a–5p AND enforce 60-min cadence (minute === 0)
 const inBusinessHours = (iso: string) => {
-  const h = new Date(iso).getHours();
-  return h >= HOUR_MIN && h < HOUR_MAX;
+  const d = new Date(iso);
+  const h = d.getHours();
+  return h >= HOUR_MIN && h < HOUR_MAX && d.getMinutes() === 0;
 };
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
