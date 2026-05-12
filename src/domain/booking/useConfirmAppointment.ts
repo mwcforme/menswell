@@ -61,15 +61,62 @@ export function useConfirmAppointment(opts?: {
     persistToBookingState: false,
   });
 
+  const [redirect, setRedirect] = useState<RedirectState | null>(null);
+  const tickRef = useRef<number | null>(null);
+  const navTimerRef = useRef<number | null>(null);
+
+  const clearTimers = useCallback(() => {
+    if (tickRef.current !== null) {
+      window.clearInterval(tickRef.current);
+      tickRef.current = null;
+    }
+    if (navTimerRef.current !== null) {
+      window.clearTimeout(navTimerRef.current);
+      navTimerRef.current = null;
+    }
+  }, []);
+
+  const cancelRedirect = useCallback(() => {
+    clearTimers();
+    setRedirect(null);
+  }, [clearTimers]);
+
+  // Cleanup on unmount.
+  useEffect(() => () => clearTimers(), [clearTimers]);
+
+  const scheduleRedirect = useCallback(
+    (url: string, totalMs: number) => {
+      clearTimers();
+      const start = Date.now();
+      setRedirect({ url, totalMs, remainingMs: totalMs });
+      tickRef.current = window.setInterval(() => {
+        const elapsed = Date.now() - start;
+        const remainingMs = Math.max(0, totalMs - elapsed);
+        setRedirect({ url, totalMs, remainingMs });
+        if (remainingMs <= 0 && tickRef.current !== null) {
+          window.clearInterval(tickRef.current);
+          tickRef.current = null;
+        }
+      }, 100);
+      navTimerRef.current = window.setTimeout(() => {
+        window.location.href = url;
+      }, totalMs);
+    },
+    [clearTimers],
+  );
+
   const reset = useCallback(() => {
+    clearTimers();
+    setRedirect(null);
     setStatus("idle");
     setError(null);
     lead.reset();
-  }, [lead]);
+  }, [clearTimers, lead]);
 
   const confirm = useCallback(
     async (input: ConfirmInput): Promise<boolean> => {
       if (status === "submitting") return false;
+      cancelRedirect();
       setStatus("submitting");
       setError(null);
 
@@ -140,20 +187,21 @@ export function useConfirmAppointment(opts?: {
           "That time was just taken. We'll have a coordinator call you to confirm another slot.",
         );
         setStatus("error");
-        setTimeout(() => {
-          window.location.href = "/book/lets-talk";
-        }, 1800);
+        scheduleRedirect("/book/lets-talk", 4000);
         return false;
       }
     },
-    [booking, lead, opts, status],
+    [booking, cancelRedirect, lead, opts, scheduleRedirect, status],
   );
 
   return {
     status,
     error,
+    redirect,
     isSubmitting: status === "submitting",
     confirm,
+    cancelRedirect,
     reset,
   };
 }
+
