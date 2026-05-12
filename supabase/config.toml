@@ -2,3 +2,6 @@ project_id = "stmyztkmioobdbxliktn"
 
 [functions.ghl-proxy]
 verify_jwt = false
+
+[functions.ghl-sync]
+verify_jwt = false

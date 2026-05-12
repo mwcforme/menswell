@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ghl_free_slots: {
+        Row: {
+          calendar_id: string
+          fetched_at: string
+          location: string
+          slot_end: string
+          slot_start: string
+        }
+        Insert: {
+          calendar_id: string
+          fetched_at?: string
+          location: string
+          slot_end: string
+          slot_start: string
+        }
+        Update: {
+          calendar_id?: string
+          fetched_at?: string
+          location?: string
+          slot_end?: string
+          slot_start?: string
+        }
+        Relationships: []
+      }
+      ghl_sync_runs: {
+        Row: {
+          error: string | null
+          finished_at: string | null
+          id: string
+          slot_count: number | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          slot_count?: number | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          slot_count?: number | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
