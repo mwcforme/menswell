@@ -55,29 +55,6 @@ const BookDuration = () => {
         prevLabel="Back"
         onPrev={handlePrev}
       >
-        {/* Reassurance banner */}
-        <div
-          className="flex items-start gap-3 p-3 mb-3"
-          style={{
-            background: "#FFF7ED",
-            borderLeft: "4px solid #F97316",
-            borderRadius: 8,
-          }}
-        >
-          <ShieldCheck size={20} style={{ color: "#E8670A", flexShrink: 0, marginTop: 2 }} />
-          <p
-            style={{
-              fontSize: 14,
-              color: "#3A4258",
-              fontFamily: "Inter, sans-serif",
-              lineHeight: 1.45,
-              margin: 0,
-            }}
-          >
-            Most men wait over 2 years to get help. You're not alone. Let's fix that today.
-          </p>
-        </div>
-
         {OPTIONS.map((o) => (
           <OptionRow
             key={o.value}
