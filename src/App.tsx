@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { GlobalSchema } from "@/components/GlobalSchema";
+import { ServicesProvider } from "@/app/providers/ServicesProvider";
 import NotFound from "./pages/NotFound";
 import NewLandingPage from "./pages/NewLandingPage";
 import BookSymptom from "./pages/book/BookSymptom";
@@ -21,6 +22,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ServicesProvider>
         <GlobalSchema />
         <Routes>
           <Route path="/" element={<Navigate to="/new" replace />} />
@@ -34,6 +36,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <MobileFooterBar />
+        </ServicesProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
