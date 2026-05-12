@@ -223,20 +223,6 @@ const BookLetsTalk = () => {
             </section>
           </div>
 
-          {/* Reassurance */}
-          <p
-            className="text-center mt-8 md:mt-10 mx-auto"
-            style={{
-              maxWidth: 520,
-              color: "rgba(255,255,255,0.55)",
-              fontSize: 14,
-              fontWeight: 400,
-              lineHeight: 1.55,
-            }}
-          >
-            No pressure, no sales pitch. We'll listen, point you in the right
-            direction, and book a visit if it's the right fit.
-          </p>
         </div>
       </div>
 
