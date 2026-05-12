@@ -2,8 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import MissingParamBanner from "@/components/book/MissingParamBanner";
-import GHLNeoCalendarMock from "@/components/book/GHLNeoCalendarMock";
-import { useBookingSync, updateBookingState, toQueryString, labelFor, type UrgencyTier } from "@/lib/bookingState";
+import GHLLiveCalendar from "@/components/book/GHLLiveCalendar";
+import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
+import { CENTER_CALENDARS, type LocationKey } from "@/lib/ghlCalendars";
 
 const PHONE_DISPLAY = "(866) 344-4955";
 const PHONE_TEL = "tel:8663444955";
