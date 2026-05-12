@@ -153,6 +153,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const lastUpdatedRef = useRef<Date | null>(null);
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
