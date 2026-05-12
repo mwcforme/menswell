@@ -26,7 +26,6 @@ const URGENCY_SUB: Record<UrgencyTier, string> = {
 const BookSchedule = () => {
   const navigate = useNavigate();
   const state = useBookingSync();
-  const missing0 = false;
   const missing = !state.symptom || !state.duration;
 
   const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
