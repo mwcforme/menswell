@@ -213,10 +213,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
-      return getFreeSlots(location, start, end)
-        .then((raw) => {
+      return fetchCachedSlots(cal.calendarId, start, end)
+        .then((parsed) => {
           if (cancelled) return;
-          const parsed = parseFreeSlots(raw);
           const out: Record<string, string[]> = {};
           days.forEach((d) => {
             const key = ymd(d);
