@@ -352,7 +352,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
               {days.map((d) => {
                 const key = ymd(d);
                 const actualCount = slotsByDay[key]?.length || 0;
-                const count = scarcityDisplayCount(d, actualCount);
+                const count = actualCount;
                 const available = actualCount > 0;
                 const selected = selectedDay === key;
                 const isToday = ymd(today) === key;
