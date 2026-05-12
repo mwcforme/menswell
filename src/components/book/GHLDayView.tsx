@@ -367,6 +367,44 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 Times shown in clinic local time (ET).
               </div>
             </div>
+            {(() => {
+              const reasonLabel: Record<typeof lastReason, string> = {
+                initial: "first load",
+                timer: "30s auto-refresh",
+                focus: "tab focus",
+                manual: "manual refresh",
+              };
+              let agoText = "just now";
+              if (lastUpdated) {
+                const secs = Math.max(0, Math.round((nowTick - lastUpdated.getTime()) / 1000));
+                if (secs < 5) agoText = "just now";
+                else if (secs < 60) agoText = `${secs}s ago`;
+                else { const m = Math.floor(secs / 60); agoText = `${m}m ago`; }
+              }
+              const tooltip = lastUpdated
+                ? `Updated ${lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })} via ${reasonLabel[lastReason]}. Auto-refreshes every 30s and on tab focus.`
+                : "Loading availability...";
+              return (
+                <button
+                  type="button"
+                  title={tooltip}
+                  aria-label={tooltip}
+                  onClick={() => setRefreshNonce((n) => n + 1)}
+                  disabled={loading}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    background: SURFACE, border: `1px solid ${LINE}`,
+                    borderRadius: 999, padding: "6px 10px",
+                    fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
+                    color: INK_SOFT, cursor: loading ? "wait" : "pointer",
+                  }}
+                >
+                  <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
+                  <span>Updated {agoText}</span>
+                  <span style={{ color: MUTED, fontWeight: 500 }}>· {reasonLabel[lastReason]}</span>
+                </button>
+              );
+            })()}
           </div>
 
           {!selectedDay ? (
