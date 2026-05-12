@@ -4,7 +4,6 @@ import { CalendarClock, CalendarDays, CalendarRange, History, ShieldCheck } from
 import BookLayout from "@/components/book/BookLayout";
 import SurveyCard from "@/components/book/SurveyCard";
 import OptionRow from "@/components/book/OptionRow";
-import MissingParamBanner from "@/components/book/MissingParamBanner";
 import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
 
 const OPTIONS = [
@@ -20,9 +19,17 @@ const BookDuration = () => {
   const [selected, setSelected] = useState<string>(state.duration || "");
   const advanceTimer = useRef<number | null>(null);
 
+  useEffect(() => {
+    if (!state.symptom) {
+      navigate("/book/symptom", { replace: true });
+    }
+  }, [state.symptom, navigate]);
+
   useEffect(() => () => {
     if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
   }, []);
+
+  if (!state.symptom) return null;
 
   const handleSelect = (value: string, urgency: UrgencyTier) => {
     if (advanceTimer.current) return;
@@ -39,11 +46,6 @@ const BookDuration = () => {
 
   return (
     <BookLayout page="duration" title="How long has this been going on? | Men's Wellness Centers">
-      {!state.symptom && (
-        <div className="px-4 md:px-6 pt-6">
-          <MissingParamBanner />
-        </div>
-      )}
       <SurveyCard
         progressLabel="Almost done. 2 quick questions"
         filledSegments={2}

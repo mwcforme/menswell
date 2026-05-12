@@ -1,7 +1,7 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
-import MissingParamBanner from "@/components/book/MissingParamBanner";
 import GHLDayView from "@/components/book/GHLDayView";
 import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
 import { CENTER_CALENDARS, type LocationKey } from "@/lib/ghlCalendars";
@@ -28,6 +28,12 @@ const BookSchedule = () => {
   const state = useBookingSync();
   const missing = !state.symptom || !state.duration;
 
+  useEffect(() => {
+    if (missing) {
+      navigate("/book/symptom", { replace: true });
+    }
+  }, [missing, navigate]);
+
   const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
   const subhead = state.urgencyTier
     ? URGENCY_SUB[state.urgencyTier]
@@ -43,10 +49,12 @@ const BookSchedule = () => {
   const [firstName = "", ...lastParts] = (state.name || "").trim().split(/\s+/);
   const lastName = lastParts.join(" ");
 
+  if (missing) return null;
+
   return (
     <BookLayout page="schedule" title="Pick your consult time | Men's Wellness Centers">
       <div className="px-3 md:px-6 py-4 md:py-8 space-y-4 md:space-y-6 pb-28 md:pb-12">
-        {missing && <MissingParamBanner />}
+
 
         {/* 3/3 progress bar */}
         <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
