@@ -1,5 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
-
 interface TCPAConsentProps {
   consent: boolean;
   onChange: (v: boolean) => void;
@@ -7,7 +5,12 @@ interface TCPAConsentProps {
   id?: string;
 }
 
-export const TCPAConsent = ({ consent, onChange, variant = "light", id = "tcpa-consent" }: TCPAConsentProps) => {
+export const TCPAConsent = ({
+  consent,
+  onChange,
+  variant = "light",
+  id = "tcpa-consent",
+}: TCPAConsentProps) => {
   const isDark = variant === "dark";
   return (
     <label htmlFor={id} className="flex items-start gap-3 cursor-pointer select-none">
@@ -30,7 +33,4 @@ export const TCPAConsent = ({ consent, onChange, variant = "light", id = "tcpa-c
   );
 };
 
-// Tiny shim so Checkbox import isn't required externally
 export default TCPAConsent;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _ = Checkbox;
