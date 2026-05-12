@@ -376,27 +376,31 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 const key = ymd(d);
                 const actualCount = slotsByDay[key]?.length || 0;
                 const count = actualCount;
-                const available = actualCount > 0;
+                const isSunday = d.getDay() === 0;
+                const available = actualCount > 0 && !isSunday;
                 const selected = selectedDay === key;
                 const isToday = ymd(today) === key;
                 const badgeText = !loading
-                  ? available
-                    ? `${count} OPEN`
-                    : "FULL"
+                  ? isSunday
+                    ? "CLOSED"
+                    : available
+                      ? `${count} OPEN`
+                      : "FULL"
                   : "···";
                 return (
                   <button
                     key={key}
                     type="button"
+                    disabled={isSunday || !available}
                     aria-pressed={selected}
-                    aria-label={`${fmtFullDay(d)} — ${count} times available`}
-                    onClick={() => { setSelectedDay(key); setSelectedSlot(null); }}
+                    aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
+                    onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
                       background: selected ? INK : SURFACE,
                       border: `1.5px solid ${selected ? INK : LINE}`,
                       borderRadius: 12, padding: "12px 6px",
                       color: selected ? "#FFFFFF" : INK,
-                      cursor: "pointer",
+                      cursor: isSunday || !available ? "default" : "pointer",
                       textAlign: "center",
                       transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                       position: "relative",
@@ -422,12 +426,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                           ? "#FFFFFF"
                           : available
                             ? count >= 3 ? "#0F7A3D" : "#B91C1C"
-                            : "#A8AEB8",
+                            : isSunday ? "#9AA0AC" : "#A8AEB8",
                         background: selected
                           ? "rgba(255,255,255,0.15)"
                           : available
                             ? count >= 3 ? "#E6F7EC" : "#FEECEC"
-                            : "#F1F2F5",
+                            : isSunday ? "#F1F2F5" : "#F1F2F5",
                         marginTop: 6,
                         letterSpacing: "0.06em",
                         padding: "2px 6px",
