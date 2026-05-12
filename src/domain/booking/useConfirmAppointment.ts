@@ -43,7 +43,7 @@ export function useConfirmAppointment(opts?: {
 
   const lead = useLeadSubmitController<ConfirmLeadInput>({
     schema: confirmLeadSchema,
-    toLeadInput: () => ({}),
+    toLeadInput: (v) => ({ firstName: v.name || "Guest", email: v.email, phone: v.phone }),
     toastOnError: false,
     persistToBookingState: false,
   });
