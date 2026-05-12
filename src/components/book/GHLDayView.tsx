@@ -134,20 +134,16 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
+      // Always show the full 8a–5p hourly slate per future day (overbook model).
+      // The API call still runs so the "last updated" indicator stays meaningful.
       return getFreeSlots(location, start, end)
-        .then((data) => {
+        .then(() => {
           if (cancelled) return;
           const out: Record<string, string[]> = {};
-          if (data && typeof data === "object") {
-            Object.entries(data as Record<string, unknown>).forEach(([k, v]) => {
-              if (k === "traceId") return;
-              const slots = (v as { slots?: string[] })?.slots;
-              if (Array.isArray(slots)) {
-                const filtered = slots.filter(inBusinessHours);
-                if (filtered.length > 0) out[k] = filtered;
-              }
-            });
-          }
+          days.forEach((d) => {
+            const slate = buildFullDaySlots(d);
+            if (slate.length > 0) out[ymd(d)] = slate;
+          });
           setSlotsByDay(out);
           setLastUpdated(new Date());
           setLastReason(reason);
@@ -155,12 +151,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           if (isInitial) {
             const firstWith = days.find((d) => out[ymd(d)]?.length);
             setSelectedDay(firstWith ? ymd(firstWith) : null);
-          } else {
-            // If currently selected slot disappeared, clear it
-            setSelectedSlot((cur) => {
-              if (!cur || !selectedDay) return cur;
-              return out[selectedDay]?.includes(cur) ? cur : null;
-            });
           }
         })
         .catch((e: Error) => { if (!cancelled && isInitial) setLoadError(e.message || "Could not load times."); })
