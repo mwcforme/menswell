@@ -26,9 +26,7 @@ const URGENCY_SUB: Record<UrgencyTier, string> = {
 const BookSchedule = () => {
   const navigate = useNavigate();
   const state = useBookingSync();
-  const [searchParams] = useSearchParams();
-  const initialView = searchParams.get("view") === "month" ? "month" : "day";
-  const [view, setView] = useState<"day" | "month">(initialView);
+  const missing0 = false;
   const missing = !state.symptom || !state.duration;
 
   const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
