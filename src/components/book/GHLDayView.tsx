@@ -102,6 +102,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       .filter((d) => d >= today);
   }, [weekStart, today]);
 
+  const [refreshNonce, setRefreshNonce] = useState(0);
+
   useEffect(() => {
     let cancelled = false;
     const start = new Date(weekStart);
@@ -109,7 +111,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const end = new Date(weekStart);
     end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
-    const load = (isInitial: boolean) => {
+    const load = (reason: "initial" | "timer" | "focus" | "manual") => {
+      const isInitial = reason === "initial";
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
@@ -128,6 +131,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             });
           }
           setSlotsByDay(out);
+          setLastUpdated(new Date());
+          setLastReason(reason);
+          setNowTick(Date.now());
           if (isInitial) {
             const firstWith = days.find((d) => out[ymd(d)]?.length);
             setSelectedDay(firstWith ? ymd(firstWith) : null);
@@ -143,10 +149,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         .finally(() => { if (!cancelled && isInitial) setLoading(false); });
     };
 
-    load(true);
+    load(refreshNonce > 0 ? "manual" : "initial");
     // Realtime refresh every 30s, plus on tab focus
-    const interval = window.setInterval(() => load(false), 30_000);
-    const onFocus = () => load(false);
+    const interval = window.setInterval(() => load("timer"), 30_000);
+    const onFocus = () => load("focus");
     window.addEventListener("focus", onFocus);
 
     return () => {
@@ -155,7 +161,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       window.removeEventListener("focus", onFocus);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weekStart, location]);
+  }, [weekStart, location, refreshNonce]);
 
   const times = selectedDay ? slotsByDay[selectedDay] || [] : [];
   const canConfirm = Boolean(selectedSlot);
