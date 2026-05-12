@@ -18,16 +18,27 @@ const StepOne = ({ onNext }: StepOneProps) => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [consent, setConsent] = useState(true);
+  const [consent, setConsent] = useState(false);
 
-  const validate = () => {
-    setErrors({});
-    return true;
-  };
+  // E.164-friendly: accept 10 digits (US) or 11 starting with 1
+  const normalizedDigits = phone.replace(/\D/g, "");
+  const validPhone = normalizedDigits.length === 10 || (normalizedDigits.length === 11 && normalizedDigits.startsWith("1"));
+  const validName = firstName.trim().length >= 2;
+  const validLocation = !!location;
+  const canSubmit = validName && validPhone && validLocation && consent;
 
   const handleSubmit = () => {
-    if (validate()) onNext({ firstName: firstName.trim(), phone, location });
+    const e: Record<string, string> = {};
+    if (!validName) e.firstName = "Please enter your full name";
+    if (!validPhone) e.phone = "Enter a valid 10-digit phone number";
+    if (!validLocation) e.location = "Select a location";
+    if (!consent) e.consent = "Please agree to be contacted";
+    setErrors(e);
+    if (Object.keys(e).length > 0) return;
+    const e164 = normalizedDigits.length === 10 ? `+1${normalizedDigits}` : `+${normalizedDigits}`;
+    onNext({ firstName: firstName.trim(), phone: e164, location });
   };
+
 
   const inputStyle: React.CSSProperties = {
     height: 52,
