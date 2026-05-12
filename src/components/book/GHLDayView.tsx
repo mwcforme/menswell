@@ -143,32 +143,12 @@ const daysFromTodayET = (day: Date): number => {
   return Math.round((dayUTC - todayUTC) / 86_400_000);
 };
 
-// Artificial scarcity: today/tomorrow/day-after show only 2 slots (mid-morning + mid-afternoon when possible).
-const applyScarcity = (day: Date, slots: string[]): string[] => {
+// Artificial scarcity badge count: today/tomorrow/day-after show "2 OPEN".
+// This is display-only; the actual time grid still shows every 8a–5p slot.
+const scarcityDisplayCount = (day: Date, actualCount: number): number => {
   const offset = daysFromTodayET(day);
-  if (offset < 0 || offset > 2) return slots;
-  if (slots.length <= 2) return slots;
-  const preferredHours = [10, 14]; // 10 AM and 2 PM ET
-  const picked: string[] = [];
-  for (const iso of slots) {
-    const h = new Date(iso).getUTCHours();
-    // We can't easily extract ET hour from UTC without offset; use index-based fallback below.
-    void h;
-  }
-  // Pick by ET wall-clock hour using the original index ordering (slots are 8..16 in order).
-  const dateStr = ymd(day);
-  for (const ph of preferredHours) {
-    const target = etWallToDate(dateStr, ph).toISOString();
-    if (slots.includes(target)) picked.push(target);
-  }
-  // If today already cut off some hours, fall back to first available
-  if (picked.length < 2) {
-    for (const iso of slots) {
-      if (!picked.includes(iso)) picked.push(iso);
-      if (picked.length === 2) break;
-    }
-  }
-  return picked.sort();
+  if (offset < 0 || offset > 2) return actualCount;
+  return Math.min(2, actualCount);
 };
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
@@ -222,7 +202,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           if (cancelled) return;
           const out: Record<string, string[]> = {};
           days.forEach((d) => {
-            const slate = applyScarcity(d, buildFullDaySlots(d));
+            const slate = buildFullDaySlots(d);
             if (slate.length > 0) out[ymd(d)] = slate;
           });
           setSlotsByDay(out);
@@ -372,8 +352,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             >
               {days.map((d) => {
                 const key = ymd(d);
-                const count = slotsByDay[key]?.length || 0;
-                const available = count > 0;
+                const actualCount = slotsByDay[key]?.length || 0;
+                const count = scarcityDisplayCount(d, actualCount);
+                const available = actualCount > 0;
                 const selected = selectedDay === key;
                 const isToday = ymd(today) === key;
                 const badgeText = !loading
