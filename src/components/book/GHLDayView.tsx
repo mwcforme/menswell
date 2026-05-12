@@ -218,9 +218,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
 
     load(refreshNonce > 0 ? "manual" : "initial");
-    // Realtime refresh every 30 min, plus on tab focus
+    // Auto-refresh every 30 min. On tab focus, only refresh if data is >5 min old.
     const interval = window.setInterval(() => load("timer"), 30 * 60 * 1000);
-    const onFocus = () => load("focus");
+    const onFocus = () => {
+      // Read freshest lastUpdated from closure-safe ref via state setter pattern
+      // (acceptable here: at worst we refresh once when not strictly needed)
+      const last = lastUpdatedRef.current;
+      if (!last || Date.now() - last.getTime() > 5 * 60 * 1000) load("focus");
+    };
     window.addEventListener("focus", onFocus);
 
     return () => {
