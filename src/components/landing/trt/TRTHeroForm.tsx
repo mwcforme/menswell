@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
+import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
+import { heroLeadSchema, type HeroLeadInput } from "@/domain/leads/leadFormSchema";
+import { getBookingState, toQueryString } from "@/lib/bookingState";
 
 const formatPhone = (v: string) => {
   const d = v.replace(/\D/g, "").slice(0, 10);
@@ -10,35 +12,42 @@ const formatPhone = (v: string) => {
 };
 
 export const TRTHeroForm = () => {
-  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [location, setLocation] = useState("");
   const [tcpa, setTcpa] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [focused, setFocused] = useState<string | null>(null);
 
-  const validatePhone = (v: string) => v.replace(/\D/g, "").length === 10;
-  const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+  const controller = useLeadSubmitController<HeroLeadInput>({
+    schema: heroLeadSchema,
+    source: "landing-page-hero",
+    toLeadInput: (v) => {
+      const [first, ...rest] = v.name.trim().split(/\s+/);
+      return {
+        firstName: first || "Guest",
+        lastName: rest.join(" ") || undefined,
+        email: v.email,
+        phone: v.phone,
+      };
+    },
+    onSuccess: (_r, v) => {
+      // Persist service tag and route to symptom step with full state in URL.
+      const merged = getBookingState();
+      const qs = toQueryString({ ...merged, location: v.location, service: "trt" });
+      // Use replace-style nav via window so back-button doesn't trap on the LP form.
+      window.location.assign(`/book/symptom?${qs}`);
+    },
+    // Hero form shows inline errors only — keep the legacy "no toast" behavior.
+    toastOnError: false,
+  });
+
+  const errors = controller.fieldErrors;
+  const isSubmitting = controller.isSubmitting;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = "Full name is required";
-    if (!validatePhone(phone)) errs.phone = "Valid 10-digit phone required";
-    if (!validateEmail(email)) errs.email = "Valid email is required";
-    if (!location) errs.location = "Please select a location";
-    if (!tcpa) errs.tcpa = "Consent required to continue";
-    setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
-
-    import("@/lib/bookingState").then(({ updateBookingState, toQueryString }) => {
-      const state = updateBookingState({
-        name, phone, email, location, source: "landing-page-hero", service: "trt",
-      });
-      navigate(`/book/symptom?${toQueryString(state)}`);
-    });
+    void controller.submit({ name, phone, email, location, tcpa });
   };
 
   const inputBase = (field: string): React.CSSProperties => ({
@@ -163,7 +172,8 @@ export const TRTHeroForm = () => {
 
         <button
           type="submit"
-          className="w-full uppercase font-bold cursor-pointer"
+          disabled={isSubmitting}
+          className="w-full uppercase font-bold cursor-pointer inline-flex items-center justify-center gap-2"
           style={{
             height: 56,
             background: "#E8670A",
@@ -174,12 +184,15 @@ export const TRTHeroForm = () => {
             letterSpacing: "0.08em",
             fontFamily: "Inter, sans-serif",
             marginTop: 4,
+            opacity: isSubmitting ? 0.85 : 1,
+            cursor: isSubmitting ? "wait" : "pointer",
             transition: "background-color 180ms ease, transform 180ms ease",
           }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#CF5B09"; e.currentTarget.style.transform = "scale(1.01)"; }}
+          onMouseEnter={(e) => { if (!isSubmitting) { e.currentTarget.style.background = "#CF5B09"; e.currentTarget.style.transform = "scale(1.01)"; } }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; e.currentTarget.style.transform = "scale(1)"; }}
         >
-          Book My Consult
+          {isSubmitting && <Loader2 size={16} className="animate-spin" />}
+          {isSubmitting ? "Booking..." : "Book My Consult"}
         </button>
 
         <label className="flex items-start gap-3 cursor-pointer -m-2 p-2 rounded-lg transition-colors hover:bg-white/5">
@@ -195,6 +208,9 @@ export const TRTHeroForm = () => {
           </span>
         </label>
         {errors.tcpa && <p className="text-xs" style={{ color: "#FF8A8A" }}>{errors.tcpa}</p>}
+        {controller.error && !Object.keys(errors).length && (
+          <p className="text-xs" style={{ color: "#FF8A8A" }}>{controller.error}</p>
+        )}
       </form>
 
       <p className="text-center mt-4 inline-flex items-center justify-center gap-1.5 w-full" style={{ color: "rgba(245,240,235,0.60)", fontFamily: "Inter, sans-serif", fontSize: 12 }}>
