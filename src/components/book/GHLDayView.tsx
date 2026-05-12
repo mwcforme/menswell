@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Clock, MapPin, CalendarCheck } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   CENTER_CALENDARS,
@@ -21,13 +21,19 @@ interface Props {
   onBooked?: (slotIso: string) => void;
 }
 
-const NAVY = "#000814";
-const NAVY_CARD = "#0B1029";
-const NAVY_BORDER = "rgba(255,255,255,0.10)";
+// Brand tokens (light surface, navy ink, orange accent)
+const INK = "#0B1029";
+const INK_SOFT = "#3A4258";
+const MUTED = "#6B7280";
+const LINE = "#E5E7EB";
+const SURFACE = "#FFFFFF";
+const CANVAS = "#F7F8FB";
 const ORANGE = "#E8670A";
-const TEXT = "#FFFFFF";
-const MUTED = "rgba(255,255,255,0.65)";
-const DIM = "rgba(255,255,255,0.35)";
+const ORANGE_SOFT = "#FFF1E6";
+
+// Business hours
+const HOUR_MIN = 8;   // 8 AM
+const HOUR_MAX = 17;  // 5 PM (exclusive at 5:00)
 
 const ymd = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -45,7 +51,9 @@ const fmtMonthDay = (d: Date) =>
   d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
 const fmtWeekRange = (start: Date) => {
   const end = new Date(start); end.setDate(end.getDate() + 6);
-  return `WEEK OF ${start.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase()}`;
+  const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  return `${s} – ${e}`;
 };
 const fmtTimeParts = (iso: string) => {
   const s = new Date(iso).toLocaleTimeString("en-US", {
@@ -55,10 +63,16 @@ const fmtTimeParts = (iso: string) => {
   return { time, ampm };
 };
 const fmtFullDay = (d: Date) =>
-  d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
+  d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
+
+// Filter to business hours 8a–5p
+const inBusinessHours = (iso: string) => {
+  const h = new Date(iso).getHours();
+  return h >= HOUR_MIN && h < HOUR_MAX;
+};
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
-  const today = useMemo(() => { const t = new Date(); t.setHours(0,0,0,0); return t; }, []);
+  const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
   const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
@@ -71,11 +85,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const cal = CENTER_CALENDARS[location];
 
+  // Only future days (today + later) within the visible week
   const days = useMemo(() => {
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d;
-    });
-  }, [weekStart]);
+    return Array.from({ length: 7 })
+      .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
+      .filter((d) => d >= today);
+  }, [weekStart, today]);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,11 +110,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           Object.entries(data as Record<string, unknown>).forEach(([k, v]) => {
             if (k === "traceId") return;
             const slots = (v as { slots?: string[] })?.slots;
-            if (Array.isArray(slots) && slots.length > 0) out[k] = slots;
+            if (Array.isArray(slots)) {
+              const filtered = slots.filter(inBusinessHours);
+              if (filtered.length > 0) out[k] = filtered;
+            }
           });
         }
         setSlotsByDay(out);
-        // auto-select first day with slots
         const firstWith = days.find((d) => out[ymd(d)]?.length);
         setSelectedDay(firstWith ? ymd(firstWith) : null);
       })
@@ -137,103 +154,164 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   return (
     <>
-      <div style={{ background: NAVY, border: `1px solid ${NAVY_BORDER}`, borderRadius: 14, overflow: "hidden", color: TEXT, fontFamily: "Inter, system-ui, sans-serif" }}>
+      <div
+        style={{
+          background: SURFACE,
+          border: `1px solid ${LINE}`,
+          borderRadius: 16,
+          overflow: "hidden",
+          color: INK,
+          fontFamily: "Inter, system-ui, sans-serif",
+          boxShadow: "0 1px 2px rgba(11,16,41,0.04), 0 24px 48px -24px rgba(11,16,41,0.18)",
+        }}
+      >
         {/* HEADER */}
-        <div className="px-4 md:px-6 pt-5 md:pt-7 pb-4">
-          <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, letterSpacing: "0.02em", fontSize: "clamp(22px, 3vw, 30px)", lineHeight: 1.05 }}>
-            PICK A DAY
+        <div
+          className="px-5 md:px-7 pt-6 md:pt-8 pb-5"
+          style={{ borderBottom: `1px solid ${LINE}`, background: SURFACE }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8, color: ORANGE, fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>
+            <CalendarCheck size={14} strokeWidth={2.5} />
+            <span>Schedule your visit</span>
           </div>
-          <div style={{ color: MUTED, fontSize: 14, marginTop: 4 }}>
-            Next available openings at your {cal.label} clinic.
+          <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, letterSpacing: "0.01em", fontSize: "clamp(22px, 3vw, 30px)", lineHeight: 1.1, color: INK }}>
+            Pick a day at the {cal.label} clinic
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, color: MUTED, fontSize: 13, marginTop: 8, flexWrap: "wrap" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <Clock size={14} /> 30 min consult
+            </span>
+            <span style={{ width: 4, height: 4, borderRadius: 999, background: LINE }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <MapPin size={14} /> In-person
+            </span>
+            <span style={{ width: 4, height: 4, borderRadius: 999, background: LINE }} />
+            <span>Hours: 8 AM – 5 PM ET</span>
           </div>
         </div>
 
         {/* WEEK NAV */}
-        <div className="px-4 md:px-6 flex items-center justify-between gap-2" style={{ marginBottom: 12 }}>
+        <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
           <button
             type="button"
             disabled={prevDisabled}
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
+            aria-label="Previous week"
             style={{
-              background: "transparent", color: TEXT, border: `1px solid ${NAVY_BORDER}`,
-              borderRadius: 8, padding: "8px 12px", fontSize: 13, fontWeight: 600,
-              cursor: prevDisabled ? "not-allowed" : "pointer", opacity: prevDisabled ? 0.4 : 1,
+              background: SURFACE, color: INK, border: `1px solid ${LINE}`,
+              borderRadius: 999, padding: "8px 12px",
+              fontSize: 13, fontWeight: 600,
+              display: "inline-flex", alignItems: "center", gap: 6,
+              cursor: prevDisabled ? "not-allowed" : "pointer",
+              opacity: prevDisabled ? 0.4 : 1,
             }}
           >
-            ← Prev week
+            <ChevronLeft size={16} /> Prev
           </button>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", color: MUTED }}>
+          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
             {fmtWeekRange(weekStart)}
           </div>
           <button
             type="button"
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
+            aria-label="Next week"
             style={{
-              background: "transparent", color: TEXT, border: `1px solid ${NAVY_BORDER}`,
-              borderRadius: 8, padding: "8px 12px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+              background: SURFACE, color: INK, border: `1px solid ${LINE}`,
+              borderRadius: 999, padding: "8px 12px",
+              fontSize: 13, fontWeight: 600,
+              display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer",
             }}
           >
-            Next week →
+            Next <ChevronRight size={16} />
           </button>
         </div>
 
         {/* DAY PILLS */}
-        <div className="px-4 md:px-6 pb-5" style={{ position: "relative" }}>
+        <div className="px-5 md:px-7 py-5" style={{ position: "relative" }}>
           {loading && (
-            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,8,20,0.55)", zIndex: 1 }}>
-              <Loader2 size={22} className="animate-spin" color={TEXT} />
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.7)", zIndex: 1 }}>
+              <Loader2 size={22} className="animate-spin" color={INK} />
             </div>
           )}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
-            {days.map((d) => {
-              const key = ymd(d);
-              const isPast = d < today;
-              const count = slotsByDay[key]?.length || 0;
-              const available = !isPast && count > 0;
-              const selected = selectedDay === key;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  disabled={!available}
-                  onClick={() => { setSelectedDay(key); setSelectedSlot(null); }}
-                  style={{
-                    background: selected ? ORANGE : NAVY_CARD,
-                    border: `1px solid ${selected ? ORANGE : NAVY_BORDER}`,
-                    borderRadius: 10, padding: "10px 6px",
-                    color: selected ? TEXT : available ? TEXT : DIM,
-                    cursor: available ? "pointer" : "not-allowed",
-                    textAlign: "center",
-                    transition: "background 120ms ease",
-                  }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: selected ? TEXT : MUTED, marginBottom: 4 }}>
-                    {fmtDayShort(d)}
-                  </div>
-                  <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 15, letterSpacing: "0.02em" }}>
-                    {fmtMonthDay(d)}
-                  </div>
-                  {available && count <= 3 && (
-                    <div style={{ fontSize: 10, fontWeight: 700, color: selected ? TEXT : ORANGE, marginTop: 4, letterSpacing: "0.06em" }}>
-                      {count} LEFT
+          {days.length === 0 ? (
+            <div style={{ color: MUTED, fontSize: 14, fontStyle: "italic", padding: "12px 4px" }}>
+              No remaining days this week. Tap Next.
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${Math.min(days.length, 7)}, minmax(0, 1fr))`,
+                gap: 8,
+              }}
+            >
+              {days.map((d) => {
+                const key = ymd(d);
+                const count = slotsByDay[key]?.length || 0;
+                const available = count > 0;
+                const selected = selectedDay === key;
+                const isToday = ymd(today) === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    disabled={!available}
+                    onClick={() => { setSelectedDay(key); setSelectedSlot(null); }}
+                    style={{
+                      background: selected ? INK : available ? SURFACE : CANVAS,
+                      border: `1px solid ${selected ? INK : LINE}`,
+                      borderRadius: 12, padding: "12px 6px",
+                      color: selected ? "#FFFFFF" : available ? INK : "#C5CAD3",
+                      cursor: available ? "pointer" : "not-allowed",
+                      textAlign: "center",
+                      transition: "background 120ms ease, transform 120ms ease",
+                      position: "relative",
+                    }}
+                  >
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: selected ? "rgba(255,255,255,0.7)" : MUTED, marginBottom: 4 }}>
+                      {isToday ? "TODAY" : fmtDayShort(d)}
                     </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "0.02em" }}>
+                      {fmtMonthDay(d)}
+                    </div>
+                    {available && count <= 3 && (
+                      <div
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: selected ? "#FFFFFF" : ORANGE,
+                          background: selected ? "rgba(255,255,255,0.15)" : ORANGE_SOFT,
+                          marginTop: 6,
+                          letterSpacing: "0.06em",
+                          padding: "2px 6px",
+                          borderRadius: 999,
+                          display: "inline-block",
+                        }}
+                      >
+                        {count} LEFT
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
           {loadError && (
-            <div style={{ marginTop: 10, fontSize: 13, color: "#FCA5A5" }}>{loadError}</div>
+            <div style={{ marginTop: 10, fontSize: 13, color: "#B91C1C" }}>{loadError}</div>
           )}
         </div>
 
         {/* TIMES */}
-        <div className="px-4 md:px-6 pb-5" style={{ borderTop: `1px solid ${NAVY_BORDER}`, paddingTop: 20 }}>
-          <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.4vw, 22px)", letterSpacing: "0.02em" }}>
-            PICK A TIME{selectedDay && ` · ${fmtFullDay(new Date(selectedDay + "T12:00:00"))}`}
-          </div>
-          <div style={{ color: MUTED, fontSize: 13, marginTop: 4, marginBottom: 16 }}>
-            All consults are 30 minutes, in-person.
+        <div className="px-5 md:px-7 pb-6" style={{ borderTop: `1px solid ${LINE}`, paddingTop: 22, background: CANVAS }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+            <div>
+              <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.4vw, 22px)", letterSpacing: "0.01em", color: INK }}>
+                {selectedDay ? `Pick a time, ${fmtFullDay(new Date(selectedDay + "T12:00:00"))}` : "Pick a time"}
+              </div>
+              <div style={{ color: MUTED, fontSize: 13, marginTop: 4 }}>
+                Times shown in clinic local time (ET).
+              </div>
+            </div>
           </div>
 
           {!selectedDay ? (
@@ -242,10 +320,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : times.length === 0 ? (
             <div style={{ color: MUTED, fontSize: 14, fontStyle: "italic", padding: "20px 4px" }}>
-              No times available on this day.
+              No times available on this day between 8 AM and 5 PM.
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {times.map((iso) => {
                 const active = iso === selectedSlot;
                 const { time, ampm } = fmtTimeParts(iso);
@@ -255,48 +333,52 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     type="button"
                     onClick={() => setSelectedSlot(iso)}
                     style={{
-                      background: active ? ORANGE : NAVY_CARD,
-                      border: `1px solid ${active ? ORANGE : NAVY_BORDER}`,
-                      borderRadius: 10, padding: "16px 18px",
+                      background: active ? ORANGE : SURFACE,
+                      border: `1px solid ${active ? ORANGE : LINE}`,
+                      borderRadius: 12, padding: "16px 18px",
                       display: "flex", alignItems: "center", justifyContent: "space-between",
-                      color: TEXT, cursor: "pointer", textAlign: "left",
-                      transition: "background 120ms ease",
+                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "left",
+                      boxShadow: active
+                        ? "0 8px 20px -10px rgba(232,103,10,0.55)"
+                        : "0 1px 0 rgba(11,16,41,0.02)",
+                      transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
                         {time}
                       </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? TEXT : MUTED }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.85)" : MUTED }}>
                         {ampm}
                       </span>
                     </div>
-                    <span style={{ fontSize: 18, color: active ? TEXT : MUTED }}>→</span>
+                    <span style={{ fontSize: 18, color: active ? "#FFFFFF" : MUTED }}>→</span>
                   </button>
                 );
               })}
             </div>
           )}
-
-          <div style={{ marginTop: 18, fontSize: 12, color: DIM }}>
-            Times shown in clinic local time (ET).
-          </div>
         </div>
 
         {/* CONFIRM BAR */}
-        <div className="px-4 md:px-6 py-4" style={{ borderTop: `1px solid ${NAVY_BORDER}`, background: NAVY_CARD }}>
+        <div
+          className="px-5 md:px-7 py-4"
+          style={{ borderTop: `1px solid ${LINE}`, background: SURFACE }}
+        >
           <button
             type="button"
             onClick={() => canConfirm && setModalOpen(true)}
             disabled={!canConfirm}
             style={{
               width: "100%", minHeight: 56,
-              background: canConfirm ? ORANGE : "rgba(255,255,255,0.08)",
-              color: canConfirm ? TEXT : MUTED,
-              border: 0, borderRadius: 10, fontSize: 16, fontWeight: 700,
+              background: canConfirm ? ORANGE : "#F1F2F5",
+              color: canConfirm ? "#FFFFFF" : "#9AA0AC",
+              border: 0, borderRadius: 12, fontSize: 16, fontWeight: 700,
               letterSpacing: "0.06em", textTransform: "uppercase",
               cursor: canConfirm ? "pointer" : "not-allowed",
               fontFamily: "Oswald, Inter, sans-serif",
+              boxShadow: canConfirm ? "0 10px 24px -10px rgba(232,103,10,0.55)" : "none",
+              transition: "transform 120ms ease, box-shadow 120ms ease",
             }}
           >
             {canConfirm && selectedSlot
@@ -307,13 +389,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       </div>
 
       <Dialog open={modalOpen} onOpenChange={(o) => !submitting && setModalOpen(o)}>
-        <DialogContent className="sm:max-w-md" style={{ background: NAVY, color: TEXT, border: `1px solid ${NAVY_BORDER}`, fontFamily: "Inter, sans-serif" }}>
+        <DialogContent className="sm:max-w-md" style={{ background: SURFACE, color: INK, border: `1px solid ${LINE}`, fontFamily: "Inter, sans-serif" }}>
           <DialogHeader>
-            <DialogTitle style={{ color: TEXT, fontFamily: "Oswald, Inter, sans-serif", letterSpacing: "0.02em" }}>
-              CONFIRM YOUR APPOINTMENT
+            <DialogTitle style={{ color: INK, fontFamily: "Oswald, Inter, sans-serif", letterSpacing: "0.02em" }}>
+              Confirm your appointment
             </DialogTitle>
           </DialogHeader>
-          <div style={{ background: NAVY_CARD, border: `1px solid ${NAVY_BORDER}`, borderRadius: 10, padding: 16, marginTop: 4 }}>
+          <div style={{ background: CANVAS, border: `1px solid ${LINE}`, borderRadius: 12, padding: 16, marginTop: 4 }}>
             <div style={{ fontSize: 12, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 8 }}>
               You're booking
             </div>
@@ -321,20 +403,20 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
               New Patient Consultation (30 min)
             </div>
             {selectedSlot && (
-              <div style={{ fontSize: 15, color: TEXT, marginBottom: 4 }}>
+              <div style={{ fontSize: 15, color: INK, marginBottom: 4 }}>
                 {fmtFullDay(new Date(selectedSlot))} · {fmtTimeParts(selectedSlot).time} {fmtTimeParts(selectedSlot).ampm} ET
               </div>
             )}
-            <div style={{ fontSize: 14, color: MUTED }}>{cal.label} — In-person</div>
+            <div style={{ fontSize: 14, color: MUTED }}>{cal.label}, In-person</div>
             {fullName && (
               <div style={{ fontSize: 14, color: MUTED, marginTop: 8 }}>
-                Under: <strong style={{ color: TEXT }}>{fullName}</strong>
+                Under: <strong style={{ color: INK }}>{fullName}</strong>
               </div>
             )}
           </div>
 
           {submitError && (
-            <div style={{ marginTop: 12, padding: "10px 12px", background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.45)", borderRadius: 8, color: "#FCA5A5", fontSize: 13 }}>
+            <div style={{ marginTop: 12, padding: "10px 12px", background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 8, color: "#B91C1C", fontSize: 13 }}>
               {submitError}
             </div>
           )}
@@ -346,12 +428,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
               disabled={submitting}
               style={{
                 width: "100%", minHeight: 52,
-                background: ORANGE, color: TEXT,
-                border: 0, borderRadius: 10, fontSize: 15, fontWeight: 700,
+                background: ORANGE, color: "#FFFFFF",
+                border: 0, borderRadius: 12, fontSize: 15, fontWeight: 700,
                 letterSpacing: "0.06em", textTransform: "uppercase",
                 cursor: submitting ? "wait" : "pointer", opacity: submitting ? 0.85 : 1,
                 fontFamily: "Oswald, Inter, sans-serif",
                 display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+                boxShadow: "0 10px 24px -10px rgba(232,103,10,0.55)",
               }}
             >
               {submitting && <Loader2 size={16} className="animate-spin" />}
