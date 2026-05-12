@@ -264,7 +264,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14, color: MUTED, fontSize: 13, marginTop: 8, flexWrap: "wrap" }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <Clock size={14} /> 30 min consult
+              <Clock size={14} /> 60 min consult
             </span>
             <span style={{ width: 4, height: 4, borderRadius: 999, background: LINE }} />
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -542,7 +542,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
               You're booking
             </div>
             <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>
-              New Patient Consultation (30 min)
+              New Patient Consultation (60 min)
             </div>
             {selectedSlot && (
               <div style={{ fontSize: 15, color: INK, marginBottom: 4 }}>
