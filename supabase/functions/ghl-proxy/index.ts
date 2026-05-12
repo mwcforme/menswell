@@ -1,4 +1,4 @@
-// ghl-proxy v2 — manual CORS
+// ghl-proxy v3 — route allowlist + manual CORS
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -10,12 +10,21 @@ const API_BASE = "https://services.leadconnectorhq.com";
 const LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
 const API_VERSION = "2021-07-28";
 
+// Strict allowlist: only these (method, path-pattern) pairs are forwarded to GHL.
+// Anything else returns 403. This prevents the anon-callable proxy from being
+// abused to enumerate contacts, delete appointments, etc.
+const ALLOW: { m: string; re: RegExp }[] = [
+  { m: "GET",  re: /^\/calendars\/[A-Za-z0-9_-]+\/free-slots$/ },
+  { m: "POST", re: /^\/contacts\/upsert$/ },
+  { m: "POST", re: /^\/calendars\/events\/appointments$/ },
+];
+
 interface ProxyRequest {
-  path: string;                          // e.g. "/contacts/" or "/calendars/events"
+  path: string;
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   query?: Record<string, string | number | boolean>;
   body?: unknown;
-  injectLocationId?: boolean;            // default true; injects locationId into body or query
+  injectLocationId?: boolean;
 }
 
 const json = (status: number, data: unknown) =>
@@ -23,6 +32,57 @@ const json = (status: number, data: unknown) =>
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+
+// Lightweight body-shape validators (avoids Zod dep). Keep additive: unknown
+// fields are dropped rather than rejected so GHL schema changes don't 500 us.
+const isStr = (v: unknown): v is string => typeof v === "string" && v.length > 0 && v.length < 500;
+const isOptStr = (v: unknown) => v === undefined || isStr(v);
+
+function validateBody(method: string, path: string, body: unknown): { ok: true; body: Record<string, unknown> } | { ok: false; error: string } {
+  if (method === "GET" || method === "DELETE") return { ok: true, body: {} };
+  if (!body || typeof body !== "object" || Array.isArray(body)) return { ok: false, error: "body must be an object" };
+  const b = body as Record<string, unknown>;
+
+  if (path === "/contacts/upsert") {
+    if (!isStr(b.firstName)) return { ok: false, error: "firstName required" };
+    if (!isOptStr(b.lastName)) return { ok: false, error: "lastName invalid" };
+    if (!isOptStr(b.email)) return { ok: false, error: "email invalid" };
+    if (!isOptStr(b.phone)) return { ok: false, error: "phone invalid" };
+    if (!isOptStr(b.source)) return { ok: false, error: "source invalid" };
+    return {
+      ok: true,
+      body: {
+        firstName: b.firstName,
+        ...(b.lastName ? { lastName: b.lastName } : {}),
+        ...(b.email ? { email: b.email } : {}),
+        ...(b.phone ? { phone: b.phone } : {}),
+        ...(b.source ? { source: b.source } : {}),
+      },
+    };
+  }
+
+  if (path === "/calendars/events/appointments") {
+    if (!isStr(b.calendarId)) return { ok: false, error: "calendarId required" };
+    if (!isStr(b.contactId)) return { ok: false, error: "contactId required" };
+    if (!isStr(b.startTime)) return { ok: false, error: "startTime required" };
+    return {
+      ok: true,
+      body: {
+        calendarId: b.calendarId,
+        contactId: b.contactId,
+        startTime: b.startTime,
+        ...(isStr(b.endTime) ? { endTime: b.endTime } : {}),
+        title: isStr(b.title) ? b.title : "Consultation",
+        appointmentStatus: "confirmed",
+        ignoreDateRange: false,
+        toNotify: true,
+        ...(isStr(b.notes) ? { notes: b.notes } : {}),
+      },
+    };
+  }
+
+  return { ok: false, error: "unsupported path" };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -37,25 +97,31 @@ Deno.serve(async (req) => {
     return json(400, { error: "Invalid JSON body" });
   }
 
-  const { path, method = "GET", query = {}, body, injectLocationId = true } = payload;
+  const { path, method = "GET", query = {}, body } = payload;
   if (!path || typeof path !== "string" || !path.startsWith("/")) {
     return json(400, { error: "`path` must start with /" });
   }
 
+  // Allowlist check — strip query/hash before matching
+  const cleanPath = path.split("?")[0].split("#")[0];
+  const allowed = ALLOW.some((a) => a.m === method && a.re.test(cleanPath));
+  if (!allowed) return json(403, { error: "endpoint not allowed" });
+
+  const validated = validateBody(method, cleanPath, body);
+  if (!validated.ok) return json(400, { error: validated.error });
+
   const search = new URLSearchParams();
-  for (const [k, v] of Object.entries(query)) search.set(k, String(v));
-  if (injectLocationId && (method === "GET" || method === "DELETE") && !search.has("locationId")) {
-    search.set("locationId", LOCATION_ID);
+  for (const [k, v] of Object.entries(query)) {
+    if (k === "locationId") continue; // server-injected only
+    search.set(k, String(v));
   }
-  const url = `${API_BASE}${path}${search.toString() ? `?${search}` : ""}`;
+  if (method === "GET" && !search.has("locationId")) search.set("locationId", LOCATION_ID);
+
+  const url = `${API_BASE}${cleanPath}${search.toString() ? `?${search}` : ""}`;
 
   let outBody: string | undefined;
-  if (body !== undefined && method !== "GET" && method !== "DELETE") {
-    const merged =
-      injectLocationId && body && typeof body === "object" && !Array.isArray(body)
-        ? { locationId: LOCATION_ID, ...(body as Record<string, unknown>) }
-        : body;
-    outBody = JSON.stringify(merged);
+  if (method !== "GET" && method !== "DELETE") {
+    outBody = JSON.stringify({ locationId: LOCATION_ID, ...validated.body });
   }
 
   try {
