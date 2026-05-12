@@ -65,15 +65,40 @@ const fmtTimeParts = (iso: string) => {
 const fmtFullDay = (d: Date) =>
   d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
 
-// Get the America/New_York UTC offset string (e.g. "-04:00") for a given calendar date.
-// Handles DST automatically.
-const etOffset = (day: Date): string => {
-  const probe = new Date(`${ymd(day)}T12:00:00Z`);
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: TIMEZONE, timeZoneName: "longOffset",
-  }).formatToParts(probe);
-  const tz = parts.find((p) => p.type === "timeZoneName")?.value || "GMT-05:00";
-  return tz.replace("GMT", "") || "-05:00"; // e.g. "-04:00"
+// Returns the UTC offset (in minutes) of America/New_York for the given UTC instant.
+// e.g. -240 during EDT, -300 during EST. Browser-independent (uses numeric parts only).
+const etOffsetMinutes = (instant: Date): number => {
+  const get = (parts: Intl.DateTimeFormatPart[], type: string) =>
+    parseInt(parts.find((p) => p.type === type)!.value, 10);
+  const fmt = (tz: string) =>
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).formatToParts(instant);
+  const u = fmt("UTC");
+  const e = fmt(TIMEZONE);
+  const utcMs = Date.UTC(
+    get(u, "year"), get(u, "month") - 1, get(u, "day"),
+    get(u, "hour") % 24, get(u, "minute"),
+  );
+  const etMs = Date.UTC(
+    get(e, "year"), get(e, "month") - 1, get(e, "day"),
+    get(e, "hour") % 24, get(e, "minute"),
+  );
+  return Math.round((etMs - utcMs) / 60000);
+};
+
+// Build a Date for the given ET wall-clock time (YYYY-MM-DD + hour, minute=0).
+// Uses ET's offset on that calendar date so display is always 8 AM..5 PM ET.
+const etWallToDate = (ymdStr: string, hour: number): Date => {
+  const [y, m, d] = ymdStr.split("-").map((n) => parseInt(n, 10));
+  // Probe at noon UTC on that date to get a stable ET offset (avoids DST edge ambiguity).
+  const probe = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+  const offsetMin = etOffsetMinutes(probe); // e.g. -240
+  // ET wall hour H corresponds to UTC = H - offsetMin (in minutes).
+  const utcMs = Date.UTC(y, m - 1, d, hour, 0, 0) - offsetMin * 60_000;
+  return new Date(utcMs);
 };
 
 // Current hour in America/New_York (0-23).
@@ -93,15 +118,15 @@ const isTodayET = (day: Date): boolean => {
   return today === ymd(day);
 };
 
-// Always render the full 8am–5pm hourly slate (overbooking model), in ET.
+// Always render the full 8am–5pm ET hourly slate (overbooking model).
 // For today, omit hours that have already passed in ET.
 const buildFullDaySlots = (day: Date): string[] => {
   const out: string[] = [];
-  const offset = etOffset(day);
   const cutoffHour = isTodayET(day) ? etHourNow() : -1;
+  const dateStr = ymd(day);
   for (let h = HOUR_MIN; h < HOUR_MAX; h++) {
     if (h <= cutoffHour) continue;
-    out.push(`${ymd(day)}T${String(h).padStart(2, "0")}:00:00${offset}`);
+    out.push(etWallToDate(dateStr, h).toISOString());
   }
   return out;
 };
