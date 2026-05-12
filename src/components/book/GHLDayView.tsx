@@ -32,8 +32,8 @@ const ORANGE = "#E8670A";
 const ORANGE_SOFT = "#FFF1E6";
 
 // Business hours
-const HOUR_MIN = 8;   // 8 AM
-const HOUR_MAX = 17;  // 5 PM (exclusive at 5:00)
+const HOUR_MIN = 8;   // 8 AM ET
+const HOUR_MAX = 18;  // exclusive — last slot is 5 PM (17:00)
 
 const ymd = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -65,27 +65,43 @@ const fmtTimeParts = (iso: string) => {
 const fmtFullDay = (d: Date) =>
   d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
 
-// Filter to business hours 8a–5p AND enforce 60-min cadence (minute === 0)
-const inBusinessHours = (iso: string) => {
-  const d = new Date(iso);
-  const h = d.getHours();
-  return h >= HOUR_MIN && h < HOUR_MAX && d.getMinutes() === 0;
+// Get the America/New_York UTC offset string (e.g. "-04:00") for a given calendar date.
+// Handles DST automatically.
+const etOffset = (day: Date): string => {
+  const probe = new Date(`${ymd(day)}T12:00:00Z`);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIMEZONE, timeZoneName: "longOffset",
+  }).formatToParts(probe);
+  const tz = parts.find((p) => p.type === "timeZoneName")?.value || "GMT-05:00";
+  return tz.replace("GMT", "") || "-05:00"; // e.g. "-04:00"
 };
 
-// Always render the full 8am–5pm hourly slate (overbooking model).
-// For today, omit hours that have already passed.
+// Current hour in America/New_York (0-23).
+const etHourNow = (): number => {
+  const s = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIMEZONE, hour: "numeric", hour12: false,
+  }).format(new Date());
+  const n = parseInt(s, 10);
+  return n === 24 ? 0 : n;
+};
+
+// Is the local-midnight day "today" in ET?
+const isTodayET = (day: Date): boolean => {
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date()); // "YYYY-MM-DD"
+  return today === ymd(day);
+};
+
+// Always render the full 8am–5pm hourly slate (overbooking model), in ET.
+// For today, omit hours that have already passed in ET.
 const buildFullDaySlots = (day: Date): string[] => {
   const out: string[] = [];
-  const now = new Date();
-  const isToday =
-    day.getFullYear() === now.getFullYear() &&
-    day.getMonth() === now.getMonth() &&
-    day.getDate() === now.getDate();
+  const offset = etOffset(day);
+  const cutoffHour = isTodayET(day) ? etHourNow() : -1;
   for (let h = HOUR_MIN; h < HOUR_MAX; h++) {
-    if (isToday && h <= now.getHours()) continue;
-    const d = new Date(day);
-    d.setHours(h, 0, 0, 0);
-    out.push(d.toISOString());
+    if (h <= cutoffHour) continue;
+    out.push(`${ymd(day)}T${String(h).padStart(2, "0")}:00:00${offset}`);
   }
   return out;
 };
