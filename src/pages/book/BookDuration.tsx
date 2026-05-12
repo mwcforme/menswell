@@ -4,7 +4,6 @@ import { CalendarClock, CalendarDays, CalendarRange, History, ShieldCheck } from
 import BookLayout from "@/components/book/BookLayout";
 import SurveyCard from "@/components/book/SurveyCard";
 import OptionRow from "@/components/book/OptionRow";
-import MissingParamBanner from "@/components/book/MissingParamBanner";
 import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
 
 const OPTIONS = [
