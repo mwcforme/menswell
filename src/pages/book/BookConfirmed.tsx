@@ -1,0 +1,328 @@
+import { CheckCircle2, MapPin, Phone, Play, FlaskConical, ExternalLink } from "lucide-react";
+import BookLayout from "@/components/book/BookLayout";
+import { useBookingSync } from "@/lib/bookingState";
+
+const EXPECT_VIDEO_SRC = "/videos/what-to-expect.mp4";
+
+type CenterInfo = {
+  centerName: string;
+  street: string;
+  cityStateZip: string;
+  phoneDisplay: string;
+  phoneTel: string;
+};
+
+const CENTERS: Record<string, CenterInfo> = {
+  "newport-news": {
+    centerName: "Men's Wellness Centers, Newport News",
+    street: "827 Diligence Drive, Suite 206",
+    cityStateZip: "Newport News, VA 23606",
+    phoneDisplay: "(757) 806-6263",
+    phoneTel: "tel:7578066263",
+  },
+  "virginia-beach": {
+    centerName: "Men's Wellness Centers, Virginia Beach",
+    street: "996 First Colonial Road",
+    cityStateZip: "Virginia Beach, VA 23454",
+    phoneDisplay: "(757) 806-6263",
+    phoneTel: "tel:7578066263",
+  },
+  "richmond": {
+    centerName: "Men's Wellness Centers, Richmond",
+    street: "4050 Innslake Dr, Suite 360",
+    cityStateZip: "Glen Allen, VA 23060",
+    phoneDisplay: "(804) 346-4636",
+    phoneTel: "tel:8043464636",
+  },
+};
+
+const DEFAULT_CENTER = CENTERS["newport-news"];
+
+const BookConfirmed = () => {
+  const state = useBookingSync();
+  const apptTime = state.appointmentTime || "Tuesday, May 12 at 10:30 AM";
+  const center = (state.location && CENTERS[state.location]) || DEFAULT_CENTER;
+  const fullAddress = `${center.centerName}, ${center.street}, ${center.cityStateZip}`;
+  const mapsQuery = encodeURIComponent(fullAddress);
+  const PHONE_DISPLAY = center.phoneDisplay;
+  const PHONE_TEL = center.phoneTel;
+  const firstName = state.name ? state.name.split(" ")[0] : "";
+
+
+  return (
+    <BookLayout page="confirmed" title="You're booked | Men's Wellness Centers">
+      <div
+        className="px-4 md:px-8 py-6 md:py-10 pb-28 md:pb-12"
+        style={{ background: "#000814" }}
+      >
+        <div className="mx-auto flex flex-col gap-8 md:gap-10" style={{ maxWidth: 1100, fontFamily: "Inter, sans-serif" }}>
+
+          {/* Status Header */}
+          <div className="flex flex-col items-center text-center">
+            <div
+              className="flex items-center justify-center mb-4 md:mb-5"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 999,
+                background: "rgba(34,197,94,0.10)",
+                border: "1px solid rgba(34,197,94,0.45)",
+                boxShadow: "0 0 24px rgba(34,197,94,0.18)",
+              }}
+            >
+              <CheckCircle2 size={24} strokeWidth={2.5} style={{ color: "#22C55E" }} />
+            </div>
+            <h1
+              style={{
+                fontFamily: "Oswald, sans-serif",
+                fontWeight: 600,
+                fontSize: "clamp(28px, 4.4vw, 40px)",
+                color: "#FFFFFF",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+                lineHeight: 1.1,
+                marginBottom: 10,
+              }}
+            >
+              Appointment Confirmed
+            </h1>
+            <div
+              className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-base md:text-lg"
+              style={{ color: "rgba(255,255,255,0.55)" }}
+            >
+              {firstName && (
+                <>
+                  <span style={{ color: "#FFFFFF", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.02em" }}>
+                    {firstName}
+                  </span>
+                  <span style={{ opacity: 0.3 }}>|</span>
+                </>
+              )}
+              <span>
+                <span style={{ color: "#FFFFFF", fontWeight: 600 }}>{apptTime}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Two-column grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
+
+            {/* Address Card */}
+            <div
+              className="relative flex flex-col justify-between overflow-hidden"
+              style={{
+                background: "#FFFFFF",
+                borderRadius: 14,
+                padding: "32px 28px",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
+              }}
+            >
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "#E8670A" }} />
+
+              <div>
+                <h2
+                  style={{
+                    fontFamily: "Oswald, sans-serif",
+                    fontWeight: 600,
+                    fontSize: "clamp(20px, 2.4vw, 26px)",
+                    color: "#0B1029",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.02em",
+                    marginBottom: 20,
+                  }}
+                >
+                  Center Location
+                </h2>
+                <div className="flex items-start gap-4">
+                  <MapPin size={26} strokeWidth={2.25} style={{ color: "#E8670A", flexShrink: 0, marginTop: 4 }} />
+                  <div>
+                    <p
+                      className="text-lg md:text-xl"
+                      style={{
+                        color: "#0B1029",
+                        fontWeight: 600,
+                        lineHeight: 1.25,
+                        marginBottom: 4,
+                      }}
+                    >
+                      {center.centerName}
+                    </p>
+                    <p
+                      className="text-base md:text-lg"
+                      style={{ color: "#3A4258", lineHeight: 1.5, fontWeight: 500 }}
+                    >
+                      {center.street}<br />
+                      {center.cityStateZip}
+                    </p>
+                    <div
+                      className="inline-flex items-center gap-1.5 mt-3"
+                      style={{
+                        background: "rgba(34,197,94,0.10)",
+                        border: "1px solid rgba(34,197,94,0.35)",
+                        color: "#0F7A3A",
+                        padding: "4px 10px",
+                        borderRadius: 999,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      <FlaskConical size={12} strokeWidth={2.5} />
+                      Same-Day Labs On Site
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className="relative mt-8 w-full overflow-hidden"
+                style={{
+                  borderRadius: 12,
+                  border: "1px solid rgba(11,16,41,0.12)",
+                  height: 280,
+                }}
+              >
+                <iframe
+                  title={`Map to ${center.centerName}`}
+                  src={`https://www.google.com/maps?q=${mapsQuery}&output=embed`}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  style={{ border: 0, width: "100%", height: "100%", display: "block" }}
+                  allowFullScreen
+                />
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute inline-flex items-center gap-2"
+                  style={{
+                    top: 12,
+                    left: 12,
+                    background: "#FFFFFF",
+                    color: "#1A56DB",
+                    padding: "10px 16px",
+                    borderRadius: 8,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    textDecoration: "none",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.18)",
+                  }}
+                >
+                  Open in Maps
+                  <ExternalLink size={14} strokeWidth={2.5} />
+                </a>
+              </div>
+            </div>
+
+            {/* Video Card */}
+            <div
+              className="relative flex flex-col overflow-hidden"
+              style={{
+                background: "#FFFFFF",
+                borderRadius: 14,
+                boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
+              }}
+            >
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "#0B1029", zIndex: 2 }} />
+
+              <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", background: "#000" }}>
+                <video
+                  src={EXPECT_VIDEO_SRC}
+                  title="What to expect at your visit"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    border: 0,
+                  }}
+                />
+              </div>
+
+              <div className="p-7 md:p-8 flex-1">
+                <div className="flex items-center gap-2 mb-3">
+                  <Play size={18} strokeWidth={2.5} style={{ color: "#E8670A" }} />
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#E8670A",
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    2 Min Watch
+                  </span>
+                </div>
+                <h2
+                  style={{
+                    fontFamily: "Oswald, sans-serif",
+                    fontWeight: 600,
+                    fontSize: "clamp(20px, 2.4vw, 26px)",
+                    color: "#0B1029",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.02em",
+                    marginBottom: 10,
+                  }}
+                >
+                  What To Expect
+                </h2>
+                <p
+                  className="text-base md:text-lg"
+                  style={{ color: "#3A4258", lineHeight: 1.5, fontWeight: 500 }}
+                >
+                  A short overview of your check-in and consultation. Bring photo ID. Eat normally. Arrive 10 minutes early.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <p
+            className="text-center text-sm md:text-base"
+            style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif" }}
+          >
+            Need to reschedule or running late? Call or text{" "}
+            <a
+              href={PHONE_TEL}
+              style={{ color: "#FFFFFF", fontWeight: 700, textDecoration: "underline", textUnderlineOffset: 4 }}
+            >
+              {PHONE_DISPLAY}
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+
+      {/* Sticky mobile tap-to-call */}
+      <a
+        href={PHONE_TEL}
+        aria-label={`Call ${PHONE_DISPLAY}`}
+        className="md:hidden fixed inset-x-0 bottom-0 flex items-center justify-center gap-3 z-50"
+        style={{
+          background: "#E8670A",
+          color: "#FFFFFF",
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 700,
+          fontSize: 22,
+          textDecoration: "none",
+          minHeight: 72,
+          padding: "16px 20px",
+          paddingBottom: "max(16px, env(safe-area-inset-bottom))",
+          boxShadow: "0 -4px 12px rgba(0,0,0,0.25)",
+        }}
+      >
+        <Phone size={24} strokeWidth={2.5} />
+        <span>CALL {PHONE_DISPLAY}</span>
+      </a>
+    </BookLayout>
+  );
+};
+
+export default BookConfirmed;

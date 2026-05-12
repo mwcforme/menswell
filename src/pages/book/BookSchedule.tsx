@@ -1,0 +1,147 @@
+import { useNavigate } from "react-router-dom";
+import { Phone } from "lucide-react";
+import BookLayout from "@/components/book/BookLayout";
+import MissingParamBanner from "@/components/book/MissingParamBanner";
+import GHLNeoCalendarMock from "@/components/book/GHLNeoCalendarMock";
+import { useBookingSync, updateBookingState, toQueryString, labelFor, type UrgencyTier } from "@/lib/bookingState";
+
+const PHONE_DISPLAY = "(866) 344-4955";
+const PHONE_TEL = "tel:8663444955";
+
+const SERVICE_LABEL: Record<string, string> = {
+  energy: "TRT evaluation",
+  sexual: "men's sexual health",
+  weight: "medical weight loss",
+  other: "a personalized consultation",
+};
+
+const URGENCY_SUB: Record<UrgencyTier, string> = {
+  early: "Catching this early gives you the best long-term results. Pick a time below.",
+  building: "You're not imagining it, and you're catching it at the right time. Pick a time below.",
+  overdue: "You've waited long enough. Most men in your situation see results within 6 to 8 weeks.",
+  long_overdue: "You've waited a long time, and that's exactly why this matters. Most men see results within 6 to 8 weeks.",
+};
+
+const BookSchedule = () => {
+  const navigate = useNavigate();
+  const state = useBookingSync();
+  const missing = !state.symptom || !state.duration;
+
+  const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
+  const subhead = state.urgencyTier
+    ? URGENCY_SUB[state.urgencyTier]
+    : "Pick a time below that works for you.";
+
+  const trackCallClick = () => {
+    if (typeof window !== "undefined" && window.dataLayer) {
+      window.dataLayer.push({ event: "phone_click", page: "schedule" });
+    }
+  };
+
+  const [firstName = "", ...lastParts] = (state.name || "").trim().split(/\s+/);
+  const lastName = lastParts.join(" ");
+
+  return (
+    <BookLayout page="schedule" title="Pick your consult time | Men's Wellness Centers">
+      <div className="px-3 md:px-6 py-4 md:py-8 space-y-4 md:space-y-6 pb-28 md:pb-12">
+        {missing && <MissingParamBanner />}
+
+        {/* 3/3 progress bar */}
+        <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
+          <div
+            className="text-center mb-2"
+            style={{
+              fontSize: 14,
+              color: "#FFFFFF",
+              opacity: 0.85,
+              letterSpacing: "0.04em",
+              fontWeight: 700,
+              fontFamily: "Inter, sans-serif",
+              textTransform: "uppercase",
+            }}
+          >
+            Last step. Pick a time
+          </div>
+          <div className="flex gap-2" role="progressbar" aria-valuemin={0} aria-valuemax={3} aria-valuenow={3}>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="flex-1"
+                style={{ height: 8, borderRadius: 4, background: "#E8670A" }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Personalized header */}
+        <section
+          className="mx-auto text-center"
+          style={{ maxWidth: 720, color: "#FFFFFF" }}
+        >
+          <h1
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(22px, 3.4vw, 32px)",
+              lineHeight: 1.2,
+              letterSpacing: "-0.01em",
+              marginBottom: 8,
+            }}
+          >
+            You're a strong candidate for {serviceLabel}.
+          </h1>
+          <p
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: 16,
+              color: "rgba(255,255,255,0.8)",
+              lineHeight: 1.5,
+              maxWidth: 560,
+              margin: "0 auto",
+            }}
+          >
+            {subhead}
+          </p>
+        </section>
+
+        {/* CALENDAR */}
+        <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
+          <GHLNeoCalendarMock
+            locationLabel={state.location ? labelFor("location", state.location) : undefined}
+            firstName={firstName}
+            lastName={lastName}
+            onConfirm={(slot) => {
+              const next = updateBookingState({ appointmentTime: slot });
+              navigate(`/book/confirmed?${toQueryString(next)}`);
+            }}
+          />
+        </section>
+      </div>
+
+      {/* Sticky mobile tap-to-call */}
+      <a
+        href={PHONE_TEL}
+        onClick={trackCallClick}
+        aria-label={`Call ${PHONE_DISPLAY} to book by phone`}
+        className="md:hidden fixed inset-x-0 bottom-0 flex items-center justify-center gap-3 z-50"
+        style={{
+          background: "#E8670A",
+          color: "#FFFFFF",
+          fontFamily: "Inter, sans-serif",
+          fontWeight: 700,
+          fontSize: 22,
+          textDecoration: "none",
+          minHeight: 72,
+          padding: "16px 20px",
+          paddingBottom: "max(16px, env(safe-area-inset-bottom))",
+          boxShadow: "0 -4px 12px rgba(0,0,0,0.25)",
+        }}
+      >
+        <Phone size={24} strokeWidth={2.5} />
+        <span>CALL {PHONE_DISPLAY}</span>
+      </a>
+    </BookLayout>
+  );
+};
+
+export default BookSchedule;
