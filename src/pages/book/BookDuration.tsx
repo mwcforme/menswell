@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CalendarClock, CalendarDays, CalendarRange, History, ShieldCheck } from "lucide-react";
+import { CalendarClock, CalendarDays, CalendarRange, History } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import SurveyCard from "@/components/book/SurveyCard";
 import OptionRow from "@/components/book/OptionRow";
