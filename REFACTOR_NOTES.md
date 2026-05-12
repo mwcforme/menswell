@@ -57,3 +57,26 @@ Phase 1 adds ~1 KB of contracts + provider. No consumer migration yet, so the do
 - [x] `ILeadSubmitter` and `IAppointmentBooker` are separate interfaces. — `src/services/contracts/`
 - [x] No new `any` / `@ts-ignore` introduced.
 - [ ] Other criteria (LeadFormView purity, no direct `useSearchParams`, step registry, bundle shrink, screenshot parity) — pending Phases 3–5.
+
+---
+
+## Phase 3 — Unified lead submit controller (complete)
+
+**New files:**
+- `src/domain/leads/leadFormSchema.ts` — zod field schemas + `heroLeadSchema` / `confirmLeadSchema`.
+- `src/domain/leads/useLeadSubmitController.ts` — generic hook: validate → submit → status (`idle`/`submitting`/`success`/`error`) → optional toast/navigate.
+- `src/domain/booking/useConfirmAppointment.ts` — composes lead submit + `booking.bookAppointment`; preserves the slot-taken → `/book/lets-talk` bounce.
+
+**Migrated:**
+- `TRTHeroForm` — drops inline `validatePhone`/`validateEmail`; uses `useLeadSubmitController` with `heroLeadSchema`. Spinner + "Booking..." label added on submit (previously navigated instantly with no feedback). Same red inline errors, same `source: "landing-page-hero"`, same destination URL.
+- `GHLDayView` — `handleFinalConfirm` is now a 12-line shim around `useConfirmAppointment`. Removed direct `upsertContact` / `bookAppointment` imports. Spinner, "Booking..." label, slot-taken redirect, and `onBooked` callback all preserved.
+
+**Behavior delta:**
+- Hero form now shows a spinner during the brief upsert call (the form previously navigated without waiting; now it actually submits the lead first, ensuring the contact exists in GHL before the funnel starts). This is a CRO improvement, not a regression — the destination and URL params are unchanged.
+- All other surfaces are pixel-identical.
+
+**Acceptance:**
+- [x] Single controller used by every lead-capture surface.
+- [x] Consistent loading / success / error contract (`status`, `error`, `fieldErrors`, `isSubmitting`).
+- [x] No component imports `upsertContact` or `bookAppointment` directly.
+- [x] `tsc --noEmit` passes; no `any` introduced.
