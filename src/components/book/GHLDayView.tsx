@@ -100,31 +100,51 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const end = new Date(weekStart);
     end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
-    setLoading(true); setLoadError(null); setSlotsByDay({});
-    setSelectedSlot(null);
+    const load = (isInitial: boolean) => {
+      if (isInitial) {
+        setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
+      }
+      return getFreeSlots(location, start, end)
+        .then((data) => {
+          if (cancelled) return;
+          const out: Record<string, string[]> = {};
+          if (data && typeof data === "object") {
+            Object.entries(data as Record<string, unknown>).forEach(([k, v]) => {
+              if (k === "traceId") return;
+              const slots = (v as { slots?: string[] })?.slots;
+              if (Array.isArray(slots)) {
+                const filtered = slots.filter(inBusinessHours);
+                if (filtered.length > 0) out[k] = filtered;
+              }
+            });
+          }
+          setSlotsByDay(out);
+          if (isInitial) {
+            const firstWith = days.find((d) => out[ymd(d)]?.length);
+            setSelectedDay(firstWith ? ymd(firstWith) : null);
+          } else {
+            // If currently selected slot disappeared, clear it
+            setSelectedSlot((cur) => {
+              if (!cur || !selectedDay) return cur;
+              return out[selectedDay]?.includes(cur) ? cur : null;
+            });
+          }
+        })
+        .catch((e: Error) => { if (!cancelled && isInitial) setLoadError(e.message || "Could not load times."); })
+        .finally(() => { if (!cancelled && isInitial) setLoading(false); });
+    };
 
-    getFreeSlots(location, start, end)
-      .then((data) => {
-        if (cancelled) return;
-        const out: Record<string, string[]> = {};
-        if (data && typeof data === "object") {
-          Object.entries(data as Record<string, unknown>).forEach(([k, v]) => {
-            if (k === "traceId") return;
-            const slots = (v as { slots?: string[] })?.slots;
-            if (Array.isArray(slots)) {
-              const filtered = slots.filter(inBusinessHours);
-              if (filtered.length > 0) out[k] = filtered;
-            }
-          });
-        }
-        setSlotsByDay(out);
-        const firstWith = days.find((d) => out[ymd(d)]?.length);
-        setSelectedDay(firstWith ? ymd(firstWith) : null);
-      })
-      .catch((e: Error) => { if (!cancelled) setLoadError(e.message || "Could not load times."); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+    load(true);
+    // Realtime refresh every 30s, plus on tab focus
+    const interval = window.setInterval(() => load(false), 30_000);
+    const onFocus = () => load(false);
+    window.addEventListener("focus", onFocus);
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekStart, location]);
 
