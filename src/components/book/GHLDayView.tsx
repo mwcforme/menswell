@@ -83,6 +83,15 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
+  const [nowTick, setNowTick] = useState<number>(Date.now());
+
+  // Tick every 15s so the "X seconds ago" label stays fresh
+  useEffect(() => {
+    const t = window.setInterval(() => setNowTick(Date.now()), 15_000);
+    return () => window.clearInterval(t);
+  }, []);
 
   const cal = CENTER_CALENDARS[location];
 
