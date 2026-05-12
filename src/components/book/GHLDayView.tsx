@@ -72,6 +72,24 @@ const inBusinessHours = (iso: string) => {
   return h >= HOUR_MIN && h < HOUR_MAX && d.getMinutes() === 0;
 };
 
+// Always render the full 8am–5pm hourly slate (overbooking model).
+// For today, omit hours that have already passed.
+const buildFullDaySlots = (day: Date): string[] => {
+  const out: string[] = [];
+  const now = new Date();
+  const isToday =
+    day.getFullYear() === now.getFullYear() &&
+    day.getMonth() === now.getMonth() &&
+    day.getDate() === now.getDate();
+  for (let h = HOUR_MIN; h < HOUR_MAX; h++) {
+    if (isToday && h <= now.getHours()) continue;
+    const d = new Date(day);
+    d.setHours(h, 0, 0, 0);
+    out.push(d.toISOString());
+  }
+  return out;
+};
+
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
