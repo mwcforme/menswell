@@ -185,15 +185,15 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       if (isInitial) {
         setLoading(true); setLoadError(null); setSlotsByDay({}); setSelectedSlot(null);
       }
-      // Always show the full 8a–5p hourly slate per future day (overbook model).
-      // The API call still runs so the "last updated" indicator stays meaningful.
       return getFreeSlots(location, start, end)
-        .then(() => {
+        .then((raw) => {
           if (cancelled) return;
+          const parsed = parseFreeSlots(raw);
           const out: Record<string, string[]> = {};
           days.forEach((d) => {
-            const slate = buildFullDaySlots(d);
-            if (slate.length > 0) out[ymd(d)] = slate;
+            const key = ymd(d);
+            const slots = dropPastSlots(d, parsed[key] || []);
+            if (slots.length > 0) out[key] = slots;
           });
           setSlotsByDay(out);
           setLastUpdated(new Date());
@@ -202,11 +202,20 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           if (isInitial) {
             const firstWith = days.find((d) => out[ymd(d)]?.length);
             setSelectedDay(firstWith ? ymd(firstWith) : null);
+          } else if (selectedDay && !out[selectedDay]) {
+            // selected day no longer has slots after refresh — fall back gracefully
+            const firstWith = days.find((d) => out[ymd(d)]?.length);
+            setSelectedDay(firstWith ? ymd(firstWith) : null);
+            setSelectedSlot(null);
+          } else if (selectedSlot && selectedDay && !out[selectedDay]?.includes(selectedSlot)) {
+            // selected slot got booked by someone else — drop it
+            setSelectedSlot(null);
           }
         })
         .catch((e: Error) => { if (!cancelled && isInitial) setLoadError(e.message || "Could not load times."); })
         .finally(() => { if (!cancelled && isInitial) setLoading(false); });
     };
+
 
     load(refreshNonce > 0 ? "manual" : "initial");
     // Realtime refresh every 30 min, plus on tab focus
