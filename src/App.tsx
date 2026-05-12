@@ -25,7 +25,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Navigate to="/new" replace />} />
           <Route path="/new" element={<NewLandingPage />} />
-          <Route path="/book" element={<BookingFunnel />} />
+          <Route path="/book" element={<Navigate to="/book/symptom" replace />} />
           <Route path="/book/symptom" element={<BookSymptom />} />
           <Route path="/book/duration" element={<BookDuration />} />
           <Route path="/book/schedule" element={<BookSchedule />} />
