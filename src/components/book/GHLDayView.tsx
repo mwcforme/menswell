@@ -294,12 +294,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         color: selected
                           ? "#FFFFFF"
                           : available
-                            ? ORANGE
+                            ? count >= 3 ? "#0F7A3D" : "#B91C1C"
                             : "#A8AEB8",
                         background: selected
                           ? "rgba(255,255,255,0.15)"
                           : available
-                            ? ORANGE_SOFT
+                            ? count >= 3 ? "#E6F7EC" : "#FEECEC"
                             : "#F1F2F5",
                         marginTop: 6,
                         letterSpacing: "0.06em",
