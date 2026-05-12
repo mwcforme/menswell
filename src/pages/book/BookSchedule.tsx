@@ -106,76 +106,27 @@ const BookSchedule = () => {
           </p>
         </section>
 
-        {/* VIEW TOGGLE */}
-        {state.location && state.location in CENTER_CALENDARS && (
-          <div className="mx-auto flex items-center justify-center gap-2" style={{ maxWidth: 720 }}>
-            {(["day", "month"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 999,
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 13,
-                  fontWeight: 700,
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  cursor: "pointer",
-                  background: view === v ? "#E8670A" : "transparent",
-                  color: "#FFFFFF",
-                  border: `1px solid ${view === v ? "#E8670A" : "rgba(255,255,255,0.25)"}`,
-                }}
-              >
-                {v === "day" ? "By day" : "By month"}
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* CALENDAR or location picker */}
         <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
           {state.location && state.location in CENTER_CALENDARS ? (
-            view === "day" ? (
-              <GHLDayView
-                location={state.location as LocationKey}
-                firstName={firstName}
-                lastName={lastName}
-                email={state.email}
-                phone={state.phone}
-                source={state.source || "mwc-book-funnel"}
-                notes={[
-                  state.symptom && `Concern: ${state.symptom}`,
-                  state.duration && `Duration: ${state.duration}`,
-                  state.urgencyTier && `Urgency: ${state.urgencyTier}`,
-                  state.note,
-                ].filter(Boolean).join(" | ")}
-                onBooked={(slotIso) => {
-                  const next = updateBookingState({ appointmentTime: slotIso });
-                  navigate(`/book/confirmed?${toQueryString(next)}`);
-                }}
-              />
-            ) : (
-              <GHLLiveCalendar
-                location={state.location as LocationKey}
-                firstName={firstName}
-                lastName={lastName}
-                email={state.email}
-                phone={state.phone}
-                source={state.source || "mwc-book-funnel"}
-                notes={[
-                  state.symptom && `Concern: ${state.symptom}`,
-                  state.duration && `Duration: ${state.duration}`,
-                  state.urgencyTier && `Urgency: ${state.urgencyTier}`,
-                  state.note,
-                ].filter(Boolean).join(" | ")}
-                onBooked={(slotIso) => {
-                  const next = updateBookingState({ appointmentTime: slotIso });
-                  navigate(`/book/confirmed?${toQueryString(next)}`);
-                }}
-              />
-            )
+            <GHLDayView
+              location={state.location as LocationKey}
+              firstName={firstName}
+              lastName={lastName}
+              email={state.email}
+              phone={state.phone}
+              source={state.source || "mwc-book-funnel"}
+              notes={[
+                state.symptom && `Concern: ${state.symptom}`,
+                state.duration && `Duration: ${state.duration}`,
+                state.urgencyTier && `Urgency: ${state.urgencyTier}`,
+                state.note,
+              ].filter(Boolean).join(" | ")}
+              onBooked={(slotIso) => {
+                const next = updateBookingState({ appointmentTime: slotIso });
+                navigate(`/book/confirmed?${toQueryString(next)}`);
+              }}
+            />
           ) : (
             <div style={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 12, padding: 20, fontFamily: "Inter, sans-serif" }}>
               <div style={{ fontSize: 13, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700, marginBottom: 10 }}>
