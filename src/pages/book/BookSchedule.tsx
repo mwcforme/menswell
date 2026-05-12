@@ -2,8 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import MissingParamBanner from "@/components/book/MissingParamBanner";
-import GHLNeoCalendarMock from "@/components/book/GHLNeoCalendarMock";
-import { useBookingSync, updateBookingState, toQueryString, labelFor, type UrgencyTier } from "@/lib/bookingState";
+import GHLLiveCalendar from "@/components/book/GHLLiveCalendar";
+import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
+import { CENTER_CALENDARS, type LocationKey } from "@/lib/ghlCalendars";
 
 const PHONE_DISPLAY = "(866) 344-4955";
 const PHONE_TEL = "tel:8663444955";
@@ -33,8 +34,9 @@ const BookSchedule = () => {
     : "Pick a time below that works for you.";
 
   const trackCallClick = () => {
-    if (typeof window !== "undefined" && window.dataLayer) {
-      window.dataLayer.push({ event: "phone_click", page: "schedule" });
+    const w = window as unknown as { dataLayer?: Array<Record<string, unknown>> };
+    if (typeof window !== "undefined" && w.dataLayer) {
+      w.dataLayer.push({ event: "phone_click", page: "schedule" });
     }
   };
 
@@ -104,18 +106,48 @@ const BookSchedule = () => {
           </p>
         </section>
 
-        {/* CALENDAR */}
+        {/* CALENDAR or location picker */}
         <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
-          <GHLNeoCalendarMock
-            locationLabel={state.location ? labelFor("location", state.location) : undefined}
-            firstName={firstName}
-            lastName={lastName}
-            onConfirm={(slot) => {
-              const next = updateBookingState({ appointmentTime: slot });
-              navigate(`/book/confirmed?${toQueryString(next)}`);
-            }}
-          />
+          {state.location && state.location in CENTER_CALENDARS ? (
+            <GHLLiveCalendar
+              location={state.location as LocationKey}
+              firstName={firstName}
+              lastName={lastName}
+              email={state.email}
+              phone={state.phone}
+              source={state.source || "mwc-book-funnel"}
+              notes={[
+                state.symptom && `Concern: ${state.symptom}`,
+                state.duration && `Duration: ${state.duration}`,
+                state.urgencyTier && `Urgency: ${state.urgencyTier}`,
+                state.note,
+              ].filter(Boolean).join(" | ")}
+              onBooked={(slotIso) => {
+                const next = updateBookingState({ appointmentTime: slotIso });
+                navigate(`/book/confirmed?${toQueryString(next)}`);
+              }}
+            />
+          ) : (
+            <div style={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 12, padding: 20, fontFamily: "Inter, sans-serif" }}>
+              <div style={{ fontSize: 13, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700, marginBottom: 10 }}>
+                Choose your center
+              </div>
+              <div className="grid gap-2">
+                {(Object.values(CENTER_CALENDARS)).map((c) => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    onClick={() => updateBookingState({ location: c.key })}
+                    style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid #D1D5DB", background: "#FFFFFF", color: "#0B1029", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer" }}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
+
       </div>
 
       {/* Sticky mobile tap-to-call */}
