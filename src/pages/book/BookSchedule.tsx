@@ -34,8 +34,9 @@ const BookSchedule = () => {
     : "Pick a time below that works for you.";
 
   const trackCallClick = () => {
-    if (typeof window !== "undefined" && window.dataLayer) {
-      window.dataLayer.push({ event: "phone_click", page: "schedule" });
+    const w = window as unknown as { dataLayer?: Array<Record<string, unknown>> };
+    if (typeof window !== "undefined" && w.dataLayer) {
+      w.dataLayer.push({ event: "phone_click", page: "schedule" });
     }
   };
 
