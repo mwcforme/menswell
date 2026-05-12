@@ -131,6 +131,46 @@ const buildFullDaySlots = (day: Date): string[] => {
   return out;
 };
 
+// Days from today in ET (0 = today, 1 = tomorrow, etc). Returns -1 if past.
+const daysFromTodayET = (day: Date): number => {
+  const todayStr = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date());
+  const [ty, tm, td] = todayStr.split("-").map(Number);
+  const todayUTC = Date.UTC(ty, tm - 1, td);
+  const [dy, dm, dd] = ymd(day).split("-").map(Number);
+  const dayUTC = Date.UTC(dy, dm - 1, dd);
+  return Math.round((dayUTC - todayUTC) / 86_400_000);
+};
+
+// Artificial scarcity: today/tomorrow/day-after show only 2 slots (mid-morning + mid-afternoon when possible).
+const applyScarcity = (day: Date, slots: string[]): string[] => {
+  const offset = daysFromTodayET(day);
+  if (offset < 0 || offset > 2) return slots;
+  if (slots.length <= 2) return slots;
+  const preferredHours = [10, 14]; // 10 AM and 2 PM ET
+  const picked: string[] = [];
+  for (const iso of slots) {
+    const h = new Date(iso).getUTCHours();
+    // We can't easily extract ET hour from UTC without offset; use index-based fallback below.
+    void h;
+  }
+  // Pick by ET wall-clock hour using the original index ordering (slots are 8..16 in order).
+  const dateStr = ymd(day);
+  for (const ph of preferredHours) {
+    const target = etWallToDate(dateStr, ph).toISOString();
+    if (slots.includes(target)) picked.push(target);
+  }
+  // If today already cut off some hours, fall back to first available
+  if (picked.length < 2) {
+    for (const iso of slots) {
+      if (!picked.includes(iso)) picked.push(iso);
+      if (picked.length === 2) break;
+    }
+  }
+  return picked.sort();
+};
+
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
   const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
@@ -182,7 +222,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           if (cancelled) return;
           const out: Record<string, string[]> = {};
           days.forEach((d) => {
-            const slate = buildFullDaySlots(d);
+            const slate = applyScarcity(d, buildFullDaySlots(d));
             if (slate.length > 0) out[ymd(d)] = slate;
           });
           setSlotsByDay(out);
