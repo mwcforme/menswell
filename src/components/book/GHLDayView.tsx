@@ -197,7 +197,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             if (slots.length > 0) out[key] = slots;
           });
           setSlotsByDay(out);
-          setLastUpdated(new Date());
+          const now = new Date();
+          setLastUpdated(now);
+          lastUpdatedRef.current = now;
           setLastReason(reason);
           setNowTick(Date.now());
           if (isInitial) {
@@ -252,9 +254,24 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         phone: phone || undefined,
         source: source || "mwc-book-funnel",
       });
-      await bookAppointment({ location, contactId, startTime: selectedSlot, notes });
-      setModalOpen(false);
-      onBooked?.(selectedSlot);
+      try {
+        await bookAppointment({ location, contactId, startTime: selectedSlot, notes });
+        setModalOpen(false);
+        onBooked?.(selectedSlot);
+      } catch (bookErr) {
+        // Slot may have been taken between rendering and booking. Persist intent
+        // so a human can follow up, then bounce to lets-talk.
+        try {
+          sessionStorage.setItem("mwc_booking_failed_intent_v1", JSON.stringify({
+            contactId, location, startTime: selectedSlot,
+            firstName, lastName, email, phone,
+            failedAt: new Date().toISOString(),
+            error: (bookErr as Error).message,
+          }));
+        } catch { /* ignore */ }
+        setSubmitError("That time was just taken. We'll have a coordinator call you to confirm another slot.");
+        setTimeout(() => { window.location.href = "/book/lets-talk"; }, 1800);
+      }
     } catch (e) {
       setSubmitError((e as Error).message || "Booking failed. Please try another time.");
     } finally { setSubmitting(false); }
