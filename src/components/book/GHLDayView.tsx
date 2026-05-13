@@ -171,7 +171,11 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
-  const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
+  // Rolling 7-day window starting today (not week-aligned) so we always show
+  // a full week of upcoming availability instead of just the remainder.
+  const [weekStart, setWeekStart] = useState<Date>(() => {
+    const t = new Date(); t.setHours(0, 0, 0, 0); return t;
+  });
   const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -269,7 +273,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const times = selectedDay ? slotsByDay[selectedDay] || [] : [];
   const canConfirm = Boolean(selectedSlot);
-  const prevDisabled = weekStart <= startOfWeek(today);
+  const prevDisabled = weekStart <= today;
 
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
@@ -375,11 +379,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${Math.min(days.length, 7)}, minmax(0, 1fr))`,
-                gap: 8,
-              }}
+              className="grid grid-cols-4 md:grid-cols-7"
+              style={{ gap: 8 }}
             >
               {days.map((d) => {
                 const key = ymd(d);
