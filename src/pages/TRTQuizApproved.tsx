@@ -33,7 +33,7 @@ export default function TRTQuizApproved() {
   const top = topCategories(state.categoryScores, 5);
   const bracket = tierBracketLabel(state.totalScore);
   const dq = state.disqualified;
-  const ctaHref = dq ? "/book/lets-talk" : "/book/symptom";
+  const ctaHref = dq ? "/book/lets-talk" : "/book";
   const ctaLabel = dq ? "Talk to my care team" : "Book my consult";
 
   // Indicator dot position on the gradient bar (severe = far right).
