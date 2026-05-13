@@ -379,11 +379,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${Math.min(days.length, 7)}, minmax(0, 1fr))`,
-                gap: 8,
-              }}
+              className="grid grid-cols-4 md:grid-cols-7"
+              style={{ gap: 8 }}
             >
               {days.map((d) => {
                 const key = ymd(d);
