@@ -65,7 +65,7 @@ const OptionRow = ({ icon: Icon, label, selected, onClick }: OptionRowProps) => 
       size={22}
       strokeWidth={2.25}
       className="transition-transform group-hover:translate-x-0.5"
-      style={{ color: selected ? "#E8670A" : "#9CA3AF", flexShrink: 0 }}
+      style={{ color: selected ? "#E8670A" : "#6B7280", flexShrink: 0 }}
       aria-hidden="true"
     />
   </button>
