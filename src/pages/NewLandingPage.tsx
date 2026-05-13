@@ -15,6 +15,9 @@ import { StickyMobileCTA } from "@/components/landing/trt/StickyMobileCTA";
 import { SectionReveal } from "@/components/landing/trt/SectionReveal";
 import { SEO } from "@/components/SEO";
 import { useScrollDepth } from "@/hooks/useAnalytics";
+import { buildFaqJsonLd } from "@/lib/schema";
+
+const faqSchema = JSON.stringify(buildFaqJsonLd());
 
 const NewLandingPage = () => {
   useScrollDepth();
