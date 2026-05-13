@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Phone } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
