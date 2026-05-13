@@ -74,4 +74,4 @@ export const TESTIMONIALS: Testimonial[] = [
 
 /** Public Google Business Profile reviews URL — verify before launch. */
 export const GBP_REVIEWS_URL =
-  "https://www.google.com/search?q=Men%27s+Wellness+Centers+Virginia+reviews";
+  "https://www.google.com/maps/search/?api=1&query=Men%27s+Wellness+Centers+Glen+Allen+VA";
