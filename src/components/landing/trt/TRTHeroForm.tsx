@@ -206,7 +206,7 @@ export const TRTHeroForm = ({
           onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; e.currentTarget.style.transform = "scale(1)"; }}
         >
           {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-          {isSubmitting ? "Booking..." : "Book My Consult"}
+          {isSubmitting ? "Booking..." : ctaLabel}
         </button>
 
         <label className="flex items-start gap-3 cursor-pointer -m-2 p-2 rounded-lg transition-colors hover:bg-white/5">
