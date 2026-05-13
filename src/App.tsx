@@ -36,7 +36,7 @@ const App = () => (
           <Route path="/new" element={<NewLandingPage />} />
           <Route path="/quiz" element={<TRTQuiz />} />
           <Route path="/quiz/approved" element={<TRTQuizApproved />} />
-          <Route path="/book" element={<Navigate to="/book/symptom" replace />} />
+          <Route path="/book" element={<Navigate to="/book/schedule" replace />} />
           <Route path="/book/symptom" element={<BookSymptom />} />
           <Route path="/book/duration" element={<BookDuration />} />
           <Route path="/book/schedule" element={<BookSchedule />} />
