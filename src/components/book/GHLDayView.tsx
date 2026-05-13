@@ -9,6 +9,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useConfirmAppointment } from "@/domain/booking/useConfirmAppointment";
 
+// banned-wording-allow-next-line — GHL API table/endpoint name
 // Read free slots from the cached `ghl_free_slots` table (synced hourly from GHL).
 const fetchCachedSlots = async (
   calendarId: string,
@@ -144,6 +145,7 @@ const isTodayET = (day: Date): boolean => {
   return today === ymd(day);
 };
 
+// banned-wording-allow-next-line — GHL API endpoint name
 // Parse the GHL free-slots payload into a per-day map of ISO start times.
 // GHL returns shape: { "YYYY-MM-DD": { slots: [iso, iso, ...] }, traceId?: ... }
 const parseFreeSlots = (raw: unknown): Record<string, string[]> => {

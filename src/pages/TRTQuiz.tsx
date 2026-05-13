@@ -99,7 +99,7 @@ export default function TRTQuiz() {
   return (
     <>
       <SEO
-        title="Free TRT Assessment . 60-Second Symptom Quiz . MWC"
+        title="No-Cost TRT Assessment . 60-Second Symptom Quiz . MWC"
         description="Take our 60-second testosterone assessment. Score your symptoms, see your tier, and book a face-to-face evaluation with a Virginia provider."
       />
 
