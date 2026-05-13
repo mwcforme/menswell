@@ -328,12 +328,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
-              background: SURFACE, color: INK, border: `1px solid ${LINE}`,
+              background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
               borderRadius: 999, padding: "8px 12px",
               fontSize: 13, fontWeight: 600,
               display: "inline-flex", alignItems: "center", gap: 6,
               cursor: prevDisabled ? "not-allowed" : "pointer",
-              opacity: prevDisabled ? 0.4 : 1,
+              opacity: prevDisabled ? 0.6 : 1,
             }}
           >
             <ChevronLeft size={16} /> Prev
