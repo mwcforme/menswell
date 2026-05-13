@@ -9,9 +9,9 @@ export interface CenterCalendar {
 }
 
 export const CENTER_CALENDARS: Record<LocationKey, CenterCalendar> = {
-  richmond:        { key: "richmond",        label: "Richmond",        calendarId: "f57aKNaxejr3y1HeHFO9" },
-  "virginia-beach":{ key: "virginia-beach",  label: "Virginia Beach",  calendarId: "YKNJFGFYB2RBJyzTczVx" },
-  "newport-news":  { key: "newport-news",    label: "Newport News",    calendarId: "Ss4R5otK1MQAeUFxJDoi" },
+  richmond:        { key: "richmond",        label: "Richmond",        calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
+  "virginia-beach":{ key: "virginia-beach",  label: "Virginia Beach",  calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
+  "newport-news":  { key: "newport-news",    label: "Newport News",    calendarId: "lBaRbjUpEmesxEloFBME" },
 };
 
 export const TIMEZONE = "America/New_York";
