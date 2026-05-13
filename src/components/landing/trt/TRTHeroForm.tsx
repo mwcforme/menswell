@@ -38,7 +38,7 @@ export const TRTHeroForm = () => {
       // Use replace-style nav via window so back-button doesn't trap on the LP form.
       window.location.assign(`/book/symptom?${qs}`);
     },
-    // Hero form shows inline errors only — keep the legacy "no toast" behavior.
+    // Hero form shows inline errors only. Keep the legacy "no toast" behavior.
     toastOnError: false,
   });
 
