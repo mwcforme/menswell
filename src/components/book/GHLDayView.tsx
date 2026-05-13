@@ -48,14 +48,19 @@ interface Props {
   onBooked?: (slotIso: string) => void;
 }
 
-// Brand tokens (light surface, navy ink, orange accent)
+// Brand tokens (light surface, navy ink, orange accent).
+// Two border tokens:
+//   LINE   — decorative dividers (header/section underlines, badge dots). Not WCAG 1.4.11 scope.
+//   BORDER — interactive component outlines (buttons, day pills, time slots). ≥3:1 vs SURFACE/CANVAS.
 const INK = "#0B1029";
 const INK_SOFT = "#2C3346";
 const MUTED = "#4B5563";
 const LINE = "#E5E7EB";
+const BORDER = "#8B92A0";
 const SURFACE = "#FFFFFF";
 const CANVAS = "#F7F8FB";
 const ORANGE = "#E8670A";
+const ORANGE_DEEP = "#C2410C"; // selected time-slot bg only — preserves AA for small AM/PM text
 const ORANGE_SOFT = "#FFF1E6";
 
 // Business hours
@@ -323,12 +328,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
-              background: SURFACE, color: INK, border: `1px solid ${LINE}`,
+              background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
               borderRadius: 999, padding: "8px 12px",
               fontSize: 13, fontWeight: 600,
               display: "inline-flex", alignItems: "center", gap: 6,
               cursor: prevDisabled ? "not-allowed" : "pointer",
-              opacity: prevDisabled ? 0.4 : 1,
+              opacity: prevDisabled ? 0.6 : 1,
             }}
           >
             <ChevronLeft size={16} /> Prev
@@ -341,7 +346,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
             aria-label="Next week"
             style={{
-              background: SURFACE, color: INK, border: `1px solid ${LINE}`,
+              background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
               borderRadius: 999, padding: "8px 12px",
               fontSize: 13, fontWeight: 600,
               display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer",
@@ -392,7 +397,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
                       background: selected ? INK : SURFACE,
-                      border: `1.5px solid ${selected ? INK : LINE}`,
+                      border: `1.5px solid ${selected ? INK : BORDER}`,
                       borderRadius: 12, padding: "12px 6px",
                       color: selected ? "#FFFFFF" : INK,
                       cursor: isSunday || !available ? "default" : "pointer",
@@ -483,7 +488,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                   disabled={loading}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 6,
-                    background: SURFACE, border: `1px solid ${LINE}`,
+                    background: SURFACE, border: `1px solid ${BORDER}`,
                     borderRadius: 999, padding: "6px 10px",
                     fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
                     color: INK_SOFT, cursor: loading ? "wait" : "pointer",
@@ -516,13 +521,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     type="button"
                     onClick={() => setSelectedSlot(iso)}
                     style={{
-                      background: active ? ORANGE : SURFACE,
-                      border: `1px solid ${active ? ORANGE : LINE}`,
+                      background: active ? ORANGE_DEEP : SURFACE,
+                      border: `1px solid ${active ? ORANGE_DEEP : BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "left",
                       boxShadow: active
-                        ? "0 8px 20px -10px rgba(232,103,10,0.55)"
+                        ? "0 8px 20px -10px rgba(194,65,12,0.55)"
                         : "0 1px 0 rgba(11,16,41,0.02)",
                       transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                     }}
@@ -531,7 +536,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
                         {time}
                       </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.85)" : MUTED }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "#FFFFFF" : MUTED }}>
                         {ampm}
                       </span>
                     </div>
@@ -554,8 +559,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             disabled={!canConfirm}
             style={{
               width: "100%", minHeight: 56,
-              background: canConfirm ? ORANGE : "#F1F2F5",
-              color: canConfirm ? "#FFFFFF" : "#9AA0AC",
+              background: canConfirm ? ORANGE : "#E5E7EB",
+              color: canConfirm ? "#FFFFFF" : "#5B6271",
               border: 0, borderRadius: 12, fontSize: 16, fontWeight: 700,
               letterSpacing: "0.06em", textTransform: "uppercase",
               cursor: canConfirm ? "pointer" : "not-allowed",
@@ -606,7 +611,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 marginTop: 12,
                 padding: "12px 14px",
                 background: "#FEF2F2",
-                border: "1px solid #FECACA",
+                border: "1px solid #EF4444",
                 borderRadius: 8,
                 color: "#B91C1C",
                 fontSize: 13,

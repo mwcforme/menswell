@@ -23,7 +23,7 @@ const OptionRow = ({ icon: Icon, label, selected, onClick }: OptionRowProps) => 
     className="group flex w-full items-center gap-3 md:gap-4 transition-all focus:outline-none focus-visible:ring-4 min-h-[68px] md:min-h-[84px] px-4 md:px-5 py-3 md:py-4 hover:-translate-y-[1px]"
     style={{
       borderRadius: 14,
-      border: `2px solid ${selected ? "#E8670A" : "#E5E7EB"}`,
+      border: `2px solid ${selected ? "#E8670A" : "#8B92A0"}`,
       background: selected ? "#FFF7F0" : "#FFFFFF",
       cursor: "pointer",
       transition: "border-color 160ms, background-color 160ms, box-shadow 160ms, transform 160ms",
@@ -65,7 +65,7 @@ const OptionRow = ({ icon: Icon, label, selected, onClick }: OptionRowProps) => 
       size={22}
       strokeWidth={2.25}
       className="transition-transform group-hover:translate-x-0.5"
-      style={{ color: selected ? "#E8670A" : "#9CA3AF", flexShrink: 0 }}
+      style={{ color: selected ? "#E8670A" : "#6B7280", flexShrink: 0 }}
       aria-hidden="true"
     />
   </button>
