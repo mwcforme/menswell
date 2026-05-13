@@ -28,18 +28,28 @@ export const TRTManifesto = () => {
           </p>
 
           <figure
-            className="mt-7 rounded-xl p-5"
+            className="mt-7 rounded-xl p-6 relative"
             style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
           >
-            <Quote className="h-5 w-5 mb-2" style={{ color: "#E8670A" }} />
+            <Quote
+              className="h-10 w-10 absolute"
+              style={{ color: "#E8670A", top: -14, left: 16, opacity: 0.9 }}
+              aria-hidden="true"
+            />
             <blockquote
-              className="text-base leading-relaxed italic"
+              className="text-base leading-relaxed italic mt-2"
               style={{ color: "rgba(255,255,255,0.92)", fontFamily: "Inter, sans-serif" }}
             >
               "I felt like I was running on fumes for two years. One visit, real labs, a real plan. Six weeks in I was sleeping again. Six months in I felt like myself."
             </blockquote>
-            <figcaption className="mt-3 text-sm" style={{ color: "rgba(255,255,255,0.65)", fontFamily: "Inter, sans-serif" }}>
-              — Mark B., 52, Richmond
+            <figcaption className="mt-3 text-sm flex items-center gap-2" style={{ color: "rgba(255,255,255,0.65)", fontFamily: "Inter, sans-serif" }}>
+              <span>— Mark B., 52, Richmond</span>
+              <span
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
+                style={{ background: "rgba(46,204,113,0.12)", color: "#5DD68A", fontSize: 11, fontWeight: 600 }}
+              >
+                ✓ Verified
+              </span>
             </figcaption>
           </figure>
 

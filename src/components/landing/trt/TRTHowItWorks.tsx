@@ -1,11 +1,11 @@
-import { X } from "lucide-react";
+import { Minus } from "lucide-react";
 
 const symptoms = [
-  "Persistent fatigue.",
-  "Loss of drive and motivation.",
-  "Difficulty focusing.",
-  "Stubborn belly fat and muscle loss.",
-  '"Normal" labs that do not match how you feel.',
+  "Persistent fatigue",
+  "Loss of drive and motivation",
+  "Difficulty focusing",
+  "Stubborn belly fat and muscle loss",
+  '"Normal" labs that do not match how you feel',
 ];
 
 const steps = [
@@ -78,7 +78,19 @@ export const TRTHowItWorks = () => {
           <ul className="mt-8 space-y-4">
             {symptoms.map((s) => (
               <li key={s} className="flex items-start gap-3">
-                <X className="h-5 w-5 flex-shrink-0 mt-0.5" strokeWidth={3} style={{ color: "#E8670A" }} />
+                <span
+                  aria-hidden="true"
+                  className="flex-shrink-0 mt-1 inline-flex items-center justify-center"
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: 999,
+                    background: "rgba(232,103,10,0.12)",
+                    color: "#E8670A",
+                  }}
+                >
+                  <Minus className="h-3.5 w-3.5" strokeWidth={3} />
+                </span>
                 <span className="text-base" style={{ color: "#1A1A1A", fontFamily: "Inter, sans-serif" }}>{s}</span>
               </li>
             ))}
@@ -91,26 +103,32 @@ export const TRTHowItWorks = () => {
           {heading("Here's how it works in one visit")}
 
           <div className="mt-8 flex flex-col gap-6">
-            {steps.map((s) => (
-              <div key={s.num} className="flex gap-4">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: "#000033" }}
-                >
-                  <span className="font-bold text-sm" style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif" }}>
-                    {s.num}
-                  </span>
+            {steps.map((s, i) => {
+              const isFinal = i === steps.length - 1;
+              return (
+                <div key={s.num} className="flex gap-4">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: isFinal ? "#E8670A" : "#000033",
+                      boxShadow: isFinal ? "0 0 0 3px rgba(232,103,10,0.18)" : "0 0 0 2px rgba(232,103,10,0.18)",
+                    }}
+                  >
+                    <span className="font-bold text-base" style={{ color: "#FFFFFF", fontFamily: "Oswald, sans-serif" }}>
+                      {s.num}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg" style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}>
+                      {s.title}
+                    </h3>
+                    <p className="text-base mt-1 leading-relaxed" style={{ color: "#4A4A4A", fontFamily: "Inter, sans-serif" }}>
+                      {s.desc}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-lg" style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}>
-                    {s.title}
-                  </h3>
-                  <p className="text-base mt-1 leading-relaxed" style={{ color: "#4A4A4A", fontFamily: "Inter, sans-serif" }}>
-                    {s.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <button

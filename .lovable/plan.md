@@ -1,103 +1,155 @@
-## Goal
+# CRO + UI/UX Overhaul — book.menswellnesscenters.com
 
-Ship two new paid-traffic landing pages, /new-wl (Weight Loss) and /new-ed (Erectile Dysfunction), cloned from the proven /new (TRT) structure. Copy and photo direction will be informed by a focused competitor scan, not invented.
+Single-page paid-media lander for TRT / ED / Weight Loss across 3 VA clinics. Goal: lift form submits without touching either lead form, while preserving brand voice, Saturday hours, and current phone numbers.
 
-## Phase 1 — Competitor research (read-only, ~10 min)
+## Hard constraints (verified before each commit)
 
-Scrape and analyze 4-5 top LPs per service so the copy is grounded, not generic. Use Firecrawl (`scrape` with `markdown` + `screenshot` formats) on:
+1. **Forms are frozen.** `TRTHeroForm.tsx` and the form card inside `ServiceFinalCTA.tsx` / `TRTFinalCTA.tsx` get zero changes — fields, labels, placeholders, validation, submit handler, consent copy, button text, aria, styling all untouched. Card *wrapper* (border-left accent, min-height) is fair game; everything inside the form is not.
+2. **Saturday stays open.** All 3 clinics keep `Mon–Sat 9:00 AM – 5:00 PM` everywhere it renders, plus in new JSON-LD and "Open now" logic.
+3. **Phone numbers unchanged**, including the duplicate `(757) 806-6263` on Newport News + Virginia Beach. Seed `locations.ts` with current strings exactly.
 
-**ED competitors**
-- hims.com/ed
-- ro.co/ed
-- bluechew.com
-- mosh.com.au/ed
-- foreverwell / local Virginia ED comp if Semrush surfaces one
+## Phase 0 — Foundations
 
-**Weight Loss competitors**
-- hims.com/weight-loss
-- ro.co/weight-loss (Ro Body)
-- foundhealth.com
-- formhealth.co
-- henrymeds.com/weight-loss
-- mochihealth.com
+- **`src/data/locations.ts`** — single source of truth: `{ slug, name, region, address, cityStateZip, phone, phoneHref, hours: "Mon–Sat 9:00 AM – 5:00 PM", mapUrl, minsFromHighway, parking }`. Seed verbatim from current `TRTLocations.tsx`.
+- **`src/data/faqs.ts`** — FAQ items in new priority order (insurance → process → safety → vs-Hims → fit → first-visit → included → timeline). Question text unchanged from current `TRTFAQ.tsx`.
+- **`src/data/testimonials.ts`** — `{ name, city, monthYear, rating, quote, source: "google" | "verified_patient" }`. Includes one 4★ entry with honest caveat.
+- **`src/lib/schema.ts`** — emits `LocalBusiness` (per location, Saturday in `dayOfWeek`) and `FAQPage` JSON-LD as `<script type="application/ld+json">` blocks via `react-helmet-async`.
+- **`src/hooks/useAnalytics.ts`** — `trackCro(slug)` wrapper that pushes `{ event: 'cro_click', cro }` to `dataLayer`. Non-form only.
+- **`src/hooks/useGeoLocation.ts`** — best-effort nearest-clinic guess (timezone + optional `navigator.geolocation` with silent failure); defaults to Glen Allen.
+- **Scroll-reveal fix** — patch `useScrollReveal` so initial state is `opacity:1`. Reveal transform is applied only inside `@media (prefers-reduced-motion: no-preference)`, with an immediate-fire fallback when the element is already in the viewport on mount. Excluded from any node inside a form card.
 
-For each, capture:
-- H1 + subhead (the headline pattern that works)
-- Trust bar items (what social proof they lead with)
-- Form fields above the fold
-- Photo style (model age, setting, mood)
-- Pricing or "first visit free" framing
-- Top 3 objection-handling sections
-- FAQ topics
+## Phase 1 — Hero (non-form)
 
-Output a short internal brief (saved to `REFACTOR_NOTES.md` under "WL + ED LP research") so the copy choices are auditable.
+- Sub-headline → `Your first visit is on us — $0 today, $0 obligation.`
+- Star row enlarged, wrapped in `<a target="_blank" rel="noopener">` to GBP reviews URL, Google "G" mark left of rating.
+- Add 5th orange check: `$0 first visit`.
+- Add credibility strip line: `BOARD-CERTIFIED PHYSICIANS · LICENSED BY THE VIRGINIA BOARD OF MEDICINE · 10,000+ MEN TREATED SINCE 2019`.
+- Hero background: radial gradient `#0B1530 → #0A1024` behind H1.
+- Form card wrapper gets `border-left: 4px solid rgba(232,103,10,0.6)` and a reserved `min-height` to prevent CLS. **No edits inside the form.**
+- Optional muted right-aligned portrait at 8% opacity (AVIF/WebP <80KB, preloaded). Gated on availability.
 
-Cross-check with Semrush `serp_analysis` on "trt virginia", "ed treatment near me", "weight loss clinic richmond va" to see which competitors actually rank and what intent they target.
+### Header (`TRTHeader.tsx`)
+- Logo → `Link to="/"`.
+- Header phone wrapped in `<a href="tel:+18663444955">`.
+- Sticky variant after 600px scroll: `backdrop-blur-md bg-[#0A1024]/85`, BOOK MY CONSULT visible.
 
-## Phase 2 — Photography direction
+## Phase 2 — Sticky mobile CTA (`StickyMobileCTA.tsx`)
 
-`/new` currently has no large photography. WL and ED LPs convert better with one credible hero photo. Per brand memory, **no AI faces, no stock-photo cliché**. Two options:
+- `<768px`, fixed bottom bar, `height:64px`, `padding-bottom: env(safe-area-inset-bottom)`.
+- Left: tap-to-call nearest clinic from `useGeoLocation`.
+- Right: orange BOOK MY CONSULT — smooth-scroll to hero form **card** and call `.focus()` on its existing first input via `querySelector`. No DOM/prop changes to the form.
+- Hides via `IntersectionObserver` when either form card is visible.
+- Replaces existing `TRTMobileCTA.tsx`.
 
-- **A** — Source from existing MWC photo library (preferred). I'll list the `/public/` and `/src/assets/` folders and pick the best in-brand shot per page.
-- **B** — Use a tasteful, age-appropriate (45-65) lifestyle photo from an authentic photography source. I will not generate AI faces.
+## Phase 3 — Credibility band (`CredibilityBand.tsx`)
 
-I'll list what's available and pick A wherever possible. For ED specifically, copy-led design (no person photo) is often the right call to preserve discretion. I'll flag this in the research brief and decide per page.
+Replaces `TRTTrustBar`. 4 stats: `10,000+ men treated since 2019`, `3 Virginia centers`, `4.9★ Google · 200+ reviews`, `$0 first visit`. Each is a `<button>` that scrolls to testimonials / locations / hero (not into the form).
 
-## Phase 3 — Page builds
+## Phase 4 — Symptoms + process (`SymptomsProcess.tsx`)
 
-Clone the `/new` component structure under namespaced folders so we don't pollute TRT components:
+- Replace red ✕ with orange `–` dash glyph.
+- Sentence-case, no trailing period.
+- Step-number circles enlarged with orange ring; step 3 gets faint orange fill/glow.
+- Existing CTA copy preserved.
 
-```text
-src/components/landing/wl/
-  WLHero.tsx            (was TRTHero)
-  WLHeroForm.tsx
-  WLTrustBar.tsx
-  WLHowItWorks.tsx
-  WLResults.tsx
-  WLManifesto.tsx
-  WLPillars.tsx
-  WLMarquee.tsx
-  WLLocations.tsx       (re-exports TRTLocations, same content)
-  WLFAQ.tsx
-  WLFinalCTA.tsx
-  WLMobileCTA.tsx
-src/components/landing/ed/   (mirror)
-src/pages/NewWeightLoss.tsx  → renders at /new-wl
-src/pages/NewED.tsx          → renders at /new-ed
-```
+## Phase 5 — Philosophy (`Philosophy.tsx` from `TRTManifesto`)
 
-Shared chrome (`TRTHeader`, `TRTFooter`, `SectionReveal`) is reused as-is — it's not service-specific.
+- Right-side portrait: swap when a better asset exists; otherwise overlay `mix-blend-multiply` navy at 20% so headline pops.
+- Pull-quote: enlarge orange quote glyph, offset top-left, add small `✓ Verified` badge by patient name.
 
-**Service-aware data flow**
-- `TRTHeroForm` posts to GHL with TRT tags. Add a `service: "trt" | "wl" | "ed"` prop on the form so each LP tags the lead correctly in GHL.
-- Conversion events: emit `lp_new_wl_cta_click` and `lp_new_ed_cta_click` per existing convention.
-- Booking handoff stays `/book/schedule` (single funnel) but appends `?service=wl` / `?service=ed` so /book can show the right symptom phrasing.
+## Phase 6 — Testimonials (`Testimonials.tsx`)
 
-**SEO**
-- /new-wl: title "Medical Weight Loss in Virginia | Men's Wellness Centers", description grounded in research brief.
-- /new-ed: title "ED Treatment in Virginia | Discreet, In-Person | Men's Wellness Centers".
-- Both inherit existing `noindex, nofollow` from `SEO.tsx` (paid LP subdomain — same posture as /new).
+- Bound to `testimonials.ts`. Mix in one 4★ with honest caveat.
+- Each card shows `Name · City, VA · Mon YYYY`.
+- Google "G" only on cards with `source: "google"`; others labeled `Verified Patient`.
+- Below grid: `Read all 200+ reviews on Google →` outbound link.
+- Existing `Join 10,000+ Virginia men…` block + CTA copy preserved.
 
-## Phase 4 — Wire up the directory and routing
+## Phase 7 — Services (`Services.tsx`)
 
-- `src/data/landingPages.ts` — add two `LIVE` entries for /new-wl and /new-ed with primaryCta `/book/schedule`.
-- `src/App.tsx` — add `<Route path="/new-wl" ... />` and `<Route path="/new-ed" ... />`.
-- Existing `/lp` directory already auto-renders any entry from `landingPages.ts`, so it picks them up for free.
+- Apply consistent slight desaturation / orange duotone to the 4 circular images so the row reads as one set.
+- Tile 2 caption: `Labs run on-site.`
+- Marquee: slower scroll, pause-on-hover, disabled under `prefers-reduced-motion`.
 
-## Out of scope (call out, don't do)
+## Phase 8 — Locations (`LocationsGrid.tsx`)
 
-- No new service-specific booking flows (they share `/book/schedule`).
-- No new email templates, no new edge functions, no DB changes.
-- No edits to /new (TRT) — pure additive work.
-- No AI-generated photography.
+- Bound to `locations.ts`. **Hours and phones unchanged.**
+- Add lazy-loaded Google Static Maps thumbnail (~200×120) per card.
+- Add `Directions` link → maps deep link.
+- Add `Free parking on-site` if confirmed (flag in `locations.ts`).
+- Mobile: CALL is primary visual, BOOK secondary. Desktop: flipped (current behavior).
+- `Open now / Opens [next day] at 9:00 AM` badge using `Mon–Sat 09:00–17:00`. Saturday treated as open. Pure function, unit-tested for Sat 2pm = open, Sat 6pm = "Opens Monday".
+- Emit `LocalBusiness` JSON-LD per location with Saturday in `dayOfWeek`.
 
-## Open question I'll resolve in Phase 1
+## Phase 9 — FAQ (`FAQ.tsx`)
 
-Whether ED page uses a hero photo or stays copy-led. I'll decide based on what the top 3 ranking ED LPs do and how brand memory's "no AI faces, authentic photography only" applies given what's in the existing photo library.
+- Reorder per spec; question text unchanged.
+- Each open answer ends with inline orange text link `→ Book a free consult` that scrolls to hero form card (no focus change inside form).
+- Emit `FAQPage` JSON-LD via `lib/schema.ts`.
+- Verify `aria-expanded` / `aria-controls` / Enter+Space toggling.
 
-## Deliverables
+## Phase 10 — Final CTA (`FinalCTA.tsx`)
 
-1. Research brief appended to REFACTOR_NOTES.md
-2. Two new live LPs at /new-wl and /new-ed
-3. Updated /lp directory
-4. Service-aware lead tagging in the hero form
+- Add sub-line under heading: `$0 today. Same- or next-day visits.`
+- Replace 3 bullets with the 3 new trust points (privacy, free reschedule, "we decline patients when not appropriate" — included only if ops confirms).
+- Form card inside this section is untouched.
+
+## Phase 11 — Footer (`Footer.tsx` for landers = `TRTFooter.tsx`)
+
+- Wrap any footer phone in `tel:` (already done — verify).
+- Add `Licensed by the Virginia Board of Medicine` line.
+- Add Google "G" + `4.9 from 200+ reviews` row linking to GBP.
+- LegitScript badge already present and clickable — keep.
+- Existing legal links unchanged. If hours render in footer they stay Mon–Sat 9–5.
+
+## Phase 12 — Performance + CWV
+
+- Cut Google Fonts to: 1 display weight (Oswald 700) + Inter 400/600. Self-host woff2 in `/public/fonts/`, `font-display: swap`, preload.
+- Section images: `loading="lazy"`, `decoding="async"`, explicit `width`/`height`.
+- Defer GA4 + Meta Pixel until `requestIdleCallback` or first interaction.
+- Reserve `min-height` on form card wrapper to keep CLS < 0.05.
+
+## Phase 13 — Accessibility
+
+- `aria-label` on every non-form icon-only button.
+- Verify orange-on-navy contrast ≥ 4.5:1 (CTA + header phone).
+- `:focus-visible` rings on; mouse focus suppressed.
+- Form input aria untouched.
+
+## Phase 14 — Analytics
+
+- `data-cro` slug + `trackCro(slug)` on every non-form CTA: `hero_phone_click`, `mobile_sticky_call`, `mobile_sticky_book_scroll`, `credibility_band_*`, `locations_card_call_<slug>`, `locations_card_book_<slug>`, `locations_card_directions_<slug>`, `faq_inline_book_<slug>`, `final_cta_section_view`, `footer_phone_click`, `footer_reviews_click`.
+- Scroll-depth events at 25/50/75/100% via single IntersectionObserver-based hook.
+- Form submit / field analytics deliberately NOT touched.
+
+## Phase 15 — Compliance
+
+- Confirm medical disclaimer present in footer; add if missing.
+- Verify HTTPS-only and that no third-party tag reads form-field values; if Meta Pixel does, flag in PR — do not fix in this pass.
+
+## Acceptance gates (all must pass before ship)
+
+1. `git diff` of `TRTHeroForm.tsx` and the form-card subtree of `ServiceFinalCTA`/`TRTFinalCTA` = empty.
+2. All 3 location cards render `Mon–Sat 9:00 AM – 5:00 PM`.
+3. `LocalBusiness` JSON-LD ×3 includes Saturday — validated in Rich Results Test.
+4. Open-now badge unit tests: Sat 14:00 ET → "Open now"; Sat 18:00 ET → "Opens Monday at 9:00 AM"; Sun 11:00 ET → "Opens Monday".
+5. Phone strings byte-identical to current production (NN/VB duplicate kept).
+6. JS-disabled view shows all content.
+7. `prefers-reduced-motion: reduce` disables marquee + reveals + >200ms transitions.
+8. Lighthouse mobile ≥ 90/95/95/95.
+9. Sticky CTA: shows <768px after hero, hides when either form card visible, respects safe-area inset.
+10. tel: links work in header, every location card, sticky bar, footer.
+11. `FAQPage` JSON-LD validates.
+12. WCAG AA contrast on all non-form text.
+
+## Apply-to scope
+
+All three landers (`/`, `/wl`, `/ed`) share `TRTHeader`, `TRTFooter`, locations, FAQ, final CTA, and credibility band. Hero/Manifesto/HowItWorks/FAQ variants per vertical (`TRT*`, `WL*`, `ED*`) get the same non-form upgrades applied symmetrically.
+
+## Open questions before implementation
+
+1. Confirmed Google Business Profile URL for the reviews link?
+2. OK to ship the "we decline patients when not clinically appropriate" trust bullet? (Only include if true.)
+3. Is `Free parking on-site` true for all 3 clinics, or per-location?
+4. Do you have a Google Static Maps API key we can use, or should the map thumbnails use an unkeyed embed/static fallback?
+5. Real 4★ Google review text we can quote, or should I draft a placeholder for your approval?

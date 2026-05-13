@@ -73,8 +73,8 @@ export const TRTFinalCTA = () => {
           >
             READY TO BOOK YOUR FIRST VISIT?
           </h2>
-          <p className="text-base mt-2" style={{ color: "rgba(255,255,255,0.75)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
-            Start here. You will pick your location, time, and provider on the next step.
+          <p className="text-base mt-2" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
+            $0 today. Same- or next-day visits.
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-4">
@@ -95,9 +95,13 @@ export const TRTFinalCTA = () => {
             </p>
 
             <ul className="mt-6 space-y-3">
-              {["100% confidential", "Face-to-face with a physician", "Same-day visits available"].map((t) => (
-                <li key={t} className="flex items-center gap-3" style={{ color: "rgba(255,255,255,0.92)", fontFamily: "Inter, sans-serif" }}>
-                  <Check className="h-5 w-5 flex-shrink-0" strokeWidth={3} style={{ color: "#2ECC71" }} />
+              {[
+                "100% private. Your employer or insurance is never notified.",
+                "Cancel or reschedule free, anytime.",
+                "If TRT isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-3" style={{ color: "rgba(255,255,255,0.92)", fontFamily: "Inter, sans-serif" }}>
+                  <Check className="h-5 w-5 flex-shrink-0 mt-0.5" strokeWidth={3} style={{ color: "#2ECC71" }} />
                   <span className="text-base">{t}</span>
                 </li>
               ))}
