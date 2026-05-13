@@ -1,4 +1,5 @@
-import { bookAppointment, getFreeSlots, TIMEZONE } from "@/lib/ghlCalendars";
+import { bookAppointment, getFreeSlots, TIMEZONE, CENTER_CALENDARS } from "@/lib/ghlCalendars";
+import { supabase } from "@/integrations/supabase/client";
 import type {
   AppointmentInput,
   AppointmentResult,
@@ -6,6 +7,30 @@ import type {
   IAppointmentBooker,
 } from "@/services/contracts/IAppointmentBooker";
 import type { LocationKey } from "@/lib/ghlCalendars";
+
+async function logBookingEvent(row: {
+  event_type: "attempt" | "success" | "error";
+  location: LocationKey;
+  slot_iso: string;
+  contact_id?: string;
+  error?: string;
+  meta?: Record<string, unknown>;
+}) {
+  try {
+    await supabase.from("booking_event_log").insert({
+      event_type: row.event_type,
+      location: row.location,
+      calendar_id: CENTER_CALENDARS[row.location]?.calendarId ?? null,
+      slot_iso: row.slot_iso,
+      contact_id: row.contact_id ?? null,
+      page_url: typeof window !== "undefined" ? window.location.href : null,
+      error: row.error ?? null,
+      meta: (row.meta ?? null) as never,
+    });
+  } catch {
+    /* never block booking on audit-log failure */
+  }
+}
 
 /**
  * Wraps the existing `ghlCalendars` helpers, which themselves route through
@@ -38,7 +63,31 @@ export class GhlProxyAppointmentBooker implements IAppointmentBooker {
   }
 
   async bookAppointment(input: AppointmentInput): Promise<AppointmentResult> {
-    const res = await bookAppointment(input);
-    return { ok: res.ok, status: res.status };
+    void logBookingEvent({
+      event_type: "attempt",
+      location: input.location,
+      slot_iso: input.startTime,
+      contact_id: input.contactId,
+    });
+    try {
+      const res = await bookAppointment(input);
+      void logBookingEvent({
+        event_type: res.ok ? "success" : "error",
+        location: input.location,
+        slot_iso: input.startTime,
+        contact_id: input.contactId,
+        error: res.ok ? undefined : `HTTP ${res.status}`,
+      });
+      return { ok: res.ok, status: res.status };
+    } catch (err) {
+      void logBookingEvent({
+        event_type: "error",
+        location: input.location,
+        slot_iso: input.startTime,
+        contact_id: input.contactId,
+        error: (err as Error).message,
+      });
+      throw err;
+    }
   }
 }
