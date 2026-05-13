@@ -1,9 +1,9 @@
 # Booking — WCAG 2.1 AA Contrast Audit
 
-Date: 2026-05-13T23:27:12.331Z
+Date: 2026-05-13T23:27:29.148Z
 Files audited: 9
-Pairs evaluated: 47
-Failures: 1
+Pairs evaluated: 50
+Failures: 0
 
 ## Method
 
@@ -67,8 +67,9 @@ Required ratios:
 | BookLayout phone link | #FFFFFF | #000814 | 20.10:1 | 4.5:1 | 1.4.3 | ✅ |
 | Survey card title text | #FFFFFF | #000814 | 20.10:1 | 3:1 | 1.4.3 | ✅ |
 | Survey card body text | #E5E7EB | #000814 | 16.23:1 | 4.5:1 | 1.4.3 | ✅ |
-| OptionRow default border | #2E343E | #000814 | 1.60:1 | 3:1 | 1.4.11 | ❌ |
+| OptionRow default border (white card) | #8B92A0 | #FFFFFF | 3.13:1 | 3:1 | 1.4.11 | ✅ |
+| OptionRow chevron icon (default) | #6B7280 | #FFFFFF | 4.83:1 | 3:1 | 1.4.11 | ✅ |
+| OptionRow label | #0B1029 | #FFFFFF | 18.74:1 | 4.5:1 | 1.4.3 | ✅ |
+| OptionRow selected fill label | #0B1029 | #FFF7F0 | 17.69:1 | 4.5:1 | 1.4.3 | ✅ |
 
-## Failures (1)
-
-- **OptionRow default border** — #2E343E on #000814 = 1.60:1 (need 3:1, WCAG 1.4.11)
+## Final result: ✅ PASS — 0 AA failures
