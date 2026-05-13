@@ -109,17 +109,11 @@ export function useLeadSubmitController<TInput>(
         page_url: typeof window !== "undefined" ? window.location.href : null,
         tags: leadInput.tags ?? null,
         attribution: attr as unknown as Record<string, unknown>,
-        crm_status: "pending" as const,
+        crm_status: "pending",
       };
-      let captureId: string | null = null;
       try {
-        const { data: inserted, error: insertErr } = await supabase
-          .from("lead_captures")
-          .insert(captureRow)
-          .select("id")
-          .single();
-        if (insertErr) throw insertErr;
-        captureId = inserted?.id ?? null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await supabase.from("lead_captures").insert(captureRow as any);
       } catch (persistErr) {
         // Never block submission on capture failure — log only.
         console.warn("[lead-capture] insert failed", persistErr);
@@ -136,16 +130,6 @@ export function useLeadSubmitController<TInput>(
             ...(typeof v.location === "string" ? { location: v.location } : {}),
             source: leadInput.source,
           });
-        }
-
-        // Mark capture as synced to CRM (best-effort; no SELECT/UPDATE policy
-        // means this will silently no-op in production — that's intentional).
-        if (captureId) {
-          void supabase
-            .from("lead_captures")
-            // @ts-expect-error update blocked by RLS; safe no-op
-            .update({ crm_status: "synced", crm_contact_id: result.contactId })
-            .eq("id", captureId);
         }
 
         setStatus("success");
