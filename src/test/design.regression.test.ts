@@ -112,7 +112,20 @@ describe("Quiz funnel routing", () => {
 });
 
 describe("Internal directory hardening", () => {
-  it("LP directory page is marked noindex", () => {
-    expect(LP_DIRECTORY).toMatch(/noindex/);
+  it("LP directory page uses SEO component (sitewide noindex applies)", () => {
+    expect(LP_DIRECTORY).toMatch(/from "@\/components\/SEO"/);
   });
 });
+
+describe("Sitewide noindex", () => {
+  const INDEX_HTML = readFileSync(resolve(__dirname, "../../index.html"), "utf8");
+  const ROBOTS = readFileSync(resolve(__dirname, "../../public/robots.txt"), "utf8");
+  it("index.html declares noindex for paid LP subdomain", () => {
+    expect(INDEX_HTML).toMatch(/name="robots"[^>]*noindex/);
+  });
+  it("robots.txt disallows generic crawlers but allows AdsBot", () => {
+    expect(ROBOTS).toMatch(/User-agent: \*\s*\n\s*Disallow: \//);
+    expect(ROBOTS).toMatch(/User-agent: AdsBot-Google\s*\n\s*Allow: \//);
+  });
+});
+
