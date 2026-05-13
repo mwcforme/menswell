@@ -521,13 +521,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     type="button"
                     onClick={() => setSelectedSlot(iso)}
                     style={{
-                      background: active ? ORANGE : SURFACE,
-                      border: `1px solid ${active ? ORANGE : LINE}`,
+                      background: active ? ORANGE_DEEP : SURFACE,
+                      border: `1px solid ${active ? ORANGE_DEEP : BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "left",
                       boxShadow: active
-                        ? "0 8px 20px -10px rgba(232,103,10,0.55)"
+                        ? "0 8px 20px -10px rgba(194,65,12,0.55)"
                         : "0 1px 0 rgba(11,16,41,0.02)",
                       transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                     }}
@@ -536,7 +536,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
                         {time}
                       </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.85)" : MUTED }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "#FFFFFF" : MUTED }}>
                         {ampm}
                       </span>
                     </div>
