@@ -40,8 +40,14 @@ export const TRTMarquee = () => (
         100% { transform: translateX(-50%); }
       }
       .animate-marquee {
-        animation: marquee 25s linear infinite;
+        animation: marquee 45s linear infinite;
         width: max-content;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .animate-marquee {
+          animation: none !important;
+          transform: translateX(0) !important;
+        }
       }
     `}</style>
   </section>
