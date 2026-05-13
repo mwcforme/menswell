@@ -627,8 +627,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       background: active ? ORANGE_DEEP : SURFACE,
                       border: `1px solid ${active ? ORANGE_DEEP : BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
-                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "left",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
                       boxShadow: active
                         ? "0 8px 20px -10px rgba(194,65,12,0.55)"
                         : "0 1px 0 rgba(11,16,41,0.02)",
