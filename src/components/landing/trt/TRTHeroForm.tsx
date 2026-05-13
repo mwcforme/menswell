@@ -11,7 +11,21 @@ const formatPhone = (v: string) => {
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 };
 
-export const TRTHeroForm = () => {
+type Service = "trt" | "wl" | "ed";
+
+interface TRTHeroFormProps {
+  service?: Service;
+  heading?: string;
+  subheading?: string;
+  ctaLabel?: string;
+}
+
+export const TRTHeroForm = ({
+  service = "trt",
+  heading = "Book My Consult",
+  subheading = "Same or next day. Takes 30 seconds.",
+  ctaLabel = "Book My Consult",
+}: TRTHeroFormProps = {}) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
