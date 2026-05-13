@@ -185,6 +185,20 @@ export const TRTHeroForm = ({
           {errors.location && <p className="text-xs mt-1" style={{ color: "#FF8A8A" }}>{errors.location}</p>}
         </div>
 
+        <label className="flex items-start gap-3 cursor-pointer pt-1">
+          <input
+            type="checkbox"
+            checked={tcpa}
+            onChange={(e) => setTcpa(e.target.checked)}
+            className="mt-0.5 flex-shrink-0 w-5 h-5 min-w-[20px] min-h-[20px] rounded border border-white/30 bg-transparent cursor-pointer"
+            style={{ accentColor: "#E8670A" }}
+          />
+          <span style={{ color: "rgba(245,240,235,0.65)", fontSize: 12, lineHeight: 1.45 }}>
+            I agree to receive SMS/calls about my appointment. Reply STOP to opt out. Msg & data rates may apply.
+          </span>
+        </label>
+        {errors.tcpa && <p className="text-xs" style={{ color: "#FF8A8A" }}>{errors.tcpa}</p>}
+
         <button
           type="submit"
           disabled={isSubmitting}
@@ -198,7 +212,7 @@ export const TRTHeroForm = ({
             borderRadius: 8,
             letterSpacing: "0.08em",
             fontFamily: "Inter, sans-serif",
-            marginTop: 4,
+            marginTop: 8,
             opacity: isSubmitting ? 0.85 : 1,
             cursor: isSubmitting ? "wait" : "pointer",
             transition: "background-color 180ms ease, transform 180ms ease",
@@ -209,20 +223,6 @@ export const TRTHeroForm = ({
           {isSubmitting && <Loader2 size={16} className="animate-spin" />}
           {isSubmitting ? "Booking..." : ctaLabel}
         </button>
-
-        <label className="flex items-start gap-3 cursor-pointer -m-2 p-2 rounded-lg transition-colors hover:bg-white/5">
-          <input
-            type="checkbox"
-            checked={tcpa}
-            onChange={(e) => setTcpa(e.target.checked)}
-            className="mt-0.5 flex-shrink-0 w-6 h-6 min-w-[24px] min-h-[24px] rounded border border-white/30 bg-transparent cursor-pointer"
-            style={{ accentColor: "#E8670A" }}
-          />
-          <span style={{ color: "rgba(245,240,235,0.55)", fontSize: 12, lineHeight: 1.45 }}>
-            I agree to receive SMS/calls about my appointment. Reply STOP to opt out. Msg & data rates may apply.
-          </span>
-        </label>
-        {errors.tcpa && <p className="text-xs" style={{ color: "#FF8A8A" }}>{errors.tcpa}</p>}
         {controller.error && !Object.keys(errors).length && (
           <p className="text-xs" style={{ color: "#FF8A8A" }}>{controller.error}</p>
         )}
