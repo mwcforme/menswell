@@ -14,9 +14,9 @@ const API_VERSION = "2021-07-28";
 const TIMEZONE = "America/New_York";
 
 const CENTERS: { key: string; calendarId: string }[] = [
-  { key: "richmond",        calendarId: "f57aKNaxejr3y1HeHFO9" },
-  { key: "virginia-beach",  calendarId: "YKNJFGFYB2RBJyzTczVx" },
-  { key: "newport-news",    calendarId: "Ss4R5otK1MQAeUFxJDoi" },
+  { key: "richmond",        calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
+  { key: "virginia-beach",  calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
+  { key: "newport-news",    calendarId: "IBaRbjUpEmesxEloFBME" },
 ];
 
 // Window we cache: now -> +21 days
