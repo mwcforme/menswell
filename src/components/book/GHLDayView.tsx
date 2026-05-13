@@ -50,8 +50,8 @@ interface Props {
 
 // Brand tokens (light surface, navy ink, orange accent)
 const INK = "#0B1029";
-const INK_SOFT = "#3A4258";
-const MUTED = "#6B7280";
+const INK_SOFT = "#2C3346";
+const MUTED = "#4B5563";
 const LINE = "#E5E7EB";
 const SURFACE = "#FFFFFF";
 const CANVAS = "#F7F8FB";
