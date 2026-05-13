@@ -488,7 +488,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                   disabled={loading}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 6,
-                    background: SURFACE, border: `1px solid ${LINE}`,
+                    background: SURFACE, border: `1px solid ${BORDER}`,
                     borderRadius: 999, padding: "6px 10px",
                     fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
                     color: INK_SOFT, cursor: loading ? "wait" : "pointer",
