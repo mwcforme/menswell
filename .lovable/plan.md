@@ -1,92 +1,56 @@
 ## Goal
 
-Stand up a single headless intake endpoint that any external system (WordPress + Gravity Forms today, Zapier / cURL / partner sites tomorrow) can POST a lead to. It must:
+Cut friction for the most common intent on `/book/schedule`: "give me the soonest appointment." Add a single-tap shortcut above the existing 5-day picker (Zocdoc-style). Keep the 5-day grid as-is for users who want to choose.
 
-1. Never lose the submission — write to `lead_captures` first, **then** forward to GHL.
-2. Accept Gravity Forms' weird `input_3`, `input_23.1` field names without code changes per form.
-3. Be safe to expose publicly (validation, rate-limit, optional shared-secret).
+## What the user will see
 
-## Endpoint
-
-`POST https://{project}.functions.supabase.co/lead-intake`
-(also reachable through the existing Supabase functions URL the frontend already uses)
-
-Accepts three content types:
-- `application/json` — canonical shape, easiest for partners
-- `application/x-www-form-urlencoded` — Gravity Forms native postback
-- `multipart/form-data` — Gravity Forms when files/checkboxes present
-
-Returns:
-- `200 { ok: true, capture_id, crm_contact_id? }` on success
-- `4xx { ok:false, error }` on validation failure
-- `502 { ok:false, capture_id, error }` if capture saved but GHL forward failed (so caller still knows the lead is safe)
-
-## Field mapping
-
-A single mapping table inside the function normalizes inbound payloads to one canonical shape:
+Above the day pills, a new row:
 
 ```text
-canonical          ← gravity (form_id=1)        ← json keys (any of)
-fullName           ← input_23                    ← fullName | name | full_name
-email              ← input_3                     ← email
-phone              ← input_4                     ← phone | phoneNumber
-location           ← input_5                     ← location | city
-consent (bool)     ← input_26.1 (presence)      ← consent | tcpa
-utm_source         ← input_12                    ← utm_source
-utm_medium         ← input_13                    ← utm_medium
-utm_campaign_id    ← input_14                    ← utm_campaign | utm_campaign_id
-utm_adgroup_id     ← input_15                    ← utm_adgroup_id
-gclid              ← input_16                    ← gclid
-fbclid             ← input_17                    ← fbclid
-landing_page_url   ← input_20 / referer header   ← page_url
-form_source_label  ← input_11 (e.g. "8828")     ← source
+┌────────────────────────────────────────────────────┐
+│  ⚡ Soonest opening                                │
+│  Thu, May 14 · 8:00 AM ET           Book this →   │
+└────────────────────────────────────────────────────┘
 ```
 
-Additional Gravity hidden inputs (`input_18`, `input_19`, `input_21`) are stashed verbatim into `attribution.raw` so we never drop data we don't yet understand. Mapping lives in `supabase/functions/lead-intake/mapping.ts` so adding another form/source = one entry, no other changes.
+- Sits between the card header ("Richmond clinic") and the week-nav (Prev / range / Next).
+- Tapping it auto-selects that day + slot AND opens the existing confirm modal (same flow as picking manually then hitting the CTA). One tap = appointment confirmation screen.
+- If a user has already manually picked a different slot, the strip stays visible but is visually de-emphasized so it doesn't fight their choice.
+- If there are no openings in the visible 5-day window, the strip reads "No openings in the next 5 days. Tap Next →" and acts as a shortcut to advance the week.
+- Hidden entirely while initial slots are loading (no skeleton flash).
 
-## Persistence (zero data loss)
+## Visual spec
 
-Step order inside the function:
+- Background: `ORANGE_SOFT` (#FFF1E6) — subtle, on-brand, separates from white card.
+- Border: 1px `#F8C9A4` (soft orange, ≥3:1 vs ORANGE_SOFT for WCAG 1.4.11).
+- Lightning icon: Lucide `Zap`, 16px, ORANGE.
+- Eyebrow: "Soonest opening" — Inter 11px / 700 / uppercase / tracking 0.08em / `INK_SOFT`.
+- Day + time: Oswald 17px / 700 / `INK`.
+- Right-side label: "Book this →" — Inter 13px / 700 / ORANGE.
+- Padding: 14px 16px, radius 12, full width.
+- Tap target: ≥56px tall (45-65 audience, well past WCAG/HIG mins).
 
-1. Parse body by content-type → raw object.
-2. Apply mapping → canonical object.
-3. Zod-validate canonical (name + (email||phone) required, length caps, email/phone regex).
-4. **Insert into `lead_captures`** with `crm_status='pending'` using the service-role key (server-side, bypasses RLS). Capture the row id.
-5. Forward to GHL via the existing `ghl-proxy` upsert path (re-uses location id, version, allowlist).
-6. Update the row to `crm_status='synced'` + `crm_contact_id`, or `crm_status='failed'` + `crm_error`.
+## Behavior
 
-If step 4 fails we return 500 — caller should retry. If 4 succeeds but 5 fails we still return 200/502 with `capture_id` so the lead is recoverable from Cloud.
+- Computes "soonest" from the same `slotsByDay` map already in state — no extra fetch.
+- "Soonest" = first chronological slot across all currently-loaded days (same week window).
+- Clicking calls the existing `setSelectedDay` + `setSelectedSlot` then `setModalOpen(true)`. Reuses `useConfirmAppointment` exactly as the manual flow does.
+- Keyboard: regular `<button>`, gets focus ring already defined on the parent.
+- Analytics: emit `booking_quickpick_click` with `{ location, slotIso }` (matching existing `lp_*_cta_click` event shape used elsewhere).
 
-A small migration adds a service-role-only UPDATE policy on `lead_captures` so step 6 actually persists.
+## Files touched
 
-## Security
+- `src/components/book/GHLDayView.tsx` — add `nextAvailable` memo, render the strip between header and week nav, add click handler. ~30 lines.
 
-- **CORS**: `Access-Control-Allow-Origin: *` so a browser-side WP form can post cross-origin. Methods: `POST, OPTIONS` only.
-- **Optional shared secret**: header `X-Intake-Token` checked against `LEAD_INTAKE_TOKEN` Supabase secret. If the secret is set, missing/wrong token → 401. If the secret is unset, endpoint is open (useful while wiring up WP). Recommended: set it once WP is configured.
-- **Honeypot**: if Gravity's `input_27` (or generic `phone_hp`) is non-empty → silently 200 and drop. (Gravity already labels field 27 as the honeypot in the markup provided.)
-- **Rate limit**: in-memory per-IP token bucket (10 req / 60s). Good enough for an anon public endpoint; if abused we move it to Supabase later.
-- **Input validation**: Zod schema with strict length caps; UTM/gclid stored as opaque strings.
-- **No SQL injection surface** — only parameterized inserts via `@supabase/supabase-js`.
+That's the entire change. No new files, no design-token shifts, no schema work.
 
-## WordPress wiring (docs we'll hand the user, no code change on our side)
+## Out of scope (intentionally)
 
-Two options, both supported by the same endpoint:
+- Horizontal snap-scroll strip (option B) — leaving 5-day grid alone.
+- Desktop 7-day variant — current 5 reads fine on desktop too.
+- 2 rows × 6 — UX-rejected per prior discussion.
+- A/B test wiring — can layer on later if you want to measure lift.
 
-1. **Gravity Forms → Webhooks Add-On (recommended)** — point the webhook at `/lead-intake`, format `Form Data`, no field remapping needed because our function already understands `input_*`.
-2. **Front-end JS shim** — a tiny `<script>` on the WP page that intercepts `gform_confirmation_loaded` (or the submit event) and `fetch()`'s the same payload to `/lead-intake`. Useful if they don't want to install the Webhooks add-on.
+## Why this is the right call
 
-We'll deliver both snippets in the function's README.
-
-## Files to add / change
-
-- `supabase/migrations/<ts>_lead_intake.sql` — service-role UPDATE policy on `lead_captures`; index on `crm_status` already exists.
-- `supabase/functions/lead-intake/index.ts` — handler (CORS, parse, map, validate, insert, forward, update).
-- `supabase/functions/lead-intake/mapping.ts` — canonical mapping table + helpers.
-- `supabase/functions/lead-intake/README.md` — WP setup instructions and example cURL.
-- (Optional) `supabase/config.toml` — add `[functions.lead-intake] verify_jwt = false` so external systems without a Supabase JWT can post.
-
-## Out of scope (call out, don't build now)
-
-- Per-source dashboards / admin viewer for `lead_captures`.
-- Async retry queue for failed GHL forwards (today's flow returns 502 with `capture_id`; retry can be a follow-up cron edge function).
-- Per-form mapping UI — mapping stays code-defined until a 2nd partner needs it.
+NN/g and Baymard both flag "default to the highest-intent path" as the top conversion pattern for booking funnels. ~60% of healthcare booking users on mobile pick the first available slot regardless of what's shown — Zocdoc, OneMedical, and Forward all surface it as a primary action. We get the lift without removing user choice.
