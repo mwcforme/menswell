@@ -430,21 +430,21 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     </div>
                     <div
                       style={{
-                        fontSize: 10,
-                        fontWeight: 700,
+                        fontSize: 11,
+                        fontWeight: 800,
                         color: selected
                           ? "#FFFFFF"
                           : available
-                            ? count >= 3 ? "#0F7A3D" : "#B91C1C"
-                            : isSunday ? "#9AA0AC" : "#A8AEB8",
+                            ? count >= 3 ? "#0B6B33" : "#991B1B"
+                            : isSunday ? "#4B5563" : "#4B5563",
                         background: selected
-                          ? "rgba(255,255,255,0.15)"
+                          ? "rgba(255,255,255,0.18)"
                           : available
-                            ? count >= 3 ? "#E6F7EC" : "#FEECEC"
-                            : isSunday ? "#F1F2F5" : "#F1F2F5",
+                            ? count >= 3 ? "#DCF5E5" : "#FDE2E2"
+                            : isSunday ? "#E5E7EB" : "#E5E7EB",
                         marginTop: 6,
                         letterSpacing: "0.06em",
-                        padding: "2px 6px",
+                        padding: "3px 7px",
                         borderRadius: 999,
                         display: "inline-block",
                       }}
