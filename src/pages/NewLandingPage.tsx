@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { TRTHeader } from "@/components/landing/trt/TRTHeader";
 import { TRTHero } from "@/components/landing/trt/TRTHero";
 import { CredibilityBand } from "@/components/landing/trt/CredibilityBand";
@@ -14,6 +15,9 @@ import { StickyMobileCTA } from "@/components/landing/trt/StickyMobileCTA";
 import { SectionReveal } from "@/components/landing/trt/SectionReveal";
 import { SEO } from "@/components/SEO";
 import { useScrollDepth } from "@/hooks/useAnalytics";
+import { buildFaqJsonLd } from "@/lib/schema";
+
+const faqSchema = JSON.stringify(buildFaqJsonLd());
 
 const NewLandingPage = () => {
   useScrollDepth();
@@ -23,6 +27,9 @@ const NewLandingPage = () => {
         title="TRT in Virginia | Testing | Men's Wellness Centers"
         description="Provider-supervised testosterone replacement therapy at 3 Virginia locations. Testing and results reviewed in-visit. Walk in today."
       />
+      <Helmet>
+        <script type="application/ld+json">{faqSchema}</script>
+      </Helmet>
       <TRTHeader />
       <main className="flex-1">
         <TRTHero />
