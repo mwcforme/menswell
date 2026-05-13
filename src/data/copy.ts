@@ -1,19 +1,30 @@
 /**
  * Approved wording map for CTAs, badges, and offer copy.
  *
- * SINGLE SOURCE OF TRUTH. Do NOT hardcode CTA/badge labels in components,
- * import from here instead. The word "free" is BANNED across all surfaces;
- * use "no-cost" / "no obligation" / "no commitment" only.
+ * SINGLE SOURCE OF TRUTH for all on-page CTA labels, badge text, and offer
+ * phrasing on landing pages (TRT, ED, WL) and shared landing components.
  *
- * If a new phrase is needed, add it here so it can be reviewed in one place.
+ * Rules:
+ *  - The word "free" (any case) is BANNED. Use "no-cost", "no obligation",
+ *    "no commitment", or "at no charge" only.
+ *  - Components must NOT hardcode CTA/badge labels. Import from COPY instead.
+ *  - To add a new label, add a key here so wording is reviewed in one place.
  */
 
 export const COPY = {
   cta: {
-    /** Primary booking CTA. Used by header, hero, locations, results, sticky bar, final CTA. */
+    /** Primary booking CTA. Header, hero submit, locations, sticky bar, final CTA. */
     bookConsult: "Book My Consult",
-    /** Inline link variant (e.g. inside FAQ answers). */
+    /** Results section CTA. */
+    startConsult: "Start My Consult",
+    /** Inline link variant inside FAQ answers. */
     bookConsultInline: "Book a no-cost consult",
+    /** ED service final-CTA + ED form card title. */
+    bookDiscreetVisit: "Book My Discreet Visit",
+    /** WL service final-CTA + WL manifesto. */
+    seeIfIQualify: "See If I Qualify",
+    /** TRT manifesto secondary CTA. */
+    seeIfYouQualify: "See If You Qualify",
     /** Phone CTA prefix. */
     callNow: "Call Now",
   },
@@ -37,4 +48,4 @@ export const COPY = {
   },
 } as const;
 
-export type CopyKey = typeof COPY;
+export type CopyMap = typeof COPY;
