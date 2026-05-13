@@ -25,6 +25,15 @@ export const LANDING_PAGES: LandingPageEntry[] = [
     notes: "Primary TRT funnel. Hero form posts to GHL via ghl-proxy.",
     updatedAt: "2026-05-13",
   },
+  {
+    slug: "/quiz",
+    name: "TRT Symptom Quiz",
+    service: "trt",
+    status: "live",
+    primaryCta: "/book/symptom",
+    notes: "60-second Low-T symptom inventory. Score routed into booking funnel as quiz_score tag.",
+    updatedAt: "2026-05-13",
+  },
 ];
 
 export interface BookingStep {
