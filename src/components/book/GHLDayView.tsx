@@ -346,7 +346,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
             aria-label="Next week"
             style={{
-              background: SURFACE, color: INK, border: `1px solid ${LINE}`,
+              background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
               borderRadius: 999, padding: "8px 12px",
               fontSize: 13, fontWeight: 600,
               display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer",
