@@ -80,3 +80,30 @@ Phase 1 adds ~1 KB of contracts + provider. No consumer migration yet, so the do
 - [x] Consistent loading / success / error contract (`status`, `error`, `fieldErrors`, `isSubmitting`).
 - [x] No component imports `upsertContact` or `bookAppointment` directly.
 - [x] `tsc --noEmit` passes; no `any` introduced.
+
+## WL + ED LP research (2026-05-13)
+
+Sources: hims.com/ed, hims.com/weight-loss, ro.co/weight-loss, henrymeds.com, bluechew.com.
+
+**ED competitor patterns**
+- Outcome-led H1s: "Stronger erections / Longer sex" (Hims), "Have Better Sex / Get hard faster, stay hard longer" (BlueChew).
+- Trust signal: "5 Million+ Men Served" (BlueChew), media logos (NBC/ESPN/FOX).
+- CTA verb: "Find my treatment", "Get started", quiz/eligibility entry.
+- Med names front-and-center: Sildenafil, Tadalafil. None mention TriMix or PT-141.
+- All-online, mail-order. None offer in-person VA care or labs.
+
+**MWC ED positioning (used in /new-ed)** — "Real Treatment. Real Results." Discreet, in-person, Virginia physician, FDA-approved orals + TriMix + PT-141, same-day labs. Differentiation: treats cause (hormones/vascular), not just symptom.
+
+**WL competitor patterns**
+- Outcome promise: "Lose 20% body weight on average" (Ro), "Weight loss that works" (Hims).
+- Med names: Wegovy, Zepbound, semaglutide, tirzepatide, GLP-1.
+- Pricing transparent: "$149/mo" (pill), "$199/mo" (pen), "$299/mo" (vial).
+- CTAs: "See if I'm eligible", "Start your journey", insurance check.
+- Visuals: pill/pen product shots, before/after weight numbers ("32 lbs*").
+
+**MWC WL positioning (used in /new-wl)** — "Lose The Weight. Keep It Off." Physician-supervised GLP-1, in-center labs, FSA/HSA, no mail-order chatbot. Differentiation: real provider adjusts dose based on bloodwork.
+
+**Photography decision**
+- WL hero: copy-led, no person photo. Manifesto uses /images/services/weight-loss.jpg.
+- ED hero: copy-led for discretion (matches competitor pattern of product/abstract over faces). Manifesto uses /images/services/sexual-wellness-couple.png.
+- No AI-generated faces per brand memory.

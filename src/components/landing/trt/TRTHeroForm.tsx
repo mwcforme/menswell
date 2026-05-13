@@ -11,7 +11,21 @@ const formatPhone = (v: string) => {
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
 };
 
-export const TRTHeroForm = () => {
+type Service = "trt" | "wl" | "ed";
+
+interface TRTHeroFormProps {
+  service?: Service;
+  heading?: string;
+  subheading?: string;
+  ctaLabel?: string;
+}
+
+export const TRTHeroForm = ({
+  service = "trt",
+  heading = "Book My Consult",
+  subheading = "Same or next day. Takes 30 seconds.",
+  ctaLabel = "Book My Consult",
+}: TRTHeroFormProps = {}) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -34,7 +48,7 @@ export const TRTHeroForm = () => {
     onSuccess: (_r, v) => {
       // Persist service tag and route to symptom step with full state in URL.
       const merged = getBookingState();
-      const qs = toQueryString({ ...merged, location: v.location, service: "trt" });
+      const qs = toQueryString({ ...merged, location: v.location, service });
       // Use replace-style nav via window so back-button doesn't trap on the LP form.
       window.location.assign(`/book/symptom?${qs}`);
     },
@@ -87,13 +101,13 @@ export const TRTHeroForm = () => {
           lineHeight: 1.15,
         }}
       >
-        Book My Consult
+        {heading}
       </h2>
       <p
         className="mt-1.5 mb-5"
         style={{ color: "rgba(245,240,235,0.70)", fontFamily: "Inter, sans-serif", fontSize: 14 }}
       >
-        Same or next day. Takes 30 seconds.
+        {subheading}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-3" noValidate>
@@ -192,7 +206,7 @@ export const TRTHeroForm = () => {
           onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; e.currentTarget.style.transform = "scale(1)"; }}
         >
           {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-          {isSubmitting ? "Booking..." : "Book My Consult"}
+          {isSubmitting ? "Booking..." : ctaLabel}
         </button>
 
         <label className="flex items-start gap-3 cursor-pointer -m-2 p-2 rounded-lg transition-colors hover:bg-white/5">
