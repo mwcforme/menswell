@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 /**
- * Common footer used across landing pages (/new, /new-wl, /new-ed).
+ * Common footer used across landing pages (/, /wl, /ed).
  * Mirrors the structure and dark-navy aesthetic of menswellnesscenters.com,
  * trimmed to required links only.
  */

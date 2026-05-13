@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { Phone, CalendarCheck, MessageSquare } from "lucide-react";
 
 /** Routes where this bar should NOT appear (they have their own mobile CTAs) */
-const EXCLUDED_ROUTES = ["/book", "/bookv2", "/intake", "/new", "/new2"];
+const EXCLUDED_ROUTES = ["/book", "/bookv2", "/intake", "/", "/wl", "/ed"];
 
 export const MobileFooterBar = () => {
   const { pathname } = useLocation();
