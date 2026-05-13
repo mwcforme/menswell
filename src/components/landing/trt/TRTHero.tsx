@@ -199,21 +199,9 @@ export const TRTHero = () => {
           </div>
         </div>
 
-        {/* RIGHT — form. Wrapper-only styling: orange left accent + min-height to reserve space.
-            DO NOT modify anything inside TRTHeroForm. */}
-        <div
-          id="hero-form"
-          className="w-full flex lg:justify-end"
-          style={{ minHeight: 560 }}
-        >
-          <div
-            className="w-full lg:max-w-[440px]"
-            style={{
-              borderLeft: "4px solid rgba(232,103,10,0.6)",
-              borderRadius: 16,
-              paddingLeft: 0,
-            }}
-          >
+        {/* RIGHT — form. No decoration. DO NOT add borders, accents, or wrappers around the form. */}
+        <div id="hero-form" className="w-full flex lg:justify-end">
+          <div className="w-full lg:max-w-[440px]">
             <TRTHeroForm />
           </div>
         </div>
