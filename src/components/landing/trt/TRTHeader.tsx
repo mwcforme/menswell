@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Phone } from "lucide-react";
+import { Link } from "react-router-dom";
+import { trackCro } from "@/hooks/useAnalytics";
 
 export const TRTHeader = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -27,23 +29,28 @@ export const TRTHeader = () => {
       }}
     >
       <div className="flex items-center justify-between px-6 mx-auto max-w-[1200px] h-full">
-        <img
-          src="/logos/Text_Logo_white.png"
-          alt="Men's Wellness Centers"
-          className="h-7 w-auto"
-        />
+        <Link to="/" aria-label="Men's Wellness Centers home" className="inline-flex">
+          <img
+            src="/logos/Text_Logo_white.png"
+            alt="Men's Wellness Centers"
+            className="h-7 w-auto"
+          />
+        </Link>
 
         {/* Desktop right */}
         <div className="hidden md:flex items-center gap-4">
           <a
-            href="tel:8663444955"
+            href="tel:+18663444955"
+            data-cro="header_phone_click"
+            onClick={() => trackCro("header_phone_click")}
             className="text-sm font-medium transition-opacity hover:opacity-80"
             style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif" }}
           >
             866-344-4955
           </a>
           <button
-            onClick={() => scrollTo("final-cta")}
+            data-cro="header_book_click"
+            onClick={() => { trackCro("header_book_click"); scrollTo("hero-form"); }}
             className="rounded-full px-5 py-2.5 text-xs font-bold uppercase cursor-pointer transition-colors duration-200"
             style={{
               background: "#E8670A",
@@ -61,7 +68,9 @@ export const TRTHeader = () => {
         {/* Mobile: phone icon only */}
         <div className="md:hidden flex items-center">
           <a
-            href="tel:8663444955"
+            href="tel:+18663444955"
+            data-cro="header_phone_click_mobile"
+            onClick={() => trackCro("header_phone_click_mobile")}
             aria-label="Call 866-344-4955"
             className="relative inline-flex items-center justify-center rounded-full"
             style={{
