@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 /**
- * Common footer used across landing pages (/new, /new-wl, /new-ed).
+ * Common footer used across landing pages (/, /wl, /ed).
  * Mirrors the structure and dark-navy aesthetic of menswellnesscenters.com,
  * trimmed to required links only.
  */
@@ -12,7 +12,7 @@ export const TRTFooter = () => {
     <footer style={{ background: "#000033", color: "rgba(255,255,255,0.78)", fontFamily: "Inter, sans-serif" }}>
       <div className="max-w-[1200px] mx-auto px-6 pt-14 pb-10">
         {/* Top: Brand + 3 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div className="md:col-span-1">
             <img
@@ -30,21 +30,6 @@ export const TRTFooter = () => {
             >
               866-344-4955
             </a>
-          </div>
-
-          {/* Locations */}
-          <div>
-            <div
-              className="text-xs font-semibold uppercase mb-4"
-              style={{ color: "#FFFFFF", letterSpacing: "0.12em" }}
-            >
-              Locations
-            </div>
-            <ul className="space-y-3 text-sm">
-              <li><Link to="/locations/richmond" className="hover:text-white transition-colors">Richmond</Link></li>
-              <li><Link to="/locations/newport-news" className="hover:text-white transition-colors">Newport News</Link></li>
-              <li><Link to="/locations/virginia-beach" className="hover:text-white transition-colors">Virginia Beach</Link></li>
-            </ul>
           </div>
 
           {/* Contact */}

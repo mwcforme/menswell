@@ -59,7 +59,7 @@ const BookSymptom = () => {
         subtitle="Pick the one that fits best."
         helperText="This helps us prepare your personalized consultation."
         prevLabel="Back"
-        onPrev={() => navigate("/new")}
+        onPrev={() => navigate("/")}
       >
         {OPTIONS.map((o) => (
           <OptionRow

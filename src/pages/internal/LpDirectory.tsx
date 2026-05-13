@@ -341,7 +341,7 @@ const LpDirectory = () => {
           <p className="text-xs mb-4" style={{ color: "rgba(245,240,235,0.55)" }}>
             Hidden fields auto-populated from URL params on first visit and persisted to a 90-day first-party cookie.
             Override the visible First/Last Name on submit when present.
-            Try: <span className="font-mono">/new?utm_source=meta&utm_campaign=test&gclid=ABC123&first_name=John</span>
+            Try: <span className="font-mono">/?utm_source=meta&utm_campaign=test&gclid=ABC123&first_name=John</span>
           </p>
           <div
             className="rounded-xl overflow-hidden mb-12"
@@ -371,7 +371,7 @@ const LpDirectory = () => {
           </div>
 
           <div className="text-center text-xs pt-8" style={{ color: "rgba(245,240,235,0.45)" }}>
-            <Link to="/new" style={{ color: COLORS.orange }}>← Back to live site</Link>
+            <Link to="/" style={{ color: COLORS.orange }}>← Back to live site</Link>
           </div>
         </div>
       </div>

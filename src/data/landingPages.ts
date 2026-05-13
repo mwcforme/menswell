@@ -17,7 +17,7 @@ export interface LandingPageEntry {
  */
 export const LANDING_PAGES: LandingPageEntry[] = [
   {
-    slug: "/new",
+    slug: "/",
     name: "TRT Hero (v1)",
     service: "trt",
     status: "live",
@@ -44,7 +44,7 @@ export const LANDING_PAGES: LandingPageEntry[] = [
     updatedAt: "2026-05-13",
   },
   {
-    slug: "/new-wl",
+    slug: "/wl",
     name: "Weight Loss Hero (v1)",
     service: "weight-loss",
     status: "live",
@@ -53,7 +53,7 @@ export const LANDING_PAGES: LandingPageEntry[] = [
     updatedAt: "2026-05-13",
   },
   {
-    slug: "/new-ed",
+    slug: "/ed",
     name: "ED Hero (v1)",
     service: "ed",
     status: "live",
