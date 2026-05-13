@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, ChevronLeft, ChevronRight, CalendarCheck, RefreshCw } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   CENTER_CALENDARS,
