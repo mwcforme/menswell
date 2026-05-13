@@ -310,23 +310,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           className="px-5 md:px-7 pt-6 md:pt-8 pb-5"
           style={{ borderBottom: `1px solid ${LINE}`, background: SURFACE }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 8, color: ORANGE, fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 6 }}>
-            <CalendarCheck size={14} strokeWidth={2.5} />
-            <span>Schedule your visit</span>
-          </div>
           <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, letterSpacing: "0.01em", fontSize: "clamp(22px, 3vw, 30px)", lineHeight: 1.1, color: INK }}>
-            Pick a day at the {cal.label} clinic
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, color: MUTED, fontSize: 13, marginTop: 8, flexWrap: "wrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <Clock size={14} /> 60 min consult
-            </span>
-            <span style={{ width: 4, height: 4, borderRadius: 999, background: LINE }} />
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <MapPin size={14} /> In-person
-            </span>
-            <span style={{ width: 4, height: 4, borderRadius: 999, background: LINE }} />
-            <span>Hours: 8 AM – 5 PM ET</span>
+            {cal.label} clinic
           </div>
         </div>
 
