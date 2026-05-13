@@ -320,74 +320,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
         </div>
 
-        {/* QUICK-PICK: soonest available opening (Zocdoc-style) */}
-        {!loading && (
-          <div className="px-5 md:px-7 pt-5">
-            <button
-              type="button"
-              onClick={handleQuickPick}
-              aria-label={
-                nextAvailable
-                  ? `Book the soonest opening, ${fmtFullDay(nextAvailable.date)} at ${fmtTimeParts(nextAvailable.iso).time} ${fmtTimeParts(nextAvailable.iso).ampm} ET`
-                  : "No openings in the next 5 days. Show next 5 days."
-              }
-              style={{
-                width: "100%",
-                minHeight: 56,
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                background: ORANGE_SOFT,
-                border: "1px solid #F8C9A4",
-                borderRadius: 12,
-                padding: "12px 16px",
-                cursor: "pointer",
-                textAlign: "left",
-                opacity: quickPickMuted ? 0.7 : 1,
-                transition: "opacity 160ms ease, transform 120ms ease, box-shadow 120ms ease",
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  flexShrink: 0,
-                  width: 32, height: 32, borderRadius: 8,
-                  background: "#FFFFFF",
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  border: "1px solid #F8C9A4",
-                }}
-              >
-                <Zap size={16} color={ORANGE} strokeWidth={2.5} fill={ORANGE} />
-              </span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{
-                  display: "block",
-                  fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                  textTransform: "uppercase", color: INK_SOFT, marginBottom: 2,
-                }}>
-                  Soonest opening
-                </span>
-                <span style={{
-                  display: "block",
-                  fontFamily: "Oswald, Inter, sans-serif",
-                  fontWeight: 700, fontSize: 17, color: INK, letterSpacing: "0.01em",
-                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                }}>
-                  {nextAvailable
-                    ? `${nextAvailable.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE })} · ${fmtTimeParts(nextAvailable.iso).time} ${fmtTimeParts(nextAvailable.iso).ampm} ET`
-                    : "No openings in the next 5 days"}
-                </span>
-              </span>
-              <span style={{
-                flexShrink: 0,
-                fontSize: 13, fontWeight: 700, color: ORANGE,
-                whiteSpace: "nowrap",
-              }}>
-                {nextAvailable ? "Book this →" : "Show next 5 →"}
-              </span>
-            </button>
-          </div>
-        )}
+
 
         {/* WEEK NAV */}
         <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
