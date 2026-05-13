@@ -265,7 +265,7 @@ function QuizPhase({
         >
           Get my results
         </button>
-        <p className="text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
+        <p className="text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>
           {answered} of {TOTAL_ITEMS} answered. Unanswered items count as zero.
         </p>
       </div>
@@ -336,7 +336,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
       <div className="mt-3 inline-block px-3 py-1 rounded text-xs uppercase tracking-[0.14em] font-semibold" style={{ background: `${result.color}22`, color: result.color, border: `1px solid ${result.color}55` }}>
         {result.label}
       </div>
-      <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.82)" }}>
+      <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.92)" }}>
         {result.note}
       </p>
       <p className="mt-3 text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
