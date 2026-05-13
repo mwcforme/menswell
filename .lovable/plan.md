@@ -1,56 +1,44 @@
-## Goal
+## Re-evaluation of three elements
 
-Cut friction for the most common intent on `/book/schedule`: "give me the soonest appointment." Add a single-tap shortcut above the existing 5-day picker (Zocdoc-style). Keep the 5-day grid as-is for users who want to choose.
+### 1. "Soonest opening" quick-pick — REMOVE
 
-## What the user will see
+It was a smart pattern in isolation, but on this page it underperforms:
 
-Above the day pills, a new row:
+- **Truncates on 390px** ("Thu, May 14 · 8:00 ...") — defeats the entire purpose of a quick-pick, which is to convey the slot at a glance.
+- **Redundant.** The calendar already auto-selects the first available day on load. The user is one tap away from the soonest slot via the time grid below — the quick-pick adds a parallel path to the same outcome.
+- **Pushes the calendar below the fold.** On 390×844 the day pills now sit ~520px down. The headline goal of /book/schedule is "see days + see times." A 76px promotional row above them costs more conversion than it gains.
+- **Two CTAs of equal visual weight** (orange-tint quick-pick + orange "Confirm" bar) split attention. Krug's rule: one obvious next action per screen.
 
-```text
-┌────────────────────────────────────────────────────┐
-│  ⚡ Soonest opening                                │
-│  Thu, May 14 · 8:00 AM ET           Book this →   │
-└────────────────────────────────────────────────────┘
-```
+**Decision:** delete the quick-pick block and `nextAvailable` computation. Keep the existing auto-select-first-available behavior — it already accomplishes the same job invisibly.
 
-- Sits between the card header ("Richmond clinic") and the week-nav (Prev / range / Next).
-- Tapping it auto-selects that day + slot AND opens the existing confirm modal (same flow as picking manually then hitting the CTA). One tap = appointment confirmation screen.
-- If a user has already manually picked a different slot, the strip stays visible but is visually de-emphasized so it doesn't fight their choice.
-- If there are no openings in the visible 5-day window, the strip reads "No openings in the next 5 days. Tap Next →" and acts as a shortcut to advance the week.
-- Hidden entirely while initial slots are loading (no skeleton flash).
+### 2. Chip labels — fixed by removing the row
 
-## Visual spec
+The "SOONEST OPENING" + truncated date is the only label that doesn't fit. Day-pill chips ("FULL", "CLOSED", "7 OPEN") fit cleanly. So removing the quick-pick resolves the chip-fit problem at the same time. No further chip work needed.
 
-- Background: `ORANGE_SOFT` (#FFF1E6) — subtle, on-brand, separates from white card.
-- Border: 1px `#F8C9A4` (soft orange, ≥3:1 vs ORANGE_SOFT for WCAG 1.4.11).
-- Lightning icon: Lucide `Zap`, 16px, ORANGE.
-- Eyebrow: "Soonest opening" — Inter 11px / 700 / uppercase / tracking 0.08em / `INK_SOFT`.
-- Day + time: Oswald 17px / 700 / `INK`.
-- Right-side label: "Book this →" — Inter 13px / 700 / ORANGE.
-- Padding: 14px 16px, radius 12, full width.
-- Tap target: ≥56px tall (45-65 audience, well past WCAG/HIG mins).
+### 3. Sticky footer — NOT best practice as currently shipped
 
-## Behavior
+On `/book/schedule` mobile there are **two competing sticky bars stacked**:
 
-- Computes "soonest" from the same `slotsByDay` map already in state — no extra fetch.
-- "Soonest" = first chronological slot across all currently-loaded days (same week window).
-- Clicking calls the existing `setSelectedDay` + `setSelectedSlot` then `setModalOpen(true)`. Reuses `useConfirmAppointment` exactly as the manual flow does.
-- Keyboard: regular `<button>`, gets focus ring already defined on the parent.
-- Analytics: emit `booking_quickpick_click` with `{ location, slotIso }` (matching existing `lp_*_cta_click` event shape used elsewhere).
+- Orange "CALL (866) 344-4955" bar from `BookSchedule.tsx` (line 158)
+- "BOOK ONLINE / CHAT TO BOOK / CALL NOW" `MobileFooterBar`
 
-## Files touched
+The exclusion list in `MobileFooterBar.tsx` only matches `/book` exactly, not `/book/schedule`, so it slips through.
 
-- `src/components/book/GHLDayView.tsx` — add `nextAvailable` memo, render the strip between header and week nav, add click handler. ~30 lines.
+This violates two principles:
+- **Don't yank users off the conversion page.** They came to schedule online; two "CALL" CTAs imply the online path is broken.
+- **No competing sticky elements.** Stacked sticky bars eat ~140px of viewport on a 844px screen.
 
-That's the entire change. No new files, no design-token shifts, no schema work.
+**Decision:**
+- Broaden `EXCLUDED_ROUTES` matching in `MobileFooterBar` from exact-match to `pathname.startsWith("/book")` and `startsWith("/bookv2")` and `startsWith("/intake")`. This kills the BOOK/CHAT/CALL bar on every booking funnel step.
+- **Keep** the single orange "CALL" fallback bar in `BookSchedule.tsx` — it's the right escape hatch for the 45-65 demo who may abandon the calendar. One sticky CTA, not two.
 
-## Out of scope (intentionally)
+## Files
 
-- Horizontal snap-scroll strip (option B) — leaving 5-day grid alone.
-- Desktop 7-day variant — current 5 reads fine on desktop too.
-- 2 rows × 6 — UX-rejected per prior discussion.
-- A/B test wiring — can layer on later if you want to measure lift.
+- `src/components/book/GHLDayView.tsx` — remove quick-pick JSX block (~67 lines), remove `Zap` import, remove `nextAvailable` useMemo, remove `handleQuickPick`, remove `quickPickMuted`, keep `advanceWeek` only if still referenced (otherwise drop).
+- `src/components/shared/MobileFooterBar.tsx` — change exclusion check to prefix-match for `/book`, `/bookv2`, `/intake`.
 
-## Why this is the right call
+## Out of scope
 
-NN/g and Baymard both flag "default to the highest-intent path" as the top conversion pattern for booking funnels. ~60% of healthcare booking users on mobile pick the first available slot regardless of what's shown — Zocdoc, OneMedical, and Forward all surface it as a primary action. We get the lift without removing user choice.
+- Day-pill visual treatment (already cleaned up last turn).
+- The orange CALL bar on `/book/schedule` stays as-is.
+- No analytics-event removal needed — `booking_quickpick_click` simply stops firing.
