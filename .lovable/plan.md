@@ -1,83 +1,103 @@
-# Plan: Paid-LP SEO hardening + Sentry integration
+## Goal
 
-Note on Lovable workflow: edits apply to the preview as I make them — there is no separate "diff-only" mode. Nothing is published to your live domain until you click Publish. I'll list every change below; approve and I'll execute, then you can review in preview before publishing.
+Ship two new paid-traffic landing pages, /new-wl (Weight Loss) and /new-ed (Erectile Dysfunction), cloned from the proven /new (TRT) structure. Copy and photo direction will be informed by a focused competitor scan, not invented.
 
-## Part 1 — SEO / indexing
+## Phase 1 — Competitor research (read-only, ~10 min)
 
-**`index.html`**
-- Add high in `<head>` (after charset/viewport):
-  - `<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />`
-  - `<meta name="googlebot" content="noindex, nofollow" />`
-  - `<meta name="bingbot" content="noindex, nofollow" />`
-- Leave existing GTM/GA, OG tags, fonts in place.
+Scrape and analyze 4-5 top LPs per service so the copy is grounded, not generic. Use Firecrawl (`scrape` with `markdown` + `screenshot` formats) on:
 
-**`public/robots.txt`** — replace contents with:
+**ED competitors**
+- hims.com/ed
+- ro.co/ed
+- bluechew.com
+- mosh.com.au/ed
+- foreverwell / local Virginia ED comp if Semrush surfaces one
+
+**Weight Loss competitors**
+- hims.com/weight-loss
+- ro.co/weight-loss (Ro Body)
+- foundhealth.com
+- formhealth.co
+- henrymeds.com/weight-loss
+- mochihealth.com
+
+For each, capture:
+- H1 + subhead (the headline pattern that works)
+- Trust bar items (what social proof they lead with)
+- Form fields above the fold
+- Photo style (model age, setting, mood)
+- Pricing or "first visit free" framing
+- Top 3 objection-handling sections
+- FAQ topics
+
+Output a short internal brief (saved to `REFACTOR_NOTES.md` under "WL + ED LP research") so the copy choices are auditable.
+
+Cross-check with Semrush `serp_analysis` on "trt virginia", "ed treatment near me", "weight loss clinic richmond va" to see which competitors actually rank and what intent they target.
+
+## Phase 2 — Photography direction
+
+`/new` currently has no large photography. WL and ED LPs convert better with one credible hero photo. Per brand memory, **no AI faces, no stock-photo cliché**. Two options:
+
+- **A** — Source from existing MWC photo library (preferred). I'll list the `/public/` and `/src/assets/` folders and pick the best in-brand shot per page.
+- **B** — Use a tasteful, age-appropriate (45-65) lifestyle photo from an authentic photography source. I will not generate AI faces.
+
+I'll list what's available and pick A wherever possible. For ED specifically, copy-led design (no person photo) is often the right call to preserve discretion. I'll flag this in the research brief and decide per page.
+
+## Phase 3 — Page builds
+
+Clone the `/new` component structure under namespaced folders so we don't pollute TRT components:
+
+```text
+src/components/landing/wl/
+  WLHero.tsx            (was TRTHero)
+  WLHeroForm.tsx
+  WLTrustBar.tsx
+  WLHowItWorks.tsx
+  WLResults.tsx
+  WLManifesto.tsx
+  WLPillars.tsx
+  WLMarquee.tsx
+  WLLocations.tsx       (re-exports TRTLocations, same content)
+  WLFAQ.tsx
+  WLFinalCTA.tsx
+  WLMobileCTA.tsx
+src/components/landing/ed/   (mirror)
+src/pages/NewWeightLoss.tsx  → renders at /new-wl
+src/pages/NewED.tsx          → renders at /new-ed
 ```
-User-agent: *
-Disallow: /
 
-User-agent: AdsBot-Google
-Allow: /
+Shared chrome (`TRTHeader`, `TRTFooter`, `SectionReveal`) is reused as-is — it's not service-specific.
 
-User-agent: AdsBot-Google-Mobile
-Allow: /
+**Service-aware data flow**
+- `TRTHeroForm` posts to GHL with TRT tags. Add a `service: "trt" | "wl" | "ed"` prop on the form so each LP tags the lead correctly in GHL.
+- Conversion events: emit `lp_new_wl_cta_click` and `lp_new_ed_cta_click` per existing convention.
+- Booking handoff stays `/book/schedule` (single funnel) but appends `?service=wl` / `?service=ed` so /book can show the right symptom phrasing.
 
-User-agent: facebookexternalhit
-Allow: /
+**SEO**
+- /new-wl: title "Medical Weight Loss in Virginia | Men's Wellness Centers", description grounded in research brief.
+- /new-ed: title "ED Treatment in Virginia | Discreet, In-Person | Men's Wellness Centers".
+- Both inherit existing `noindex, nofollow` from `SEO.tsx` (paid LP subdomain — same posture as /new).
 
-User-agent: Twitterbot
-Allow: /
-```
+## Phase 4 — Wire up the directory and routing
 
-**`public/sitemap.xml`** — delete.
+- `src/data/landingPages.ts` — add two `LIVE` entries for /new-wl and /new-ed with primaryCta `/book/schedule`.
+- `src/App.tsx` — add `<Route path="/new-wl" ... />` and `<Route path="/new-ed" ... />`.
+- Existing `/lp` directory already auto-renders any entry from `landingPages.ts`, so it picks them up for free.
 
-**`src/components/SEO.tsx`** — new component using `react-helmet-async` (already installed). Props: `title`, `description`, `ogImage?`. Emits self-referencing canonical to `https://book.menswellnesscenters.com${pathname}`, og:url/type/site_name/title/description/image, twitter:card. Adds noindex meta as belt-and-suspenders.
+## Out of scope (call out, don't do)
 
-**Per-page wiring**
-- Replace `GlobalSchema` usage with `<SEO>` per route page: `NewLandingPage`, `TRTQuiz`, `TRTQuizApproved`, `BookSchedule`, `BookSymptom`, `BookDuration`, `BookConfirmed`, `BookLetsTalk`, `LpDirectory`, all 4 legal pages, `NotFound`.
-- Delete `src/components/GlobalSchema.tsx` and remove from `App.tsx`.
+- No new service-specific booking flows (they share `/book/schedule`).
+- No new email templates, no new edge functions, no DB changes.
+- No edits to /new (TRT) — pure additive work.
+- No AI-generated photography.
 
-**Strip JSON-LD / schema.org**
-- Remove `organizationSchema` (was in `GlobalSchema`).
-- Remove FAQPage JSON-LD from `src/components/landing/trt/TRTFAQ.tsx`.
-- Grep for any other `application/ld+json` or `@context` and remove.
+## Open question I'll resolve in Phase 1
 
-**OG image**
-- Reference `/og-image.png` (already used in `SEOHead`). If the file doesn't exist in `public/`, I'll generate a 1200×630 brand image. Confirm in step below.
+Whether ED page uses a hero photo or stays copy-led. I'll decide based on what the top 3 ranking ED LPs do and how brand memory's "no AI faces, authentic photography only" applies given what's in the existing photo library.
 
-## Part 2 — Sentry
+## Deliverables
 
-**Install**: `@sentry/react`, `@sentry/vite-plugin`.
-
-**`src/lib/sentry.ts`** — exact init you specified (router v6 browser tracing, replay with `maskAllInputs: true`, traces 1.0, replay session 0.1 / on-error 1.0, `sendDefaultPii: true`, propagation targets for the booking subdomain).
-
-**`src/main.tsx`** — `import "./lib/sentry";` as the first line, before React imports.
-
-**`src/App.tsx`** — wrap root in `Sentry.ErrorBoundary` with the fallback UI you specified (refresh + call message). I'll use `(804) 215-0517` unless you give me a different number — confirm below.
-
-**Sentry test trigger**
-- New `src/components/SentryTestTrigger.tsx`: when `window.location.search` includes `sentry_test=1`, renders a fixed bottom-right low-z-index button that throws `new Error("Sentry test error from MWC booking LP - " + new Date().toISOString())`.
-- Mount inside `App.tsx` so it works on every route (you said "root route" but query-param gating already restricts it; mounting once is cleaner).
-
-**`vite.config.ts`** — add `sentryVitePlugin` gated on `process.env.SENTRY_AUTH_TOKEN`, `build.sourcemap: true`. I need your Sentry **org slug** to fill in (project will be `mwc-booking-lp`).
-
-**Env vars** (you'll add via Lovable settings after approval):
-- `VITE_SENTRY_DSN` — Sentry → Project → Settings → Client Keys (DSN). Public, ships to client.
-- `VITE_SENTRY_RELEASE` — bump per deploy, e.g. `lp-2026-05-13-001`.
-- `SENTRY_AUTH_TOKEN` — Sentry → Settings → Account → Auth Tokens, scopes `project:releases` + `org:read`. Build-time only.
-
-I'll also need to relax `src/config/env.ts` — currently it rejects unknown env vars via `safeParse`; Sentry vars are optional so no schema change needed (zod ignores extras), but I'll verify.
-
-## Two confirmations before I start
-1. **Sentry org slug** for `vite.config.ts`?
-2. **Phone number** for the ErrorBoundary fallback (your prompt has `(804) XXX-XXXX`)?
-
-If you want me to proceed with placeholders (`REPLACE_WITH_SENTRY_ORG_SLUG` and `(804) 215-0517`) and you'll edit them after, say "go with placeholders."
-
-## Files touched
-- Modified: `index.html`, `public/robots.txt`, `src/App.tsx`, `src/main.tsx`, `vite.config.ts`, `src/components/landing/trt/TRTFAQ.tsx`, plus every route page (~13 files) for `<SEO>` wiring, `package.json`/lockfile.
-- Created: `src/components/SEO.tsx`, `src/lib/sentry.ts`, `src/components/SentryTestTrigger.tsx`.
-- Deleted: `public/sitemap.xml`, `src/components/GlobalSchema.tsx`. (`src/components/SEOHead.tsx` superseded by new `SEO.tsx` — I'll delete it too unless you want both.)
-
-## Test URL post-publish
-`https://book.menswellnesscenters.com/?sentry_test=1` → click the bottom-right button → check Sentry Issues.
+1. Research brief appended to REFACTOR_NOTES.md
+2. Two new live LPs at /new-wl and /new-ed
+3. Updated /lp directory
+4. Service-aware lead tagging in the hero form
