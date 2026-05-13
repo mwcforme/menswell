@@ -65,6 +65,60 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_captures: {
+        Row: {
+          attribution: Json | null
+          created_at: string
+          crm_contact_id: string | null
+          crm_error: string | null
+          crm_status: string
+          email: string | null
+          id: string
+          location: string | null
+          name: string | null
+          page_url: string | null
+          phone: string | null
+          service: string | null
+          source: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          attribution?: Json | null
+          created_at?: string
+          crm_contact_id?: string | null
+          crm_error?: string | null
+          crm_status?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          name?: string | null
+          page_url?: string | null
+          phone?: string | null
+          service?: string | null
+          source?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          attribution?: Json | null
+          created_at?: string
+          crm_contact_id?: string | null
+          crm_error?: string | null
+          crm_status?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          name?: string | null
+          page_url?: string | null
+          phone?: string | null
+          service?: string | null
+          source?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
