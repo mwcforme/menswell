@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import {
   Phone, Star, ChevronDown, ShieldCheck, FlaskConical, Stethoscope, ClipboardCheck,
   AlertTriangle, ArrowUpRight,

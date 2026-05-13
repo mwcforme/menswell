@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import { useQuizState, computeScores, type Tier } from "@/lib/quizState";
 import { CATEGORIES } from "@/data/quizContent";
 import { StepSymptoms } from "@/components/quiz/StepSymptoms";
@@ -98,11 +98,10 @@ export default function TRTQuiz() {
 
   return (
     <>
-      <Helmet>
-        <title>Free TRT Assessment . 60-Second Symptom Quiz . MWC</title>
-        <meta name="description" content="Take our 60-second testosterone assessment. Score your symptoms, see your tier, and book a face-to-face evaluation with a Virginia provider." />
-        <meta name="robots" content="noindex,follow" />
-      </Helmet>
+      <SEO
+        title="Free TRT Assessment . 60-Second Symptom Quiz . MWC"
+        description="Take our 60-second testosterone assessment. Score your symptoms, see your tier, and book a face-to-face evaluation with a Virginia provider."
+      />
 
       {state.currentStep === 1 ? (
         <StepSymptoms
