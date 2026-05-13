@@ -611,7 +611,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 marginTop: 12,
                 padding: "12px 14px",
                 background: "#FEF2F2",
-                border: "1px solid #FECACA",
+                border: "1px solid #EF4444",
                 borderRadius: 8,
                 color: "#B91C1C",
                 fontSize: 13,
