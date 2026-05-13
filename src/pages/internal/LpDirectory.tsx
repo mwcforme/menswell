@@ -303,7 +303,7 @@ const LpDirectory = () => {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs" style={{ color: "rgba(245,240,235,0.65)" }}>{p.notes ?? "—"}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: "rgba(245,240,235,0.65)" }}>{p.notes ?? "-"}</td>
                   </tr>
                 ))}
               </tbody>
