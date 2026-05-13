@@ -82,7 +82,7 @@ const fmtDayShort = (d: Date) =>
 const fmtMonthDay = (d: Date) =>
   d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
 const fmtWeekRange = (start: Date) => {
-  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const end = new Date(start); end.setDate(end.getDate() + 4);
   const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   return `${s} – ${e}`;
@@ -205,7 +205,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   // Only future days (today + later) within the visible week
   const days = useMemo(() => {
-    return Array.from({ length: 7 })
+    return Array.from({ length: 5 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
@@ -217,7 +217,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 5); end.setHours(0, 0, 0, 0);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -325,7 +325,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 5); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -343,7 +343,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 5); setWeekStart(w); }}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -369,7 +369,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              className="grid grid-cols-4 md:grid-cols-7"
+              className="grid grid-cols-5"
               style={{ gap: 8 }}
             >
               {days.map((d) => {
