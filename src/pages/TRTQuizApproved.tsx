@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import {
   Phone, Star, ChevronDown, ShieldCheck, FlaskConical, Stethoscope, ClipboardCheck,
   AlertTriangle, ArrowUpRight,
@@ -40,24 +40,12 @@ export default function TRTQuizApproved() {
   const indicatorPct =
     bracket === "Severe" ? 88 : bracket === "Moderate" ? 70 : bracket === "Mild" ? 45 : 22;
 
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
-
   return (
     <div style={{ background: "#FFFFFF", color: "#0B1029", fontFamily: "Inter, sans-serif" }}>
-      <Helmet>
-        <title>{`${firstName}'s TRT Assessment Results . MWC`}</title>
-        <meta name="description" content="Your personalized testosterone assessment results from Men's Wellness Centers." />
-        <meta name="robots" content="noindex,follow" />
-        <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
-      </Helmet>
+      <SEO
+        title={`${firstName}'s TRT Assessment Results . MWC`}
+        description="Your personalized testosterone assessment results from Men's Wellness Centers."
+      />
 
       <ResultsTopBar />
 

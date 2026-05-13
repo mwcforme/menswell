@@ -1,150 +1,83 @@
-## Goal
+# Plan: Paid-LP SEO hardening + Sentry integration
 
-Replace the current single-page `/quiz` with a multi-step, mobile-first TRT lead funnel modeled on jointitan.com/quiz, fully adapted to MWC's brand and compliance rules. Add a personalized `/quiz/approved` results page.
+Note on Lovable workflow: edits apply to the preview as I make them — there is no separate "diff-only" mode. Nothing is published to your live domain until you click Publish. I'll list every change below; approve and I'll execute, then you can review in preview before publishing.
 
-## Brand adaptations (locked by memory)
+## Part 1 — SEO / indexing
 
-- **Colors:** Orange `#E8670A` (not Titan red) on Midnight Navy `#000814` (not pure black). Results page uses warm cream `#F5F0EB` over white.
-- **Typography:** Oswald (display, ALL CAPS headings) + Inter (body). No Anton/Bebas.
-- **Logo:** MWC wordmark only (`/logos/Text_Logo_white.png`), no globe.
-- **Tone:** "men" not "guys", "Center" not "clinic", "Provider". No em-dashes anywhere in copy.
-- **Compliance:** Drop the 10:00 countdown and the "20% or free" guarantee. Replace `$149→$49` with **"First visit on us."** TCPAConsent unchecked by default, gates submit. "Individual results vary" disclaimer on results page. No AI-generated faces.
-- **Disqualification = soft route:** Anyone flagging a medical condition still completes lead capture. Submit tags the lead `needs_in_person_clearance` in GHL and routes them to `/book/lets-talk` instead of `/book/symptom`.
+**`index.html`**
+- Add high in `<head>` (after charset/viewport):
+  - `<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />`
+  - `<meta name="googlebot" content="noindex, nofollow" />`
+  - `<meta name="bingbot" content="noindex, nofollow" />`
+- Leave existing GTM/GA, OG tags, fonts in place.
 
-## Routing
+**`public/robots.txt`** — replace contents with:
+```
+User-agent: *
+Disallow: /
 
-- `/quiz` → multi-step funnel (replaces current page)
-- `/quiz/approved` → personalized results page; redirect to `/quiz` if `mwc_quiz_v1.completed !== true`
-- After completion, `/quiz` auto-redirects to `/quiz/approved`
-- Dev-only "Reset Quiz" pill (bottom-right of `/quiz/approved`, only when `import.meta.env.DEV`)
+User-agent: AdsBot-Google
+Allow: /
 
-## Step structure
+User-agent: AdsBot-Google-Mobile
+Allow: /
 
-```text
-/quiz
- ├─ Step 1  SYMPTOM ASSESSMENT  (progress 0–60%)
- ├─ Transition A — "ANALYZING YOUR ASSESSMENT" (2.5s)
- ├─ Step 2  SAFETY CHECK         (progress 60–85%)
- ├─ Step 3  LEAD CAPTURE         (progress 85–100%)
- ├─ Transition B — "FINALIZING YOUR RESULTS" (~4s)
- └─ /quiz/approved
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
 ```
 
-No back button. No step counter. Sticky orange CTA on quiz steps (mobile-first).
+**`public/sitemap.xml`** — delete.
 
-### Step 1 — Symptom Assessment
-- Headline: `TAKE OUR 60-SECOND ASSESSMENT` / `TO SEE IF TRT IS RIGHT FOR YOU` (line 2 in orange).
-- 7 categories, 23 symptoms total (per brief), each row a Navy-tinted card with Lucide icon + 0/1/2/3 segmented control. Selected number = orange fill, white text.
-- **Sequential unlock** within each category (row N disabled until N-1 answered, opacity 40, smooth scroll-into-view on advance). Category 7 (Digestive) unlocks all rows simultaneously.
-- Inline orange-red error "Please select an option." under any unanswered row when CTA pressed.
-- CTA: `GET MY RESULTS` (orange, full-width sticky on mobile).
+**`src/components/SEO.tsx`** — new component using `react-helmet-async` (already installed). Props: `title`, `description`, `ogImage?`. Emits self-referencing canonical to `https://book.menswellnesscenters.com${pathname}`, og:url/type/site_name/title/description/image, twitter:card. Adds noindex meta as belt-and-suspenders.
 
-### Step 2 — Safety Check
-- Headline: `QUICK SAFETY CHECK`
-- Multi-select tile checkboxes. "None of the below" rendered first with divider; mutually exclusive with the 7 medical conditions (per brief, verbatim).
-- CTA: `NEXT`. Branching:
-  - "None of the below" only → Step 3 with `disqualified: false`.
-  - Any medical condition → Step 3 with `disqualified: true` (soft route — still capture lead per user decision).
+**Per-page wiring**
+- Replace `GlobalSchema` usage with `<SEO>` per route page: `NewLandingPage`, `TRTQuiz`, `TRTQuizApproved`, `BookSchedule`, `BookSymptom`, `BookDuration`, `BookConfirmed`, `BookLetsTalk`, `LpDirectory`, all 4 legal pages, `NotFound`.
+- Delete `src/components/GlobalSchema.tsx` and remove from `App.tsx`.
 
-### Step 3 — Lead Capture
-- Headline: `WHERE SHOULD WE SEND MY RESULTS?` (uses MWC "My" ownership language).
-- Fields: **Full Name** (per MWC standard, not "First Name"), Email, Phone (auto-format `(XXX) XXX-XXXX`), State (US dropdown).
-- TCPAConsent checkbox, unchecked, blocks submit. Standard MWC TCPA copy.
-- Trust badge: "256-Bit Encrypted. Private. HIPAA-conscious." (no shield emoji, use Lucide Lock).
-- One short testimonial card below.
-- CTA: `SHOW MY RESULTS` → Transition B → `/quiz/approved`.
+**Strip JSON-LD / schema.org**
+- Remove `organizationSchema` (was in `GlobalSchema`).
+- Remove FAQPage JSON-LD from `src/components/landing/trt/TRTFAQ.tsx`.
+- Grep for any other `application/ld+json` or `@context` and remove.
 
-### Transitions
-- A (post-Step 1, 2.5s) and B (post-Step 3, ~4s): full-screen Navy, centered logo, Oswald headline, orange spinner. B includes a 0→100% progress bar and three checklist items ticking off ("Confirming clinical eligibility", "Analyzing symptom patterns", "Preparing my personalized report").
+**OG image**
+- Reference `/og-image.png` (already used in `SEOHead`). If the file doesn't exist in `public/`, I'll generate a 1200×630 brand image. Confirm in step below.
 
-## /quiz/approved (results page)
+## Part 2 — Sentry
 
-White background `#FFFFFF` body, sticky black topbar (logo left, phone right). 10 sections per the brief, with these MWC adjustments:
+**Install**: `@sentry/react`, `@sentry/vite-plugin`.
 
-| # | Section | Notes |
-|---|---|---|
-| 1 | `[FIRST_NAME]'S ASSESSMENT RESULTS` | Personalized, Oswald all caps |
-| 2 | Testosterone status card | Gradient slider with indicator dot. **No stock face image** (memory: no AI faces, prefer authentic). Use a clean clinical illustration or omit. |
-| 3 | Top symptom categories | Render top 3–5 scoring categories with severity badges (Severe `#E11D2E` / Moderate `#F59E0B` / Mild `#10B981`). Hide zero-score categories. |
-| 4 | "WHY ACT NOW" risk list | Per brief, qualitative phrasing per FTC compliance memory. |
-| 5 | TRT outcome promise | Headline rewritten to avoid "feel like a man again" (banned tone). Use **"PROVEN TO RESTORE ENERGY, STRENGTH AND DRIVE."** Keep `130%+ in 6 months` claim with the clinical-studies fine print verbatim. |
-| 6 | 3 Next-Steps cards | Adapted to MWC's in-person model: `1. SCHEDULE MY VISIT` / `2. IN-PERSON LABS AND EVALUATION` / `3. PERSONALIZED PROTOCOL` (face-to-face, not video). |
-| 7 | Offer | **Drop countdown.** **Drop "guarantee" box.** Replace pricing with `FIRST VISIT ON US` block + included items. Primary CTA `BOOK MY CONSULT` → `/book/symptom` (or `/book/lets-talk` if disqualified). |
-| 8 | 5 testimonials | Use the 5 quotes from the brief, attributed as "Verified MWC patient." Plain stacked cards (memory: high-conversion plain text format). |
-| 9 | "WEEK BY WEEK" 3 columns | Per brief, qualitative outcomes only. |
-| 10 | FAQ accordion | Per brief, with FAQPage JSON-LD schema. Use existing FAQUnified component (orange chevron). |
+**`src/lib/sentry.ts`** — exact init you specified (router v6 browser tracing, replay with `maskAllInputs: true`, traces 1.0, replay session 0.1 / on-error 1.0, `sendDefaultPii: true`, propagation targets for the booking subdomain).
 
-Plus footer: legal links (Privacy, Terms, HIPAA), © 2026.
+**`src/main.tsx`** — `import "./lib/sentry";` as the first line, before React imports.
 
-## State + persistence
+**`src/App.tsx`** — wrap root in `Sentry.ErrorBoundary` with the fallback UI you specified (refresh + call message). I'll use `(804) 215-0517` unless you give me a different number — confirm below.
 
-```ts
-// src/lib/quizState.ts
-type QuizAnswer = 0 | 1 | 2 | 3;
-interface QuizState {
-  symptoms: Record<string, QuizAnswer | null>;     // 23 keys
-  safetyConditions: string[];                       // [] | ['none'] | ['prostate_cancer', ...]
-  fullName: string; email: string; phone: string; state: string;
-  consent: boolean;
-  currentStep: 1 | 2 | 3 | 'processing' | 'finalizing' | 'approved';
-  completed: boolean;
-  disqualified: boolean;
-  startedAt: string; completedAt?: string;
-  totalScore: number;                               // 0–69
-  categoryScores: Record<CategoryId, { sum: number; tier: 'None'|'Mild'|'Moderate'|'Severe' }>;
-  utm: { source?:string; medium?:string; campaign?:string; term?:string; content?:string };
-}
-```
+**Sentry test trigger**
+- New `src/components/SentryTestTrigger.tsx`: when `window.location.search` includes `sentry_test=1`, renders a fixed bottom-right low-z-index button that throws `new Error("Sentry test error from MWC booking LP - " + new Date().toISOString())`.
+- Mount inside `App.tsx` so it works on every route (you said "root route" but query-param gating already restricts it; mounting once is cleaner).
 
-- Single `useQuizState` hook backed by `sessionStorage` key `mwc_quiz_v1`.
-- Tier mapping per category sum: `0→None`, `1–2→Mild`, `3–5→Moderate`, `6+→Severe`.
-- Persist on every change. Reset helper exposed for dev button.
+**`vite.config.ts`** — add `sentryVitePlugin` gated on `process.env.SENTRY_AUTH_TOKEN`, `build.sourcemap: true`. I need your Sentry **org slug** to fill in (project will be `mwc-booking-lp`).
 
-## Submit pipeline (reuses existing infra)
+**Env vars** (you'll add via Lovable settings after approval):
+- `VITE_SENTRY_DSN` — Sentry → Project → Settings → Client Keys (DSN). Public, ships to client.
+- `VITE_SENTRY_RELEASE` — bump per deploy, e.g. `lp-2026-05-13-001`.
+- `SENTRY_AUTH_TOKEN` — Sentry → Settings → Account → Auth Tokens, scopes `project:releases` + `org:read`. Build-time only.
 
-On Step 3 submit, fire **one** call to the existing `useLeadSubmitController` (which already POSTs through `ghl-proxy` and triggers `meta-capi`):
+I'll also need to relax `src/config/env.ts` — currently it rejects unknown env vars via `safeParse`; Sentry vars are optional so no schema change needed (zod ignores extras), but I'll verify.
 
-- `source: "trt-quiz-v2"`
-- `tags`: `quiz_score:N`, `quiz_bracket:severe|moderate|mild|minimal`, `quiz_tier_<category>:<tier>` for each scoring category, plus `needs_in_person_clearance` if disqualified.
-- `note`: serialized symptom and safety summary so the clinical team sees it.
-- `attribution` (UTMs + gclid/fbclid) is already auto-attached via `src/lib/attribution.ts`.
+## Two confirmations before I start
+1. **Sentry org slug** for `vite.config.ts`?
+2. **Phone number** for the ErrorBoundary fallback (your prompt has `(804) XXX-XXXX`)?
 
-On success → Transition B → `/quiz/approved` with state already in sessionStorage. No new edge function needed.
+If you want me to proceed with placeholders (`REPLACE_WITH_SENTRY_ORG_SLUG` and `(804) 215-0517`) and you'll edit them after, say "go with placeholders."
 
-## File plan
+## Files touched
+- Modified: `index.html`, `public/robots.txt`, `src/App.tsx`, `src/main.tsx`, `vite.config.ts`, `src/components/landing/trt/TRTFAQ.tsx`, plus every route page (~13 files) for `<SEO>` wiring, `package.json`/lockfile.
+- Created: `src/components/SEO.tsx`, `src/lib/sentry.ts`, `src/components/SentryTestTrigger.tsx`.
+- Deleted: `public/sitemap.xml`, `src/components/GlobalSchema.tsx`. (`src/components/SEOHead.tsx` superseded by new `SEO.tsx` — I'll delete it too unless you want both.)
 
-```text
-src/pages/TRTQuiz.tsx                    REWRITE — becomes the multi-step shell
-src/pages/TRTQuizApproved.tsx            NEW    — /quiz/approved results page
-src/components/quiz/QuizShell.tsx        NEW    — progress bar, logo, sticky CTA frame
-src/components/quiz/StepSymptoms.tsx     NEW
-src/components/quiz/StepSafety.tsx       NEW
-src/components/quiz/StepLead.tsx         NEW
-src/components/quiz/TransitionScreen.tsx NEW    — used for both A and B
-src/components/quiz/SymptomRow.tsx       NEW    — sequential-unlock segmented control
-src/components/quiz/results/*.tsx        NEW    — TestosteroneCard, SymptomBadges,
-                                                 NextSteps, Offer, WeekByWeek, ResultsFAQ
-src/data/quizContent.ts                  NEW    — categories, symptoms, safety options,
-                                                 FAQ items, testimonials, US states
-src/lib/quizState.ts                     NEW    — useQuizState hook + scoring helpers
-src/App.tsx                              EDIT   — add /quiz/approved route
-src/data/landingPages.ts                 EDIT   — bump quiz entry
-```
-
-## Acceptance criteria (delta from brief)
-
-All brief criteria PLUS:
-- Renders cleanly at 360px width (MWC mobile floor) without horizontal scroll.
-- TCPA checkbox unchecked by default and gates submit.
-- No countdown timer present.
-- No "guarantee or it's free" copy present.
-- Disqualified leads still POST to GHL with the `needs_in_person_clearance` tag.
-- Sticky CTA on quiz steps does not overlap last symptom row (uses `pb-32 safe-area-inset-bottom`).
-- Single H1 per route. FAQPage JSON-LD on `/quiz/approved` matches visible text exactly.
-- Final submit logs full payload via existing analytics + capi paths; no new console.log stub.
-
-## Out of scope
-
-- Nice-to-haves (Framer transitions, particle bg, print stylesheet) — defer until after baseline ships.
-- New `/api/lead` endpoint — uses existing GHL proxy.
-- Real testosterone-curve chart asset — use a simple SVG line illustration in code; commission real chart later.
+## Test URL post-publish
+`https://book.menswellnesscenters.com/?sentry_test=1` → click the bottom-right button → check Sentry Issues.

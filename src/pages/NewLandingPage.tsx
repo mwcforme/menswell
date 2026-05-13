@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { TRTHeader } from "@/components/landing/trt/TRTHeader";
 import { TRTHero } from "@/components/landing/trt/TRTHero";
 import { TRTTrustBar } from "@/components/landing/trt/TRTTrustBar";
@@ -13,16 +12,15 @@ import { TRTFAQ } from "@/components/landing/trt/TRTFAQ";
 import { TRTFooter } from "@/components/landing/trt/TRTFooter";
 import { TRTMobileCTA } from "@/components/landing/trt/TRTMobileCTA";
 import { SectionReveal } from "@/components/landing/trt/SectionReveal";
+import { SEO } from "@/components/SEO";
 
 const NewLandingPage = () => {
-  useEffect(() => {
-    document.title = "TRT in Virginia | Testing | Men's Wellness Centers";
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", "Provider-supervised testosterone replacement therapy at 3 Virginia locations. Testing and results reviewed in-visit. Walk in today.");
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "Inter, sans-serif" }}>
+      <SEO
+        title="TRT in Virginia | Testing | Men's Wellness Centers"
+        description="Provider-supervised testosterone replacement therapy at 3 Virginia locations. Testing and results reviewed in-visit. Walk in today."
+      />
       <TRTHeader />
       <main className="flex-1">
         <TRTHero />
