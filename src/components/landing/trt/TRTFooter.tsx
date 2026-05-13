@@ -12,7 +12,7 @@ export const TRTFooter = () => {
     <footer style={{ background: "#000033", color: "rgba(255,255,255,0.78)", fontFamily: "Inter, sans-serif" }}>
       <div className="max-w-[1200px] mx-auto px-6 pt-14 pb-10">
         {/* Top: Brand + 3 columns */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div className="md:col-span-1">
             <img
