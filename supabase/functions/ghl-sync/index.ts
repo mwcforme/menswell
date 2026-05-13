@@ -16,7 +16,7 @@ const TIMEZONE = "America/New_York";
 const CENTERS: { key: string; calendarId: string }[] = [
   { key: "richmond",        calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
   { key: "virginia-beach",  calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
-  { key: "newport-news",    calendarId: "IBaRbjUpEmesxEloFBME" },
+  { key: "newport-news",    calendarId: "lBaRbjUpEmesxEloFBME" },
 ];
 
 // Window we cache: now -> +21 days
