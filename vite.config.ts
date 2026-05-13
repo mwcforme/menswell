@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
+// @ts-expect-error - .mjs file, no declaration needed
 import { vitePluginCheckBannedWording } from "./scripts/check-banned-wording.mjs";
 
 // https://vitejs.dev/config/
