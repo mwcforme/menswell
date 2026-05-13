@@ -79,10 +79,12 @@ const App = () => (
         <BrowserRouter>
           <ServicesProvider>
             <Routes>
-              <Route path="/" element={<Navigate to="/new" replace />} />
-              <Route path="/new" element={<NewLandingPage />} />
-              <Route path="/new-wl" element={<NewWeightLoss />} />
-              <Route path="/new-ed" element={<NewED />} />
+              <Route path="/" element={<NewLandingPage />} />
+              <Route path="/wl" element={<NewWeightLoss />} />
+              <Route path="/ed" element={<NewED />} />
+              <Route path="/new" element={<Navigate to="/" replace />} />
+              <Route path="/new-wl" element={<Navigate to="/wl" replace />} />
+              <Route path="/new-ed" element={<Navigate to="/ed" replace />} />
               <Route path="/quiz" element={<TRTQuiz />} />
               <Route path="/quiz/approved" element={<TRTQuizApproved />} />
               <Route path="/book" element={<Navigate to="/book/schedule" replace />} />

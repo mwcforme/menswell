@@ -32,21 +32,6 @@ export const TRTFooter = () => {
             </a>
           </div>
 
-          {/* Locations */}
-          <div>
-            <div
-              className="text-xs font-semibold uppercase mb-4"
-              style={{ color: "#FFFFFF", letterSpacing: "0.12em" }}
-            >
-              Locations
-            </div>
-            <ul className="space-y-3 text-sm">
-              <li><Link to="/locations/richmond" className="hover:text-white transition-colors">Richmond</Link></li>
-              <li><Link to="/locations/newport-news" className="hover:text-white transition-colors">Newport News</Link></li>
-              <li><Link to="/locations/virginia-beach" className="hover:text-white transition-colors">Virginia Beach</Link></li>
-            </ul>
-          </div>
-
           {/* Contact */}
           <div>
             <div
