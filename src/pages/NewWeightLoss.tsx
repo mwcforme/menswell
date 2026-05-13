@@ -14,6 +14,7 @@ import { WLHowItWorks } from "@/components/landing/wl/WLHowItWorks";
 import { WLManifesto } from "@/components/landing/wl/WLManifesto";
 import { WLFAQ } from "@/components/landing/wl/WLFAQ";
 import { ServiceFinalCTA } from "@/components/landing/shared/ServiceFinalCTA";
+import { COPY } from "@/data/copy";
 
 const NewWeightLoss = () => { useScrollDepth();
   return (
@@ -37,13 +38,13 @@ const NewWeightLoss = () => { useScrollDepth();
           <ServiceFinalCTA
             service="wl"
             headline="READY TO START LOSING THE WEIGHT?"
-            subhead="No-cost consult. Same- or next-day visits."
-            cardTitle="See If I Qualify"
-            ctaLabel="See If I Qualify"
+            subhead={COPY.offer.finalSubhead}
+            cardTitle={COPY.cta.seeIfIQualify}
+            ctaLabel={COPY.cta.seeIfIQualify}
             intro="No more cycles of strict diets and bounce-back. A Virginia physician, real labs, and the right medication for your body."
             bullets={[
               "100% private. Your employer or insurance is never notified.",
-              "Cancel or reschedule at no charge, anytime.",
+              COPY.offer.cancelReschedule,
               "If GLP-1 treatment isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
             ]}
           />

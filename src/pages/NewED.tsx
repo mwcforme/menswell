@@ -14,6 +14,7 @@ import { EDHowItWorks } from "@/components/landing/ed/EDHowItWorks";
 import { EDManifesto } from "@/components/landing/ed/EDManifesto";
 import { EDFAQ } from "@/components/landing/ed/EDFAQ";
 import { ServiceFinalCTA } from "@/components/landing/shared/ServiceFinalCTA";
+import { COPY } from "@/data/copy";
 
 const NewED = () => { useScrollDepth();
   return (
@@ -37,13 +38,13 @@ const NewED = () => { useScrollDepth();
           <ServiceFinalCTA
             service="ed"
             headline="READY TO HANDLE THIS THE RIGHT WAY?"
-            subhead="No-cost consult. Same- or next-day visits."
-            cardTitle="Book My Discreet Visit"
-            ctaLabel="Book My Discreet Visit"
+            subhead={COPY.offer.finalSubhead}
+            cardTitle={COPY.cta.bookDiscreetVisit}
+            ctaLabel={COPY.cta.bookDiscreetVisit}
             intro="No mail-order pills. No rotating clinicians. A Virginia physician who diagnoses the cause and prescribes what actually works for your case."
             bullets={[
               "100% private. Your employer or insurance is never notified.",
-              "Cancel or reschedule at no charge, anytime.",
+              COPY.offer.cancelReschedule,
               "If ED treatment isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
             ]}
           />

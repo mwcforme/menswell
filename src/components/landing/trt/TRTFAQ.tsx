@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { TRT_FAQS } from "@/data/faqs";
+import { COPY } from "@/data/copy";
 
 export const TRTFAQ = () => {
   const [open, setOpen] = useState<number | null>(0);
@@ -70,7 +71,7 @@ export const TRTFAQ = () => {
                           fontSize: "inherit",
                         }}
                       >
-                        → Book a no-cost consult
+                        → {COPY.cta.bookConsultInline}
                       </button>
                     </p>
                   </div>

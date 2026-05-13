@@ -3,6 +3,7 @@ import { Lock, Loader2 } from "lucide-react";
 import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
 import { heroLeadSchema, type HeroLeadInput } from "@/domain/leads/leadFormSchema";
 import { getBookingState, toQueryString } from "@/lib/bookingState";
+import { COPY } from "@/data/copy";
 
 const formatPhone = (v: string) => {
   const d = v.replace(/\D/g, "").slice(0, 10);
@@ -22,9 +23,9 @@ interface TRTHeroFormProps {
 
 export const TRTHeroForm = ({
   service = "trt",
-  heading = "Book My Consult",
+  heading = COPY.cta.bookConsult,
   subheading = "Same or next day. Takes 30 seconds.",
-  ctaLabel = "Book My Consult",
+  ctaLabel = COPY.cta.bookConsult,
 }: TRTHeroFormProps = {}) => {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");

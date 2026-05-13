@@ -1,4 +1,5 @@
 import { Star } from "lucide-react";
+import { COPY } from "@/data/copy";
 
 const testimonials = [
   {
@@ -82,7 +83,7 @@ export const TRTResults = () => {
             className="inline-flex items-center justify-center rounded-full px-8 font-bold uppercase cursor-pointer border-none"
             style={{ height: 56, minHeight: 56, background: "#E8670A", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
           >
-            Start My Consult
+            {COPY.cta.startConsult}
           </button>
         </div>
       </div>

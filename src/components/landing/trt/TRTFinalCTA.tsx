@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, MapPin } from "lucide-react";
+import { COPY } from "@/data/copy";
 
 export const TRTFinalCTA = () => {
   const [name, setName] = useState("");
@@ -74,7 +75,7 @@ export const TRTFinalCTA = () => {
             READY TO BOOK YOUR FIRST VISIT?
           </h2>
           <p className="text-base mt-2" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
-            No-cost consult. Same- or next-day visits.
+            {COPY.offer.finalSubhead}
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-4">
@@ -97,7 +98,7 @@ export const TRTFinalCTA = () => {
             <ul className="mt-6 space-y-3">
               {[
                 "100% private. Your employer or insurance is never notified.",
-                "Cancel or reschedule at no charge, anytime.",
+                COPY.offer.cancelReschedule,
                 "If TRT isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-3" style={{ color: "rgba(255,255,255,0.92)", fontFamily: "Inter, sans-serif" }}>
@@ -153,7 +154,7 @@ export const TRTFinalCTA = () => {
               fontWeight: 700,
             }}
           >
-            Book My Consult
+            {COPY.cta.bookConsult}
           </h3>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -246,7 +247,7 @@ export const TRTFinalCTA = () => {
               onMouseEnter={(e) => { e.currentTarget.style.background = "#CF5B09"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; }}
             >
-              Book My Consult
+              {COPY.cta.bookConsult}
             </button>
           </form>
 

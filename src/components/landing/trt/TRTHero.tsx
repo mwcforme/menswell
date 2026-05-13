@@ -2,13 +2,14 @@ import { Check, Star } from "lucide-react";
 import { TRTHeroForm } from "./TRTHeroForm";
 import { GBP_REVIEWS_URL } from "@/data/testimonials";
 import { trackCro } from "@/hooks/useAnalytics";
+import { COPY } from "@/data/copy";
 
 const trustChecks = [
   "No referral needed",
   "Same/next-day visits",
   "Face-to-face physician",
   "Licensed VA providers",
-  "No-cost consult",
+  COPY.badge.noCostConsult,
 ];
 
 const COLORS = {
@@ -119,7 +120,7 @@ export const TRTHero = () => {
               lineHeight: 1.5,
             }}
           >
-            No-cost consult. No commitment, no pressure.
+            {COPY.offer.heroSubhead}
           </p>
 
           {/* Star rating row — clickable, links to GBP */}
@@ -188,7 +189,7 @@ export const TRTHero = () => {
               fontFamily: "Inter, sans-serif",
             }}
           >
-            Book My Consult
+            {COPY.cta.bookConsult}
           </button>
 
           <div

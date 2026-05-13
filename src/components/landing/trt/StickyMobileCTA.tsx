@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Phone } from "lucide-react";
 import { LOCATIONS } from "@/data/locations";
 import { trackCro } from "@/hooks/useAnalytics";
+import { COPY } from "@/data/copy";
 
 /**
  * Persistent mobile bottom action bar. Appears after the hero scrolls
@@ -118,7 +119,7 @@ export const StickyMobileCTA = () => {
           letterSpacing: "0.08em",
         }}
       >
-        Book My Consult
+        {COPY.cta.bookConsult}
       </button>
     </div>
   );

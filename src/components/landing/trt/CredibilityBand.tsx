@@ -1,5 +1,6 @@
 import { trackCro } from "@/hooks/useAnalytics";
 import { GBP_REVIEWS_URL } from "@/data/testimonials";
+import { COPY } from "@/data/copy";
 
 interface Stat {
   value: string;
@@ -13,7 +14,7 @@ const stats: Stat[] = [
   { value: "10,000+", label: "Men Treated\nSince 2019", slug: "credibility_band_count", scrollTo: "results" },
   { value: "3", label: "Virginia\nCenters", slug: "credibility_band_locations", scrollTo: "locations" },
   { value: "4.9★", label: "Google Rating\n200+ Reviews", slug: "credibility_band_reviews", href: GBP_REVIEWS_URL },
-  { value: "No-Cost", label: "Initial Consult\nNo Obligation", slug: "credibility_band_offer", scrollTo: "hero" },
+  { value: COPY.badge.offerValue, label: COPY.badge.offerLabel, slug: "credibility_band_offer", scrollTo: "hero" },
 ];
 
 export const CredibilityBand = () => {
