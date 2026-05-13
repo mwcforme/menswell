@@ -449,7 +449,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
             )}
           </button>
 
-          <div className="flex items-center justify-center gap-2 text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
+          <div className="flex items-center justify-center gap-2 text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>
             <Lock size={12} /> Your information is private and HIPAA-aware.
           </div>
         </form>
