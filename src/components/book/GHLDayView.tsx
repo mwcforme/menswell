@@ -171,7 +171,11 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
 
 const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
-  const [weekStart, setWeekStart] = useState<Date>(() => startOfWeek(new Date()));
+  // Rolling 7-day window starting today (not week-aligned) so we always show
+  // a full week of upcoming availability instead of just the remainder.
+  const [weekStart, setWeekStart] = useState<Date>(() => {
+    const t = new Date(); t.setHours(0, 0, 0, 0); return t;
+  });
   const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
