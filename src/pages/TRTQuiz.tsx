@@ -220,7 +220,7 @@ function QuizPhase({
                   <label className="text-sm md:text-[15px]" style={{ color: "rgba(245,240,235,0.92)" }}>
                     {item.label}
                   </label>
-                  <div className="grid grid-cols-4 gap-2 md:w-[280px]">
+                  <div className="grid grid-cols-4 gap-2.5 md:gap-3 md:w-[300px]">
                     {SCORE_OPTIONS.map((n) => {
                       const active = scores[item.id] === n;
                       return (
@@ -230,7 +230,7 @@ function QuizPhase({
                           aria-pressed={active}
                           aria-label={`${item.label}: ${n}`}
                           onClick={() => setScore(item.id, n)}
-                          className="h-11 rounded-md text-sm font-semibold transition-colors"
+                          className="h-12 md:h-14 rounded-lg text-sm md:text-base font-semibold transition-colors active:scale-95"
                           style={{
                             background: active ? "#E8670A" : "rgba(255,255,255,0.10)",
                             color: active ? "#FFFFFF" : "rgba(245,240,235,0.92)",
