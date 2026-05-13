@@ -50,8 +50,8 @@ interface Props {
 
 // Brand tokens (light surface, navy ink, orange accent)
 const INK = "#0B1029";
-const INK_SOFT = "#3A4258";
-const MUTED = "#6B7280";
+const INK_SOFT = "#2C3346";
+const MUTED = "#4B5563";
 const LINE = "#E5E7EB";
 const SURFACE = "#FFFFFF";
 const CANVAS = "#F7F8FB";
@@ -422,29 +422,29 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       opacity: available || selected ? 1 : 0.85,
                     }}
                   >
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: selected ? "rgba(255,255,255,0.75)" : MUTED, marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : INK_SOFT, marginBottom: 4 }}>
                       {isToday ? "TODAY" : fmtDayShort(d)}
                     </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "0.02em", textDecoration: !available && !loading ? "line-through" : "none", textDecorationColor: "#D7DAE0" }}>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", textDecoration: !available && !loading ? "line-through" : "none", textDecorationColor: "#9CA3AF" }}>
                       {fmtMonthDay(d)}
                     </div>
                     <div
                       style={{
-                        fontSize: 10,
-                        fontWeight: 700,
+                        fontSize: 11,
+                        fontWeight: 800,
                         color: selected
                           ? "#FFFFFF"
                           : available
-                            ? count >= 3 ? "#0F7A3D" : "#B91C1C"
-                            : isSunday ? "#9AA0AC" : "#A8AEB8",
+                            ? count >= 3 ? "#0B6B33" : "#991B1B"
+                            : isSunday ? "#4B5563" : "#4B5563",
                         background: selected
-                          ? "rgba(255,255,255,0.15)"
+                          ? "rgba(255,255,255,0.18)"
                           : available
-                            ? count >= 3 ? "#E6F7EC" : "#FEECEC"
-                            : isSunday ? "#F1F2F5" : "#F1F2F5",
+                            ? count >= 3 ? "#DCF5E5" : "#FDE2E2"
+                            : isSunday ? "#E5E7EB" : "#E5E7EB",
                         marginTop: 6,
                         letterSpacing: "0.06em",
-                        padding: "2px 6px",
+                        padding: "3px 7px",
                         borderRadius: 999,
                         display: "inline-block",
                       }}
