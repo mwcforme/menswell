@@ -2,16 +2,19 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Phone, CalendarCheck, MessageSquare } from "lucide-react";
 
-/** Routes where this bar should NOT appear (they have their own mobile CTAs) */
-const EXCLUDED_ROUTES = ["/book", "/bookv2", "/intake", "/", "/wl", "/ed"];
+/** Exact routes where this bar should NOT appear */
+const EXCLUDED_EXACT = ["/", "/wl", "/ed"];
+/** Route prefixes (entire funnels) where this bar should NOT appear */
+const EXCLUDED_PREFIXES = ["/book", "/bookv2", "/intake", "/lp/"];
 
 export const MobileFooterBar = () => {
   const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
 
-  // Hide on excluded routes & landing pages with dedicated CTAs
+  const path = pathname.toLowerCase();
   const isExcluded =
-    EXCLUDED_ROUTES.includes(pathname.toLowerCase()) || pathname.startsWith("/lp/");
+    EXCLUDED_EXACT.includes(path) ||
+    EXCLUDED_PREFIXES.some((p) => path === p || path.startsWith(p.endsWith("/") ? p : `${p}/`));
 
   useEffect(() => {
     if (isExcluded) return;
