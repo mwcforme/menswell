@@ -42,10 +42,10 @@ export default function TRTQuizApproved() {
 
   return (
     <div style={{ background: "#FFFFFF", color: "#0B1029", fontFamily: "Inter, sans-serif" }}>
-      <Helmet>
-        <title>{`${firstName}'s TRT Assessment Results . MWC`}</title>
-        <meta name="description" content="Your personalized testosterone assessment results from Men's Wellness Centers." />
-      </Helmet>
+      <SEO
+        title={`${firstName}'s TRT Assessment Results . MWC`}
+        description="Your personalized testosterone assessment results from Men's Wellness Centers."
+      />
 
       <ResultsTopBar />
 
