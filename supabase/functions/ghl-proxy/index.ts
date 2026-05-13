@@ -128,14 +128,20 @@ function validateBody(method: string, path: string, body: unknown): { ok: true; 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
-  const apiKey = Deno.env.get("GHL_API_KEY");
-  if (!apiKey) return json(500, { error: "GHL_API_KEY is not configured" });
-
-  let payload: ProxyRequest;
+  let payload: ProxyRequest & { __env?: AppEnv };
   try {
     payload = await req.json();
   } catch {
     return json(400, { error: "Invalid JSON body" });
+  }
+
+  const env = detectEnv(req, payload.__env);
+  const { apiKey, locationId } = envCreds(env);
+  if (!apiKey) {
+    return json(500, { error: `GHL API key for ${env} is not configured` });
+  }
+  if (!locationId) {
+    return json(500, { error: `GHL location id for ${env} is not configured` });
   }
 
   const { path, method = "GET", query = {}, body } = payload;
@@ -156,13 +162,13 @@ Deno.serve(async (req) => {
     if (k === "locationId") continue; // server-injected only
     search.set(k, String(v));
   }
-  if (method === "GET" && !search.has("locationId")) search.set("locationId", LOCATION_ID);
+  if (method === "GET" && !search.has("locationId")) search.set("locationId", locationId);
 
   const url = `${API_BASE}${cleanPath}${search.toString() ? `?${search}` : ""}`;
 
   let outBody: string | undefined;
   if (method !== "GET" && method !== "DELETE") {
-    outBody = JSON.stringify({ locationId: LOCATION_ID, ...validated.body });
+    outBody = JSON.stringify({ locationId, ...validated.body });
   }
 
   try {
