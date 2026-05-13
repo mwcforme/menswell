@@ -82,14 +82,15 @@ const BookSchedule = () => {
           <h1
             style={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(22px, 3.4vw, 32px)",
-              lineHeight: 1.2,
+              fontWeight: 600,
+              fontSize: "clamp(20px, 2.6vw, 26px)",
+              lineHeight: 1.25,
               letterSpacing: "-0.01em",
-              marginBottom: 8,
+              marginBottom: 6,
+              textTransform: "none",
             }}
           >
-            You're a strong candidate for {serviceLabel}.
+            Schedule your {serviceLabel}.
           </h1>
           <p
             style={{
