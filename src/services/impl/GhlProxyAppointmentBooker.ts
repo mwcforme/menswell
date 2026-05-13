@@ -25,7 +25,7 @@ async function logBookingEvent(row: {
       contact_id: row.contact_id ?? null,
       page_url: typeof window !== "undefined" ? window.location.href : null,
       error: row.error ?? null,
-      meta: row.meta ?? null,
+      meta: (row.meta ?? null) as never,
     });
   } catch {
     /* never block booking on audit-log failure */
