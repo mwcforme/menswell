@@ -16,10 +16,10 @@ const SERVICE_LABEL: Record<string, string> = {
 };
 
 const URGENCY_SUB: Record<UrgencyTier, string> = {
-  early: "Pick a time that works for you. Most visits run about 60 minutes.",
-  building: "Pick a time that works for you. Most visits run about 60 minutes.",
-  overdue: "Pick a time that works for you. Most visits run about 60 minutes.",
-  long_overdue: "Pick a time that works for you. Most visits run about 60 minutes.",
+  early: "60-minute in-person visit at our Virginia clinic.",
+  building: "60-minute in-person visit at our Virginia clinic.",
+  overdue: "60-minute in-person visit at our Virginia clinic.",
+  long_overdue: "60-minute in-person visit at our Virginia clinic.",
 };
 
 const BookSchedule = () => {
@@ -29,7 +29,7 @@ const BookSchedule = () => {
   const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
   const subhead = state.urgencyTier
     ? URGENCY_SUB[state.urgencyTier]
-    : "Pick a time that works for you. Most visits run about 60 minutes.";
+    : "60-minute in-person visit at our Virginia clinic.";
 
   const trackCallClick = () => {
     const w = window as unknown as { dataLayer?: Array<Record<string, unknown>> };
