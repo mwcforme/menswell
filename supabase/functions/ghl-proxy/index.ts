@@ -1,4 +1,4 @@
-// ghl-proxy v3 — route allowlist + manual CORS
+// ghl-proxy v4 — env-aware (prod vs stage) + route allowlist + manual CORS
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -7,8 +7,39 @@ const corsHeaders = {
 };
 
 const API_BASE = "https://services.leadconnectorhq.com";
-const LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
+const PROD_LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
 const API_VERSION = "2021-07-28";
+
+type AppEnv = "prod" | "stage";
+
+const PROD_HOSTS = new Set<string>([
+  "book.menswellnesscenters.com",
+  "menswellnesscenters.com",
+  "www.menswellnesscenters.com",
+]);
+
+function detectEnv(req: Request, hint?: unknown): AppEnv {
+  if (hint === "prod" || hint === "stage") return hint;
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  try {
+    const host = new URL(origin).hostname.toLowerCase();
+    if (PROD_HOSTS.has(host)) return "prod";
+  } catch { /* ignore */ }
+  return "stage";
+}
+
+function envCreds(env: AppEnv): { apiKey: string | undefined; locationId: string } {
+  if (env === "stage") {
+    return {
+      apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
+      locationId: Deno.env.get("GHL_LOCATION_ID_STAGE") ?? "",
+    };
+  }
+  return {
+    apiKey: Deno.env.get("GHL_API_KEY"),
+    locationId: Deno.env.get("GHL_LOCATION_ID") ?? PROD_LOCATION_ID,
+  };
+}
 
 // Strict allowlist: only these (method, path-pattern) pairs are forwarded to GHL.
 // Anything else returns 403. This prevents the anon-callable proxy from being
