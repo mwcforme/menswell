@@ -514,31 +514,32 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       opacity: available || selected ? 1 : 0.85,
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : INK_SOFT, marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : available ? INK_SOFT : MUTED, marginBottom: 4, opacity: available || selected ? 1 : 0.6 }}>
                       {isToday ? "TODAY" : fmtDayShort(d)}
                     </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", textDecoration: !available && !loading ? "line-through" : "none", textDecorationColor: "#9CA3AF" }}>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", opacity: available || selected ? 1 : 0.45 }}>
                       {fmtMonthDay(d)}
                     </div>
                     <div
                       style={{
                         fontSize: 11,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: selected
                           ? "#FFFFFF"
                           : available
-                            ? count >= 3 ? "#0B6B33" : "#991B1B"
-                            : isSunday ? "#4B5563" : "#4B5563",
+                            ? INK_SOFT
+                            : MUTED,
                         background: selected
                           ? "rgba(255,255,255,0.18)"
                           : available
-                            ? count >= 3 ? "#DCF5E5" : "#FDE2E2"
-                            : isSunday ? "#E5E7EB" : "#E5E7EB",
+                            ? "#EEF1F6"
+                            : "transparent",
                         marginTop: 6,
                         letterSpacing: "0.06em",
                         padding: "3px 7px",
                         borderRadius: 999,
                         display: "inline-block",
+                        opacity: available || selected ? 1 : 0.7,
                       }}
                     >
                       {badgeText}
