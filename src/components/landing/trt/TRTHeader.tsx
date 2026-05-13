@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCro } from "@/hooks/useAnalytics";
+import { COPY } from "@/data/copy";
 
 export const TRTHeader = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -61,7 +62,7 @@ export const TRTHeader = () => {
             onMouseEnter={(e) => { e.currentTarget.style.background = "#CF5B09"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; }}
           >
-            Book My Consult
+            {COPY.cta.bookConsult}
           </button>
         </div>
 

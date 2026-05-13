@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { MapPin, Phone, Clock, ChevronDown } from "lucide-react";
+import { COPY } from "@/data/copy";
 
 const locations = [
   {
@@ -105,7 +106,7 @@ export const TRTLocations = () => {
                     className="text-xs font-bold uppercase text-center rounded-full cursor-pointer inline-flex items-center justify-center"
                     style={{ height: 48, minHeight: 48, background: "#E8670A", color: "#FFFFFF", letterSpacing: "0.08em", fontFamily: "Inter, sans-serif", border: "none" }}
                   >
-                    Book My Consult
+                    {COPY.cta.bookConsult}
                   </button>
                 </div>
               </div>

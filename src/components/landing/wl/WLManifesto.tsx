@@ -1,4 +1,5 @@
 import { Quote } from "lucide-react";
+import { COPY } from "@/data/copy";
 
 export const WLManifesto = () => (
   <section className="py-10 md:py-16" style={{ background: "#000033" }}>
@@ -33,10 +34,10 @@ export const WLManifesto = () => (
           className="mt-7 inline-flex items-center justify-center rounded-full px-8 font-bold uppercase cursor-pointer border-none"
           style={{ height: 56, minHeight: 56, background: "#E8670A", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
         >
-          See If I Qualify
+          {COPY.cta.seeIfIQualify}
         </button>
         <p className="mt-3 text-xs" style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif" }}>
-          No-obligation consult. Individual results vary.
+          {COPY.offer.manifestoTag}
         </p>
       </div>
 
