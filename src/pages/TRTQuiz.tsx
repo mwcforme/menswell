@@ -186,12 +186,12 @@ function QuizPhase({
         <h1 className="font-bold uppercase leading-[1.05]" style={{ fontFamily: "Oswald, sans-serif", fontSize: "clamp(34px, 5.5vw, 56px)", letterSpacing: "0.01em" }}>
           See if testosterone replacement therapy is right for you.
         </h1>
-        <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.78)" }}>
+        <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.90)" }}>
           A short symptom inventory used by our clinical team. Score each item, then we will route you to a center near you for a proper in-person evaluation. Your answers are private.
         </p>
-        <div className="mt-6 inline-flex items-center gap-3 rounded-md px-4 py-2 text-sm" style={{ background: "rgba(232,103,10,0.10)", border: "1px solid rgba(232,103,10,0.35)", color: "#FFB07A" }}>
+        <div className="mt-6 inline-flex items-center gap-3 rounded-md px-4 py-2 text-sm" style={{ background: "rgba(232,103,10,0.14)", border: "1px solid rgba(232,103,10,0.45)", color: "#FFB07A" }}>
           <span className="font-semibold">Score each symptom:</span>
-          <span style={{ color: "rgba(245,240,235,0.85)" }}>0 none, 1 mild, 2 moderate, 3 severe</span>
+          <span style={{ color: "rgba(245,240,235,0.90)" }}>0 none, 1 mild, 2 moderate, 3 severe</span>
         </div>
       </header>
 
@@ -199,18 +199,18 @@ function QuizPhase({
         {SECTIONS.map((section, idx) => (
           <section
             key={section.id}
-            className="rounded-2xl p-6 md:p-8"
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+          className="rounded-2xl p-5 md:p-8"
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.16)" }}
           >
             <div className="flex items-start justify-between gap-4 mb-1">
               <h2 className="font-semibold uppercase" style={{ fontFamily: "Oswald, sans-serif", fontSize: "clamp(20px, 2.4vw, 26px)", letterSpacing: "0.02em" }}>
                 {section.title}
               </h2>
-              <div className="text-xs tabular-nums px-2 py-1 rounded" style={{ color: "rgba(245,240,235,0.55)", border: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="text-xs tabular-nums px-2.5 py-1 rounded-md shrink-0" style={{ color: "rgba(245,240,235,0.75)", border: "1px solid rgba(255,255,255,0.20)" }}>
                 {idx + 1} / {SECTIONS.length}
               </div>
             </div>
-            <p className="text-sm mb-6" style={{ color: "rgba(245,240,235,0.62)" }}>
+            <p className="text-sm mb-5 md:mb-6" style={{ color: "rgba(245,240,235,0.80)" }}>
               {section.blurb}
             </p>
 
@@ -220,7 +220,7 @@ function QuizPhase({
                   <label className="text-sm md:text-[15px]" style={{ color: "rgba(245,240,235,0.92)" }}>
                     {item.label}
                   </label>
-                  <div className="grid grid-cols-4 gap-2 md:w-[280px]">
+                  <div className="grid grid-cols-4 gap-2.5 md:gap-3 md:w-[300px]">
                     {SCORE_OPTIONS.map((n) => {
                       const active = scores[item.id] === n;
                       return (
@@ -230,11 +230,11 @@ function QuizPhase({
                           aria-pressed={active}
                           aria-label={`${item.label}: ${n}`}
                           onClick={() => setScore(item.id, n)}
-                          className="h-11 rounded-md text-sm font-semibold transition-colors"
+                          className="h-12 md:h-14 rounded-lg text-sm md:text-base font-semibold transition-colors active:scale-95"
                           style={{
-                            background: active ? "#E8670A" : "rgba(255,255,255,0.04)",
-                            color: active ? "#FFFFFF" : "rgba(245,240,235,0.78)",
-                            border: `1px solid ${active ? "#E8670A" : "rgba(255,255,255,0.12)"}`,
+                            background: active ? "#E8670A" : "rgba(255,255,255,0.10)",
+                            color: active ? "#FFFFFF" : "rgba(245,240,235,0.92)",
+                            border: `1px solid ${active ? "#E8670A" : "rgba(255,255,255,0.24)"}`,
                           }}
                         >
                           {n}
@@ -265,7 +265,7 @@ function QuizPhase({
         >
           Get my results
         </button>
-        <p className="text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
+        <p className="text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>
           {answered} of {TOTAL_ITEMS} answered. Unanswered items count as zero.
         </p>
       </div>
@@ -314,7 +314,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
     width: "100%",
     height: 50,
     background: "rgba(11,16,41,0.6)",
-    border: `1px solid ${focused === field ? "#E8670A" : "rgba(245,240,235,0.20)"}`,
+    border: `1px solid ${focused === field ? "#E8670A" : "rgba(245,240,235,0.40)"}`,
     borderRadius: 8,
     padding: "0 16px",
     fontSize: 15,
@@ -336,10 +336,10 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
       <div className="mt-3 inline-block px-3 py-1 rounded text-xs uppercase tracking-[0.14em] font-semibold" style={{ background: `${result.color}22`, color: result.color, border: `1px solid ${result.color}55` }}>
         {result.label}
       </div>
-      <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.82)" }}>
+      <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.92)" }}>
         {result.note}
       </p>
-      <p className="mt-3 text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
+      <p className="mt-3 text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>
         This is not a diagnosis. Only a blood panel and clinical evaluation can confirm low testosterone. Individual results vary.
       </p>
 
@@ -347,7 +347,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
         <h2 className="font-bold uppercase mb-2" style={{ fontFamily: "Oswald, sans-serif", fontSize: 22, letterSpacing: "0.02em" }}>
           See your results with a provider
         </h2>
-        <p className="text-sm mb-6" style={{ color: "rgba(245,240,235,0.7)" }}>
+        <p className="text-sm mb-5 md:mb-6" style={{ color: "rgba(245,240,235,0.85)" }}>
           Tell us where to send your results and we will hold a time at the center nearest you.
         </p>
 
@@ -412,11 +412,11 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
               <option value="newport-news">Newport News</option>
               <option value="virginia-beach">Virginia Beach</option>
             </select>
-            <ChevronDown size={18} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(245,240,235,0.55)" }} />
+            <ChevronDown size={18} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(245,240,235,0.75)" }} />
             {errors.location && <p className="mt-1 text-xs" style={{ color: "#FF8A8A" }}>{errors.location}</p>}
           </div>
 
-          <label className="flex items-start gap-3 text-xs leading-relaxed select-none" style={{ color: "rgba(245,240,235,0.72)" }}>
+          <label className="flex items-start gap-3 text-xs md:text-sm leading-relaxed select-none" style={{ color: "rgba(245,240,235,0.85)" }}>
             <input
               type="checkbox"
               checked={tcpa}
@@ -449,7 +449,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
             )}
           </button>
 
-          <div className="flex items-center justify-center gap-2 text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
+          <div className="flex items-center justify-center gap-2 text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>
             <Lock size={12} /> Your information is private and HIPAA-aware.
           </div>
         </form>
