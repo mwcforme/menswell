@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      booking_event_log: {
+        Row: {
+          calendar_id: string | null
+          contact_id: string | null
+          created_at: string
+          error: string | null
+          event_type: string
+          id: string
+          lead_capture_id: string | null
+          location: string | null
+          meta: Json | null
+          page_url: string | null
+          slot_iso: string | null
+          source: string | null
+        }
+        Insert: {
+          calendar_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          error?: string | null
+          event_type: string
+          id?: string
+          lead_capture_id?: string | null
+          location?: string | null
+          meta?: Json | null
+          page_url?: string | null
+          slot_iso?: string | null
+          source?: string | null
+        }
+        Update: {
+          calendar_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          error?: string | null
+          event_type?: string
+          id?: string
+          lead_capture_id?: string | null
+          location?: string | null
+          meta?: Json | null
+          page_url?: string | null
+          slot_iso?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       ghl_free_slots: {
         Row: {
           calendar_id: string
