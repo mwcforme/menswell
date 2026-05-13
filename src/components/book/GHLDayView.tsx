@@ -451,10 +451,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
             <div>
               <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.4vw, 22px)", letterSpacing: "0.01em", color: INK }}>
-                {selectedDay ? `Pick a time, ${fmtFullDay(new Date(selectedDay + "T12:00:00"))}` : "Pick a time"}
+                {selectedDay ? fmtFullDay(new Date(selectedDay + "T12:00:00")) : "Select a day"}
               </div>
               <div style={{ color: MUTED, fontSize: 13, marginTop: 4 }}>
-                Times shown in clinic local time (ET).
+                All times shown in ET.
               </div>
             </div>
             {(() => {
