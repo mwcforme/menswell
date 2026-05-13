@@ -106,9 +106,9 @@ export const TRTHero = () => {
               fontWeight: 700,
             }}
           >
-            Get Your Edge Back.
+            Get Your Energy, Drive,
             <br />
-            <span style={{ color: COLORS.orange }}>In One Visit.</span>
+            <span style={{ color: COLORS.orange }}>and Confidence Back</span>
           </h1>
 
           <p

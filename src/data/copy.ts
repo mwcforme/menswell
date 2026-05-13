@@ -38,7 +38,7 @@ export const COPY = {
   },
   offer: {
     /** Hero subhead under the H1. */
-    heroSubhead: "No-cost consult. No commitment, no pressure.",
+    heroSubhead: "Same-day and next-day appointments at 3 Virginia clinics. Book in under 5 minutes. Labs, results, and your care plan – all in one visit.",
     /** Final CTA / WL / ED subhead. */
     finalSubhead: "No-cost consult. Same- or next-day visits.",
     /** Manifesto / proof closer. */
