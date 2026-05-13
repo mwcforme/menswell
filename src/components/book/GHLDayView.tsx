@@ -325,7 +325,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 5); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -343,7 +343,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 5); setWeekStart(w); }}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
