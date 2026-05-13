@@ -412,7 +412,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
               <option value="newport-news">Newport News</option>
               <option value="virginia-beach">Virginia Beach</option>
             </select>
-            <ChevronDown size={18} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(245,240,235,0.55)" }} />
+            <ChevronDown size={18} className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" style={{ color: "rgba(245,240,235,0.75)" }} />
             {errors.location && <p className="mt-1 text-xs" style={{ color: "#FF8A8A" }}>{errors.location}</p>}
           </div>
 
