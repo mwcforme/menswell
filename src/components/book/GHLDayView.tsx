@@ -643,7 +643,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         {ampm}
                       </span>
                     </div>
-                    <span style={{ fontSize: 18, color: active ? "#FFFFFF" : MUTED }}>→</span>
                   </button>
                 );
               })}
