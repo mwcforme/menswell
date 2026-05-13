@@ -559,8 +559,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             disabled={!canConfirm}
             style={{
               width: "100%", minHeight: 56,
-              background: canConfirm ? ORANGE : "#F1F2F5",
-              color: canConfirm ? "#FFFFFF" : "#9AA0AC",
+              background: canConfirm ? ORANGE : "#E5E7EB",
+              color: canConfirm ? "#FFFFFF" : "#5B6271",
               border: 0, borderRadius: 12, fontSize: 16, fontWeight: 700,
               letterSpacing: "0.06em", textTransform: "uppercase",
               cursor: canConfirm ? "pointer" : "not-allowed",
