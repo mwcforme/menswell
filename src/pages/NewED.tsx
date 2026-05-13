@@ -37,7 +37,7 @@ const NewED = () => { useScrollDepth();
           <ServiceFinalCTA
             service="ed"
             headline="READY TO HANDLE THIS THE RIGHT WAY?"
-            subhead="$0 today. Same- or next-day visits."
+            subhead="Free consult. Same- or next-day visits."
             cardTitle="Book My Discreet Visit"
             ctaLabel="Book My Discreet Visit"
             intro="No mail-order pills. No rotating clinicians. A Virginia physician who diagnoses the cause and prescribes what actually works for your case."

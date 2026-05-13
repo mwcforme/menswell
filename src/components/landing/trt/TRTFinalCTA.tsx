@@ -74,7 +74,7 @@ export const TRTFinalCTA = () => {
             READY TO BOOK YOUR FIRST VISIT?
           </h2>
           <p className="text-base mt-2" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
-            $0 today. Same- or next-day visits.
+            Free consult. Same- or next-day visits.
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-4">
