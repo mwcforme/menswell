@@ -36,8 +36,36 @@ function rateLimit(ip: string): boolean {
 
 // ---- GHL config (mirrors ghl-proxy) ----
 const GHL_API_BASE = "https://services.leadconnectorhq.com";
-const GHL_LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
 const GHL_API_VERSION = "2021-07-28";
+const PROD_LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
+
+type AppEnv = "prod" | "stage";
+const PROD_HOSTS = new Set<string>([
+  "book.menswellnesscenters.com",
+  "menswellnesscenters.com",
+  "www.menswellnesscenters.com",
+]);
+function detectEnv(req: Request, hint?: unknown): AppEnv {
+  if (hint === "prod" || hint === "stage") return hint;
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  try {
+    const host = new URL(origin).hostname.toLowerCase();
+    if (PROD_HOSTS.has(host)) return "prod";
+  } catch { /* ignore */ }
+  return "stage";
+}
+function envCreds(env: AppEnv) {
+  if (env === "stage") {
+    return {
+      apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
+      locationId: Deno.env.get("GHL_LOCATION_ID_STAGE") ?? "",
+    };
+  }
+  return {
+    apiKey: Deno.env.get("GHL_API_KEY"),
+    locationId: Deno.env.get("GHL_LOCATION_ID") ?? PROD_LOCATION_ID,
+  };
+}
 
 async function parseBody(req: Request): Promise<Record<string, unknown>> {
   const ct = (req.headers.get("content-type") ?? "").toLowerCase();
