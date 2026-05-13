@@ -5,6 +5,7 @@ import { useServices } from "@/app/providers/ServicesProvider";
 import { updateBookingState } from "@/lib/bookingState";
 import { getAttribution, attributionTags } from "@/lib/attribution";
 import { trackConversion } from "@/lib/capi";
+import { supabase } from "@/integrations/supabase/client";
 import type { LeadInput, LeadResult } from "@/services/contracts/ILeadSubmitter";
 
 export type LeadSubmitStatus = "idle" | "submitting" | "success" | "error";
