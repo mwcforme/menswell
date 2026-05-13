@@ -37,7 +37,7 @@ const NewWeightLoss = () => { useScrollDepth();
           <ServiceFinalCTA
             service="wl"
             headline="READY TO START LOSING THE WEIGHT?"
-            subhead="$0 today. Same- or next-day visits."
+            subhead="Free consult. Same- or next-day visits."
             cardTitle="See If I Qualify"
             ctaLabel="See If I Qualify"
             intro="No more cycles of strict diets and bounce-back. A Virginia physician, real labs, and the right medication for your body."
