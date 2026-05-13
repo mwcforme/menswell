@@ -186,12 +186,12 @@ function QuizPhase({
         <h1 className="font-bold uppercase leading-[1.05]" style={{ fontFamily: "Oswald, sans-serif", fontSize: "clamp(34px, 5.5vw, 56px)", letterSpacing: "0.01em" }}>
           See if testosterone replacement therapy is right for you.
         </h1>
-        <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.78)" }}>
+        <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.90)" }}>
           A short symptom inventory used by our clinical team. Score each item, then we will route you to a center near you for a proper in-person evaluation. Your answers are private.
         </p>
-        <div className="mt-6 inline-flex items-center gap-3 rounded-md px-4 py-2 text-sm" style={{ background: "rgba(232,103,10,0.10)", border: "1px solid rgba(232,103,10,0.35)", color: "#FFB07A" }}>
+        <div className="mt-6 inline-flex items-center gap-3 rounded-md px-4 py-2 text-sm" style={{ background: "rgba(232,103,10,0.14)", border: "1px solid rgba(232,103,10,0.45)", color: "#FFB07A" }}>
           <span className="font-semibold">Score each symptom:</span>
-          <span style={{ color: "rgba(245,240,235,0.85)" }}>0 none, 1 mild, 2 moderate, 3 severe</span>
+          <span style={{ color: "rgba(245,240,235,0.90)" }}>0 none, 1 mild, 2 moderate, 3 severe</span>
         </div>
       </header>
 
