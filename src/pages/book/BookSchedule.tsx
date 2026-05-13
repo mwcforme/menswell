@@ -81,11 +81,12 @@ const BookSchedule = () => {
           <h1
             style={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 600,
-              fontSize: "clamp(20px, 2.6vw, 26px)",
+              fontWeight: 700,
+              fontSize: "clamp(22px, 2.8vw, 28px)",
               lineHeight: 1.25,
               letterSpacing: "-0.01em",
-              marginBottom: 6,
+              marginBottom: 8,
+              color: "#FFFFFF",
               textTransform: "none",
             }}
           >
@@ -94,9 +95,9 @@ const BookSchedule = () => {
           <p
             style={{
               fontFamily: "Inter, sans-serif",
-              fontSize: 16,
-              color: "rgba(255,255,255,0.8)",
-              lineHeight: 1.5,
+              fontSize: 17,
+              color: "#E5E7EB",
+              lineHeight: 1.55,
               maxWidth: 560,
               margin: "0 auto",
             }}
