@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+// Banned-wording scanner. Run via: node scripts/check-banned-wording.mjs
 /**
  * Banned-wording scanner.
  *
