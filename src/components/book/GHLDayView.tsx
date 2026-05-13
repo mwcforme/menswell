@@ -205,7 +205,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   // Only future days (today + later) within the visible week
   const days = useMemo(() => {
-    return Array.from({ length: 7 })
+    return Array.from({ length: 5 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
