@@ -599,7 +599,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 >
                   <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
                   <span>Updated {agoText}</span>
-                  <span style={{ color: MUTED, fontWeight: 500 }}>· {reasonLabel[lastReason]}</span>
                 </button>
               );
             })()}
