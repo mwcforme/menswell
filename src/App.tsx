@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ServicesProvider } from "@/app/providers/ServicesProvider";
 import NotFound from "./pages/NotFound";
 import NewLandingPage from "./pages/NewLandingPage";
+import NewWeightLoss from "./pages/NewWeightLoss";
+import NewED from "./pages/NewED";
 import TRTQuiz from "./pages/TRTQuiz";
 import TRTQuizApproved from "./pages/TRTQuizApproved";
 import BookSymptom from "./pages/book/BookSymptom";
@@ -79,6 +81,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Navigate to="/new" replace />} />
               <Route path="/new" element={<NewLandingPage />} />
+              <Route path="/new-wl" element={<NewWeightLoss />} />
+              <Route path="/new-ed" element={<NewED />} />
               <Route path="/quiz" element={<TRTQuiz />} />
               <Route path="/quiz/approved" element={<TRTQuizApproved />} />
               <Route path="/book" element={<Navigate to="/book/schedule" replace />} />

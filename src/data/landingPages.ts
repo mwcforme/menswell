@@ -43,6 +43,24 @@ export const LANDING_PAGES: LandingPageEntry[] = [
     notes: "Personalized results + offer page after quiz. CTA bypasses symptom gate.",
     updatedAt: "2026-05-13",
   },
+  {
+    slug: "/new-wl",
+    name: "Weight Loss Hero (v1)",
+    service: "weight-loss",
+    status: "live",
+    primaryCta: "/book/symptom",
+    notes: "GLP-1 medical weight loss LP. Hero form tags lead service=wl in GHL. Copy informed by Hims/Ro/Henry research.",
+    updatedAt: "2026-05-13",
+  },
+  {
+    slug: "/new-ed",
+    name: "ED Hero (v1)",
+    service: "ed",
+    status: "live",
+    primaryCta: "/book/symptom",
+    notes: "Discreet in-person ED LP. Sildenafil/Tadalafil/TriMix/PT-141 positioning vs Hims/BlueChew. Service=ed tag.",
+    updatedAt: "2026-05-13",
+  },
 ];
 
 export interface BookingStep {
