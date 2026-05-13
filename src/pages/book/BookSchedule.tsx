@@ -52,10 +52,9 @@ const BookSchedule = () => {
           <div
             className="text-center mb-2"
             style={{
-              fontSize: 14,
+              fontSize: 13,
               color: "#FFFFFF",
-              opacity: 0.85,
-              letterSpacing: "0.04em",
+              letterSpacing: "0.08em",
               fontWeight: 700,
               fontFamily: "Inter, sans-serif",
               textTransform: "uppercase",
