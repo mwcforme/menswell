@@ -63,8 +63,6 @@ export function StepLead({
         email: v.email,
         phone: v.phone,
         tags: [`quiz_state:${v.state}`],
-        // Note flows through to the GHL Contact for clinician visibility.
-        note: noteBody,
       };
     },
     onSuccess: (_r, v) => {
