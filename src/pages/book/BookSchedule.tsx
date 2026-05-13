@@ -16,10 +16,10 @@ const SERVICE_LABEL: Record<string, string> = {
 };
 
 const URGENCY_SUB: Record<UrgencyTier, string> = {
-  early: "Pick a time that works for you. Most visits run about 60 minutes.",
-  building: "Pick a time that works for you. Most visits run about 60 minutes.",
-  overdue: "Pick a time that works for you. Most visits run about 60 minutes.",
-  long_overdue: "Pick a time that works for you. Most visits run about 60 minutes.",
+  early: "60-minute in-person visit at our Virginia clinic.",
+  building: "60-minute in-person visit at our Virginia clinic.",
+  overdue: "60-minute in-person visit at our Virginia clinic.",
+  long_overdue: "60-minute in-person visit at our Virginia clinic.",
 };
 
 const BookSchedule = () => {
