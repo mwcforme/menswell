@@ -13,13 +13,14 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === "development" && componentTagger(),
-    process.env.SENTRY_AUTH_TOKEN &&
-      sentryVitePlugin({
-        org: "REPLACE_WITH_SENTRY_ORG_SLUG",
-        project: "mwc-booking-lp",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-        telemetry: false,
-      }),
+    process.env.SENTRY_AUTH_TOKEN
+      ? sentryVitePlugin({
+          org: "REPLACE_WITH_SENTRY_ORG_SLUG",
+          project: "mwc-booking-lp",
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          telemetry: false,
+        })
+      : null,
   ].filter(Boolean),
   build: {
     sourcemap: true,

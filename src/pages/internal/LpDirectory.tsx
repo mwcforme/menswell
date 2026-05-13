@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Copy, ExternalLink, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
-import { SEOHead } from "@/components/SEOHead";
+import { SEO } from "@/components/SEO";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -102,11 +102,9 @@ const LpDirectory = () => {
 
   return (
     <>
-      <SEOHead
+      <SEO
         title="LP Directory (Internal) | MWC"
-        description="Internal landing-page directory. Noindex."
-        canonical="https://mwcv2.lovable.app/lp"
-        noindex
+        description="Internal landing-page directory."
       />
       <div
         className="min-h-screen"
