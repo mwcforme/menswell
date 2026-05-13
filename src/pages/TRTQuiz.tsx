@@ -300,7 +300,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
         ...merged,
         location: v.location,
         service: "trt",
-        notes: `Quiz score ${total} of 84 (${result.label}).`,
+        note: `Quiz score ${total} of 84 (${result.label}).`,
       });
       window.location.assign(`/book/symptom?${qs}`);
     },
