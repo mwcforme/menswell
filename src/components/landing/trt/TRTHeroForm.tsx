@@ -48,7 +48,7 @@ export const TRTHeroForm = ({
     onSuccess: (_r, v) => {
       // Persist service tag and route to symptom step with full state in URL.
       const merged = getBookingState();
-      const qs = toQueryString({ ...merged, location: v.location, service: "trt" });
+      const qs = toQueryString({ ...merged, location: v.location, service });
       // Use replace-style nav via window so back-button doesn't trap on the LP form.
       window.location.assign(`/book/symptom?${qs}`);
     },
