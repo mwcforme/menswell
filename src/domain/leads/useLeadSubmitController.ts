@@ -4,6 +4,7 @@ import type { ZodSchema } from "zod";
 import { useServices } from "@/app/providers/ServicesProvider";
 import { updateBookingState } from "@/lib/bookingState";
 import { getAttribution, attributionTags } from "@/lib/attribution";
+import { trackConversion } from "@/lib/capi";
 import type { LeadInput, LeadResult } from "@/services/contracts/ILeadSubmitter";
 
 export type LeadSubmitStatus = "idle" | "submitting" | "success" | "error";
@@ -111,6 +112,26 @@ export function useLeadSubmitController<TInput>(
         }
 
         setStatus("success");
+
+        // Fire server-side Lead conversion (Meta CAPI + GA4 MP) deduped by event_id.
+        const v = validated as Record<string, unknown>;
+        const fullName = typeof v.name === "string" ? v.name.trim() : "";
+        const [firstName, ...rest] = fullName.split(/\s+/);
+        void trackConversion("Lead", {
+          user_data: {
+            email: typeof v.email === "string" ? v.email : undefined,
+            phone: typeof v.phone === "string" ? v.phone : undefined,
+            first_name: attr.first_name || firstName || undefined,
+            last_name: attr.last_name || (rest.length ? rest.join(" ") : undefined),
+            state: typeof v.location === "string" ? "VA" : undefined,
+            external_id: result.contactId,
+          },
+          custom_data: {
+            content_name: leadInput.source,
+            lp_slug: typeof window !== "undefined" ? window.location.pathname : undefined,
+          },
+        });
+
         await opts.onSuccess?.(result, validated);
         if (opts.navigateTo) nav.go(opts.navigateTo);
         return result;
