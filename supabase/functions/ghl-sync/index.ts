@@ -36,7 +36,7 @@ const json = (status: number, data: unknown) =>
 async function fetchSlots(calendarId: string, apiKey: string) {
   const start = Date.now();
   const end = start + WINDOW_DAYS * 24 * 60 * 60 * 1000;
-  const url = `${API_BASE}/calendars/${calendarId}/free-slots?startDate=${start}&endDate=${end}&timezone=${encodeURIComponent(TIMEZONE)}&locationId=${LOCATION_ID}`;
+  const url = `${API_BASE}/calendars/${calendarId}/free-slots?startDate=${start}&endDate=${end}&timezone=${encodeURIComponent(TIMEZONE)}`;
   const r = await fetch(url, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
