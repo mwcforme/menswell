@@ -82,7 +82,14 @@ export async function upsertContact(input: UpsertContactInput): Promise<string> 
   const res = await ghl<{ contact?: { id: string }; new?: boolean }>({
     path: "/contacts/upsert",
     method: "POST",
-    body: input,
+    body: {
+      firstName: input.firstName,
+      ...(input.lastName ? { lastName: input.lastName } : {}),
+      ...(input.email ? { email: input.email } : {}),
+      ...(input.phone ? { phone: input.phone } : {}),
+      ...(input.source ? { source: input.source } : {}),
+      ...(input.tags && input.tags.length ? { tags: input.tags } : {}),
+    },
   });
   const id = res.data?.contact?.id;
   if (!id) throw new Error("GHL upsertContact: missing contact id");

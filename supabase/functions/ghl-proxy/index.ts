@@ -49,6 +49,15 @@ function validateBody(method: string, path: string, body: unknown): { ok: true; 
     if (!isOptStr(b.email)) return { ok: false, error: "email invalid" };
     if (!isOptStr(b.phone)) return { ok: false, error: "phone invalid" };
     if (!isOptStr(b.source)) return { ok: false, error: "source invalid" };
+    // tags: optional string[], cap count + length to prevent abuse
+    let tags: string[] | undefined;
+    if (b.tags !== undefined) {
+      if (!Array.isArray(b.tags)) return { ok: false, error: "tags must be array" };
+      const filtered = (b.tags as unknown[])
+        .filter((t): t is string => typeof t === "string" && t.length > 0 && t.length <= 100)
+        .slice(0, 30);
+      if (filtered.length) tags = filtered;
+    }
     return {
       ok: true,
       body: {
@@ -57,6 +66,7 @@ function validateBody(method: string, path: string, body: unknown): { ok: true; 
         ...(b.email ? { email: b.email } : {}),
         ...(b.phone ? { phone: b.phone } : {}),
         ...(b.source ? { source: b.source } : {}),
+        ...(tags ? { tags } : {}),
       },
     };
   }
