@@ -7,6 +7,7 @@ import { GlobalSchema } from "@/components/GlobalSchema";
 import { ServicesProvider } from "@/app/providers/ServicesProvider";
 import NotFound from "./pages/NotFound";
 import NewLandingPage from "./pages/NewLandingPage";
+import TRTQuiz from "./pages/TRTQuiz";
 import BookSymptom from "./pages/book/BookSymptom";
 import BookDuration from "./pages/book/BookDuration";
 import BookSchedule from "./pages/book/BookSchedule";
@@ -32,6 +33,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Navigate to="/new" replace />} />
           <Route path="/new" element={<NewLandingPage />} />
+          <Route path="/quiz" element={<TRTQuiz />} />
           <Route path="/book" element={<Navigate to="/book/symptom" replace />} />
           <Route path="/book/symptom" element={<BookSymptom />} />
           <Route path="/book/duration" element={<BookDuration />} />
