@@ -37,13 +37,13 @@ const NewED = () => { useScrollDepth();
           <ServiceFinalCTA
             service="ed"
             headline="READY TO HANDLE THIS THE RIGHT WAY?"
-            subhead="Free consult. Same- or next-day visits."
+            subhead="No-cost consult. Same- or next-day visits."
             cardTitle="Book My Discreet Visit"
             ctaLabel="Book My Discreet Visit"
             intro="No mail-order pills. No rotating clinicians. A Virginia physician who diagnoses the cause and prescribes what actually works for your case."
             bullets={[
               "100% private. Your employer or insurance is never notified.",
-              "Cancel or reschedule free, anytime.",
+              "Cancel or reschedule at no charge, anytime.",
               "If ED treatment isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
             ]}
           />

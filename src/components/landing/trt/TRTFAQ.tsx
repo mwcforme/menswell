@@ -70,7 +70,7 @@ export const TRTFAQ = () => {
                           fontSize: "inherit",
                         }}
                       >
-                        → Book a free consult
+                        → Book a no-cost consult
                       </button>
                     </p>
                   </div>

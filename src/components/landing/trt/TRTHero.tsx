@@ -8,7 +8,7 @@ const trustChecks = [
   "Same/next-day visits",
   "Face-to-face physician",
   "Licensed VA providers",
-  "Free consult",
+  "No-cost consult",
 ];
 
 const COLORS = {
@@ -119,7 +119,7 @@ export const TRTHero = () => {
               lineHeight: 1.5,
             }}
           >
-            Free consult. No commitment, no pressure.
+            No-cost consult. No commitment, no pressure.
           </p>
 
           {/* Star rating row — clickable, links to GBP */}

@@ -37,13 +37,13 @@ const NewWeightLoss = () => { useScrollDepth();
           <ServiceFinalCTA
             service="wl"
             headline="READY TO START LOSING THE WEIGHT?"
-            subhead="Free consult. Same- or next-day visits."
+            subhead="No-cost consult. Same- or next-day visits."
             cardTitle="See If I Qualify"
             ctaLabel="See If I Qualify"
             intro="No more cycles of strict diets and bounce-back. A Virginia physician, real labs, and the right medication for your body."
             bullets={[
               "100% private. Your employer or insurance is never notified.",
-              "Cancel or reschedule free, anytime.",
+              "Cancel or reschedule at no charge, anytime.",
               "If GLP-1 treatment isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
             ]}
           />

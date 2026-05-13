@@ -74,7 +74,7 @@ export const TRTFinalCTA = () => {
             READY TO BOOK YOUR FIRST VISIT?
           </h2>
           <p className="text-base mt-2" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
-            Free consult. Same- or next-day visits.
+            No-cost consult. Same- or next-day visits.
           </p>
 
           <div className="flex items-center justify-center gap-2 mt-4">
@@ -97,7 +97,7 @@ export const TRTFinalCTA = () => {
             <ul className="mt-6 space-y-3">
               {[
                 "100% private. Your employer or insurance is never notified.",
-                "Cancel or reschedule free, anytime.",
+                "Cancel or reschedule at no charge, anytime.",
                 "If TRT isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-3" style={{ color: "rgba(255,255,255,0.92)", fontFamily: "Inter, sans-serif" }}>
