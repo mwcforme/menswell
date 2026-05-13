@@ -206,7 +206,7 @@ function QuizPhase({
               <h2 className="font-semibold uppercase" style={{ fontFamily: "Oswald, sans-serif", fontSize: "clamp(20px, 2.4vw, 26px)", letterSpacing: "0.02em" }}>
                 {section.title}
               </h2>
-              <div className="text-xs tabular-nums px-2 py-1 rounded" style={{ color: "rgba(245,240,235,0.55)", border: "1px solid rgba(255,255,255,0.10)" }}>
+              <div className="text-xs tabular-nums px-2.5 py-1 rounded-md shrink-0" style={{ color: "rgba(245,240,235,0.75)", border: "1px solid rgba(255,255,255,0.20)" }}>
                 {idx + 1} / {SECTIONS.length}
               </div>
             </div>
