@@ -422,7 +422,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       opacity: available || selected ? 1 : 0.85,
                     }}
                   >
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: selected ? "rgba(255,255,255,0.75)" : MUTED, marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : INK_SOFT, marginBottom: 4 }}>
                       {isToday ? "TODAY" : fmtDayShort(d)}
                     </div>
                     <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 16, letterSpacing: "0.02em", textDecoration: !available && !loading ? "line-through" : "none", textDecorationColor: "#D7DAE0" }}>
