@@ -15,7 +15,7 @@ import { EDManifesto } from "@/components/landing/ed/EDManifesto";
 import { EDFAQ } from "@/components/landing/ed/EDFAQ";
 import { ServiceFinalCTA } from "@/components/landing/shared/ServiceFinalCTA";
 
-const NewED = () => {
+const NewED = () => { useScrollDepth();
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "Inter, sans-serif" }}>
       <SEO
@@ -25,7 +25,7 @@ const NewED = () => {
       <TRTHeader />
       <main className="flex-1">
         <EDHero />
-        <SectionReveal><TRTTrustBar /></SectionReveal>
+        <SectionReveal><CredibilityBand /></SectionReveal>
         <SectionReveal><EDHowItWorks /></SectionReveal>
         <SectionReveal><EDManifesto /></SectionReveal>
         <SectionReveal><TRTResults /></SectionReveal>
@@ -50,7 +50,7 @@ const NewED = () => {
         </SectionReveal>
       </main>
       <TRTFooter />
-      <TRTMobileCTA />
+      <StickyMobileCTA />
       <div className="md:hidden" style={{ height: 56 }} aria-hidden="true" />
     </div>
   );

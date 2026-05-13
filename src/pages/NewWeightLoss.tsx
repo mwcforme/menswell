@@ -15,7 +15,7 @@ import { WLManifesto } from "@/components/landing/wl/WLManifesto";
 import { WLFAQ } from "@/components/landing/wl/WLFAQ";
 import { ServiceFinalCTA } from "@/components/landing/shared/ServiceFinalCTA";
 
-const NewWeightLoss = () => {
+const NewWeightLoss = () => { useScrollDepth();
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "Inter, sans-serif" }}>
       <SEO
@@ -25,7 +25,7 @@ const NewWeightLoss = () => {
       <TRTHeader />
       <main className="flex-1">
         <WLHero />
-        <SectionReveal><TRTTrustBar /></SectionReveal>
+        <SectionReveal><CredibilityBand /></SectionReveal>
         <SectionReveal><WLHowItWorks /></SectionReveal>
         <SectionReveal><WLManifesto /></SectionReveal>
         <SectionReveal><TRTResults /></SectionReveal>
@@ -50,7 +50,7 @@ const NewWeightLoss = () => {
         </SectionReveal>
       </main>
       <TRTFooter />
-      <TRTMobileCTA />
+      <StickyMobileCTA />
       <div className="md:hidden" style={{ height: 56 }} aria-hidden="true" />
     </div>
   );
