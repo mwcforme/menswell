@@ -13,6 +13,10 @@ import BookSchedule from "./pages/book/BookSchedule";
 import BookConfirmed from "./pages/book/BookConfirmed";
 import BookLetsTalk from "./pages/book/BookLetsTalk";
 import LpDirectory from "./pages/internal/LpDirectory";
+import PrivacyPolicy from "./pages/legal/PrivacyPolicy";
+import TermsOfService from "./pages/legal/TermsOfService";
+import TcpaDisclosure from "./pages/legal/TcpaDisclosure";
+import PrescribingPolicy from "./pages/legal/PrescribingPolicy";
 import { MobileFooterBar } from "./components/shared/MobileFooterBar";
 
 const queryClient = new QueryClient();
@@ -35,6 +39,10 @@ const App = () => (
           <Route path="/book/confirmed" element={<BookConfirmed />} />
           <Route path="/book/lets-talk" element={<BookLetsTalk />} />
           <Route path="/lp" element={<LpDirectory />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/tcpa" element={<TcpaDisclosure />} />
+          <Route path="/prescribing-policy" element={<PrescribingPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <MobileFooterBar />
