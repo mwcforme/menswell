@@ -273,7 +273,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const times = selectedDay ? slotsByDay[selectedDay] || [] : [];
   const canConfirm = Boolean(selectedSlot);
-  const prevDisabled = weekStart <= startOfWeek(today);
+  const prevDisabled = weekStart <= today;
 
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
