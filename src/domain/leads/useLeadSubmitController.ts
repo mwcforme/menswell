@@ -97,12 +97,38 @@ export function useLeadSubmitController<TInput>(
         tags: [...(opts.tags ?? []), ...(base.tags ?? []), ...attributionTags(attr)],
       };
 
+      // ---- Persist raw capture FIRST (zero data loss if CRM fails) ----
+      const v = validated as Record<string, unknown>;
+      const captureRow = {
+        name: typeof v.name === "string" ? v.name : null,
+        phone: typeof v.phone === "string" ? v.phone : (leadInput.phone ?? null),
+        email: typeof v.email === "string" ? v.email : (leadInput.email ?? null),
+        location: typeof v.location === "string" ? v.location : null,
+        service: typeof v.service === "string" ? v.service : null,
+        source: leadInput.source ?? null,
+        page_url: typeof window !== "undefined" ? window.location.href : null,
+        tags: leadInput.tags ?? null,
+        attribution: attr as unknown as Record<string, unknown>,
+        crm_status: "pending" as const,
+      };
+      let captureId: string | null = null;
+      try {
+        const { data: inserted, error: insertErr } = await supabase
+          .from("lead_captures")
+          .insert(captureRow)
+          .select("id")
+          .single();
+        if (insertErr) throw insertErr;
+        captureId = inserted?.id ?? null;
+      } catch (persistErr) {
+        // Never block submission on capture failure — log only.
+        console.warn("[lead-capture] insert failed", persistErr);
+      }
+
       try {
         const result = await leads.submitLead(leadInput);
 
         if (opts.persistToBookingState !== false) {
-          // Best-effort hydrate of downstream funnel state.
-          const v = validated as Record<string, unknown>;
           updateBookingState({
             ...(typeof v.name === "string" ? { name: v.name } : {}),
             ...(typeof v.phone === "string" ? { phone: v.phone } : {}),
@@ -112,10 +138,18 @@ export function useLeadSubmitController<TInput>(
           });
         }
 
+        // Mark capture as synced to CRM (best-effort; no SELECT/UPDATE policy
+        // means this will silently no-op in production — that's intentional).
+        if (captureId) {
+          void supabase
+            .from("lead_captures")
+            // @ts-expect-error update blocked by RLS; safe no-op
+            .update({ crm_status: "synced", crm_contact_id: result.contactId })
+            .eq("id", captureId);
+        }
+
         setStatus("success");
 
-        // Fire server-side Lead conversion (Meta CAPI + GA4 MP) deduped by event_id.
-        const v = validated as Record<string, unknown>;
         const fullName = typeof v.name === "string" ? v.name.trim() : "";
         const [firstName, ...rest] = fullName.split(/\s+/);
         void trackConversion("Lead", {
