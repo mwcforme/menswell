@@ -416,7 +416,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
             {errors.location && <p className="mt-1 text-xs" style={{ color: "#FF8A8A" }}>{errors.location}</p>}
           </div>
 
-          <label className="flex items-start gap-3 text-xs leading-relaxed select-none" style={{ color: "rgba(245,240,235,0.72)" }}>
+          <label className="flex items-start gap-3 text-xs md:text-sm leading-relaxed select-none" style={{ color: "rgba(245,240,235,0.85)" }}>
             <input
               type="checkbox"
               checked={tcpa}
