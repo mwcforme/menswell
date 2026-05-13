@@ -199,8 +199,8 @@ function QuizPhase({
         {SECTIONS.map((section, idx) => (
           <section
             key={section.id}
-            className="rounded-2xl p-6 md:p-8"
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+          className="rounded-2xl p-5 md:p-8"
+            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.16)" }}
           >
             <div className="flex items-start justify-between gap-4 mb-1">
               <h2 className="font-semibold uppercase" style={{ fontFamily: "Oswald, sans-serif", fontSize: "clamp(20px, 2.4vw, 26px)", letterSpacing: "0.02em" }}>
