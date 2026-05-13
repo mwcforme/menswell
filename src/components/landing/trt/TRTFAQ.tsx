@@ -45,15 +45,7 @@ export const TRTFAQ = () => {
     el?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
-  };
+
 
   return (
     <section id="faq" style={{ background: "#F5F0EB" }}>
@@ -94,7 +86,7 @@ export const TRTFAQ = () => {
           })}
         </div>
       </div>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      
     </section>
   );
 };
