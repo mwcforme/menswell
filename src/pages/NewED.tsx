@@ -36,11 +36,15 @@ const NewED = () => {
           <ServiceFinalCTA
             service="ed"
             headline="READY TO HANDLE THIS THE RIGHT WAY?"
-            subhead="One discreet visit. Real labs. The right protocol for you."
+            subhead="$0 today. Same- or next-day visits."
             cardTitle="Book My Discreet Visit"
             ctaLabel="Book My Discreet Visit"
             intro="No mail-order pills. No rotating clinicians. A Virginia physician who diagnoses the cause and prescribes what actually works for your case."
-            bullets={["100% confidential", "Face-to-face with a physician", "Same-day visits available"]}
+            bullets={[
+              "100% private. Your employer or insurance is never notified.",
+              "Cancel or reschedule free, anytime.",
+              "If ED treatment isn't right for you, our providers will tell you. Treatment is only prescribed when clinically appropriate.",
+            ]}
           />
         </SectionReveal>
       </main>
