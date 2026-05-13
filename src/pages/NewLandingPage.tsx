@@ -27,6 +27,9 @@ const NewLandingPage = () => {
         title="TRT in Virginia | Testing | Men's Wellness Centers"
         description="Provider-supervised testosterone replacement therapy at 3 Virginia locations. Testing and results reviewed in-visit. Walk in today."
       />
+      <Helmet>
+        <script type="application/ld+json">{faqSchema}</script>
+      </Helmet>
       <TRTHeader />
       <main className="flex-1">
         <TRTHero />
