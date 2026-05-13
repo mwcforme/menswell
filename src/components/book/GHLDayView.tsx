@@ -397,7 +397,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
                       background: selected ? INK : SURFACE,
-                      border: `1.5px solid ${selected ? INK : LINE}`,
+                      border: `1.5px solid ${selected ? INK : BORDER}`,
                       borderRadius: 12, padding: "12px 6px",
                       color: selected ? "#FFFFFF" : INK,
                       cursor: isSunday || !available ? "default" : "pointer",
