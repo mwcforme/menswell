@@ -210,7 +210,7 @@ function QuizPhase({
                 {idx + 1} / {SECTIONS.length}
               </div>
             </div>
-            <p className="text-sm mb-6" style={{ color: "rgba(245,240,235,0.62)" }}>
+            <p className="text-sm mb-5 md:mb-6" style={{ color: "rgba(245,240,235,0.80)" }}>
               {section.blurb}
             </p>
 
