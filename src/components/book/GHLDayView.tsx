@@ -514,31 +514,32 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       opacity: available || selected ? 1 : 0.85,
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : INK_SOFT, marginBottom: 4 }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : available ? INK_SOFT : MUTED, marginBottom: 4, opacity: available || selected ? 1 : 0.6 }}>
                       {isToday ? "TODAY" : fmtDayShort(d)}
                     </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", textDecoration: !available && !loading ? "line-through" : "none", textDecorationColor: "#9CA3AF" }}>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", opacity: available || selected ? 1 : 0.45 }}>
                       {fmtMonthDay(d)}
                     </div>
                     <div
                       style={{
                         fontSize: 11,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         color: selected
                           ? "#FFFFFF"
                           : available
-                            ? count >= 3 ? "#0B6B33" : "#991B1B"
-                            : isSunday ? "#4B5563" : "#4B5563",
+                            ? INK_SOFT
+                            : MUTED,
                         background: selected
                           ? "rgba(255,255,255,0.18)"
                           : available
-                            ? count >= 3 ? "#DCF5E5" : "#FDE2E2"
-                            : isSunday ? "#E5E7EB" : "#E5E7EB",
+                            ? "#EEF1F6"
+                            : "transparent",
                         marginTop: 6,
                         letterSpacing: "0.06em",
                         padding: "3px 7px",
                         borderRadius: 999,
                         display: "inline-block",
+                        opacity: available || selected ? 1 : 0.7,
                       }}
                     >
                       {badgeText}
@@ -598,7 +599,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 >
                   <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
                   <span>Updated {agoText}</span>
-                  <span style={{ color: MUTED, fontWeight: 500 }}>· {reasonLabel[lastReason]}</span>
                 </button>
               );
             })()}
@@ -626,8 +626,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       background: active ? ORANGE_DEEP : SURFACE,
                       border: `1px solid ${active ? ORANGE_DEEP : BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
-                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "left",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
                       boxShadow: active
                         ? "0 8px 20px -10px rgba(194,65,12,0.55)"
                         : "0 1px 0 rgba(11,16,41,0.02)",
@@ -642,7 +642,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         {ampm}
                       </span>
                     </div>
-                    <span style={{ fontSize: 18, color: active ? "#FFFFFF" : MUTED }}>→</span>
                   </button>
                 );
               })}
