@@ -280,6 +280,35 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const canConfirm = Boolean(selectedSlot);
   const prevDisabled = weekStart <= today;
 
+  // "Soonest opening" — first chronological slot across the loaded 5-day window.
+  const nextAvailable = useMemo(() => {
+    if (loading) return null;
+    let best: { dayKey: string; iso: string; date: Date } | null = null;
+    for (const [dayKey, slots] of Object.entries(slotsByDay)) {
+      for (const iso of slots) {
+        const d = new Date(iso);
+        if (!best || d < best.date) best = { dayKey, iso, date: d };
+      }
+    }
+    return best;
+  }, [slotsByDay, loading]);
+
+  const advanceWeek = () => {
+    const w = new Date(weekStart); w.setDate(w.getDate() + 5); setWeekStart(w);
+  };
+
+  const handleQuickPick = () => {
+    if (!nextAvailable) { advanceWeek(); return; }
+    setSelectedDay(nextAvailable.dayKey);
+    setSelectedSlot(nextAvailable.iso);
+    setModalOpen(true);
+    if (typeof window !== "undefined") {
+      type GtagFn = (cmd: "event", name: string, params: Record<string, unknown>) => void;
+      const gtag = (window as unknown as { gtag?: GtagFn }).gtag;
+      gtag?.("event", "booking_quickpick_click", { location, slotIso: nextAvailable.iso });
+    }
+  };
+
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
     const ok = await confirmCtl.confirm({
@@ -296,6 +325,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   };
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+  // Quick-pick is "muted" when the user has already chosen a different slot,
+  // so it doesn't fight their decision.
+  const quickPickMuted = Boolean(selectedSlot && nextAvailable && selectedSlot !== nextAvailable.iso);
 
   return (
     <>
