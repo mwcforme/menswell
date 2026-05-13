@@ -9,17 +9,17 @@ const PHONE_DISPLAY = "(866) 344-4955";
 const PHONE_TEL = "tel:8663444955";
 
 const SERVICE_LABEL: Record<string, string> = {
-  energy: "TRT evaluation",
-  sexual: "men's sexual health",
-  weight: "medical weight loss",
-  other: "a personalized consultation",
+  energy: "TRT consult",
+  sexual: "men's sexual health consult",
+  weight: "medical weight loss consult",
+  other: "consultation",
 };
 
 const URGENCY_SUB: Record<UrgencyTier, string> = {
-  early: "Catching this early gives you the best long-term results. Pick a time below.",
-  building: "You're not imagining it, and you're catching it at the right time. Pick a time below.",
-  overdue: "You've waited long enough. Most men in your situation see results within 6 to 8 weeks.",
-  long_overdue: "You've waited a long time, and that's exactly why this matters. Most men see results within 6 to 8 weeks.",
+  early: "Pick a time that works for you. Most visits run about 60 minutes.",
+  building: "Pick a time that works for you. Most visits run about 60 minutes.",
+  overdue: "Pick a time that works for you. Most visits run about 60 minutes.",
+  long_overdue: "Pick a time that works for you. Most visits run about 60 minutes.",
 };
 
 const BookSchedule = () => {
@@ -29,7 +29,7 @@ const BookSchedule = () => {
   const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
   const subhead = state.urgencyTier
     ? URGENCY_SUB[state.urgencyTier]
-    : "Pick a time below that works for you.";
+    : "Pick a time that works for you. Most visits run about 60 minutes.";
 
   const trackCallClick = () => {
     const w = window as unknown as { dataLayer?: Array<Record<string, unknown>> };
@@ -82,14 +82,15 @@ const BookSchedule = () => {
           <h1
             style={{
               fontFamily: "Inter, sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(22px, 3.4vw, 32px)",
-              lineHeight: 1.2,
+              fontWeight: 600,
+              fontSize: "clamp(20px, 2.6vw, 26px)",
+              lineHeight: 1.25,
               letterSpacing: "-0.01em",
-              marginBottom: 8,
+              marginBottom: 6,
+              textTransform: "none",
             }}
           >
-            You're a strong candidate for {serviceLabel}.
+            Schedule your {serviceLabel}.
           </h1>
           <p
             style={{
