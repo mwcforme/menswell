@@ -232,9 +232,9 @@ function QuizPhase({
                           onClick={() => setScore(item.id, n)}
                           className="h-11 rounded-md text-sm font-semibold transition-colors"
                           style={{
-                            background: active ? "#E8670A" : "rgba(255,255,255,0.04)",
-                            color: active ? "#FFFFFF" : "rgba(245,240,235,0.78)",
-                            border: `1px solid ${active ? "#E8670A" : "rgba(255,255,255,0.12)"}`,
+                            background: active ? "#E8670A" : "rgba(255,255,255,0.10)",
+                            color: active ? "#FFFFFF" : "rgba(245,240,235,0.92)",
+                            border: `1px solid ${active ? "#E8670A" : "rgba(255,255,255,0.24)"}`,
                           }}
                         >
                           {n}
