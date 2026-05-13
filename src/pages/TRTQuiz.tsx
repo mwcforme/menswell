@@ -69,13 +69,13 @@ export default function TRTQuiz() {
   const navigate = useNavigate();
   const { state, setSymptom, setSafetyConditions, setContact, setStep, markCompleted } = useQuizState();
 
-  // After completion, /quiz redirects to /quiz/approved (mirrors Titan).
-  if (state.completed) return <Navigate to="/quiz/approved" replace />;
-
   // Reset to step 1 if state is in a transition phase from a stale session.
   useEffect(() => {
     if (state.currentStep === "approved" && !state.completed) setStep(1);
   }, [state.currentStep, state.completed, setStep]);
+
+  // After completion, /quiz redirects to /quiz/approved (mirrors Titan).
+  if (state.completed) return <Navigate to="/quiz/approved" replace />;
 
   const totalScore = state.totalScore;
   const bracket = tierBracketLabel(totalScore);
