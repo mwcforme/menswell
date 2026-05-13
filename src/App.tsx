@@ -12,6 +12,7 @@ import BookDuration from "./pages/book/BookDuration";
 import BookSchedule from "./pages/book/BookSchedule";
 import BookConfirmed from "./pages/book/BookConfirmed";
 import BookLetsTalk from "./pages/book/BookLetsTalk";
+import LpDirectory from "./pages/internal/LpDirectory";
 import { MobileFooterBar } from "./components/shared/MobileFooterBar";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/book/schedule" element={<BookSchedule />} />
           <Route path="/book/confirmed" element={<BookConfirmed />} />
           <Route path="/book/lets-talk" element={<BookLetsTalk />} />
+          <Route path="/lp" element={<LpDirectory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <MobileFooterBar />

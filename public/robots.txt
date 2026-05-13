@@ -27,5 +27,7 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /lp
+Disallow: /book/
 
 Sitemap: https://mwcv2.lovable.app/sitemap.xml
