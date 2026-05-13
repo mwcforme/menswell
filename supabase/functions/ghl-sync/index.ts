@@ -14,9 +14,9 @@ const API_VERSION = "2021-07-28";
 const TIMEZONE = "America/New_York";
 
 const CENTERS: { key: string; calendarId: string }[] = [
-  { key: "richmond",        calendarId: "f57aKNaxejr3y1HeHFO9" },
-  { key: "virginia-beach",  calendarId: "YKNJFGFYB2RBJyzTczVx" },
-  { key: "newport-news",    calendarId: "Ss4R5otK1MQAeUFxJDoi" },
+  { key: "richmond",        calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
+  { key: "virginia-beach",  calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
+  { key: "newport-news",    calendarId: "lBaRbjUpEmesxEloFBME" },
 ];
 
 // Window we cache: now -> +21 days
@@ -36,7 +36,7 @@ const json = (status: number, data: unknown) =>
 async function fetchSlots(calendarId: string, apiKey: string) {
   const start = Date.now();
   const end = start + WINDOW_DAYS * 24 * 60 * 60 * 1000;
-  const url = `${API_BASE}/calendars/${calendarId}/free-slots?startDate=${start}&endDate=${end}&timezone=${encodeURIComponent(TIMEZONE)}&locationId=${LOCATION_ID}`;
+  const url = `${API_BASE}/calendars/${calendarId}/free-slots?startDate=${start}&endDate=${end}&timezone=${encodeURIComponent(TIMEZONE)}`;
   const r = await fetch(url, {
     headers: {
       Authorization: `Bearer ${apiKey}`,
