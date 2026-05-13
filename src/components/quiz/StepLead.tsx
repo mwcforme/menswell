@@ -13,7 +13,8 @@ interface StepLeadProps {
   bracket: string;
   disqualified: boolean;
   tags: string[];
-  noteBody: string;
+  /** Reserved for future GHL note support; currently unused. */
+  noteBody?: string;
   onCapture: (patch: { fullName: string; email: string; phone: string; state: string; consent: boolean }) => void;
   onSubmitted: () => void;
 }
@@ -41,7 +42,7 @@ const formatPhone = (v: string) => {
  * the Finalizing transition. Progress 85–100%.
  */
 export function StepLead({
-  initial, totalScore, bracket, disqualified, tags, noteBody,
+  initial, totalScore, bracket, disqualified, tags,
   onCapture, onSubmitted,
 }: StepLeadProps) {
   const [name, setName] = useState(initial.fullName);
