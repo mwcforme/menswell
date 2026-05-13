@@ -101,13 +101,13 @@ export const TRTHeroForm = ({
           lineHeight: 1.15,
         }}
       >
-        Book My Consult
+        {heading}
       </h2>
       <p
         className="mt-1.5 mb-5"
         style={{ color: "rgba(245,240,235,0.70)", fontFamily: "Inter, sans-serif", fontSize: 14 }}
       >
-        Same or next day. Takes 30 seconds.
+        {subheading}
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-3" noValidate>
