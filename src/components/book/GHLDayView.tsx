@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader2, ChevronLeft, ChevronRight, RefreshCw, Zap } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   CENTER_CALENDARS,
@@ -280,35 +280,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const canConfirm = Boolean(selectedSlot);
   const prevDisabled = weekStart <= today;
 
-  // "Soonest opening" — first chronological slot across the loaded 5-day window.
-  const nextAvailable = useMemo(() => {
-    if (loading) return null;
-    let best: { dayKey: string; iso: string; date: Date } | null = null;
-    for (const [dayKey, slots] of Object.entries(slotsByDay)) {
-      for (const iso of slots) {
-        const d = new Date(iso);
-        if (!best || d < best.date) best = { dayKey, iso, date: d };
-      }
-    }
-    return best;
-  }, [slotsByDay, loading]);
-
-  const advanceWeek = () => {
-    const w = new Date(weekStart); w.setDate(w.getDate() + 5); setWeekStart(w);
-  };
-
-  const handleQuickPick = () => {
-    if (!nextAvailable) { advanceWeek(); return; }
-    setSelectedDay(nextAvailable.dayKey);
-    setSelectedSlot(nextAvailable.iso);
-    setModalOpen(true);
-    if (typeof window !== "undefined") {
-      type GtagFn = (cmd: "event", name: string, params: Record<string, unknown>) => void;
-      const gtag = (window as unknown as { gtag?: GtagFn }).gtag;
-      gtag?.("event", "booking_quickpick_click", { location, slotIso: nextAvailable.iso });
-    }
-  };
-
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
     const ok = await confirmCtl.confirm({
@@ -325,10 +296,6 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   };
 
   const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
-
-  // Quick-pick is "muted" when the user has already chosen a different slot,
-  // so it doesn't fight their decision.
-  const quickPickMuted = Boolean(selectedSlot && nextAvailable && selectedSlot !== nextAvailable.iso);
 
   return (
     <>
@@ -353,74 +320,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
         </div>
 
-        {/* QUICK-PICK: soonest available opening (Zocdoc-style) */}
-        {!loading && (
-          <div className="px-5 md:px-7 pt-5">
-            <button
-              type="button"
-              onClick={handleQuickPick}
-              aria-label={
-                nextAvailable
-                  ? `Book the soonest opening, ${fmtFullDay(nextAvailable.date)} at ${fmtTimeParts(nextAvailable.iso).time} ${fmtTimeParts(nextAvailable.iso).ampm} ET`
-                  : "No openings in the next 5 days. Show next 5 days."
-              }
-              style={{
-                width: "100%",
-                minHeight: 56,
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                background: ORANGE_SOFT,
-                border: "1px solid #F8C9A4",
-                borderRadius: 12,
-                padding: "12px 16px",
-                cursor: "pointer",
-                textAlign: "left",
-                opacity: quickPickMuted ? 0.7 : 1,
-                transition: "opacity 160ms ease, transform 120ms ease, box-shadow 120ms ease",
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  flexShrink: 0,
-                  width: 32, height: 32, borderRadius: 8,
-                  background: "#FFFFFF",
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  border: "1px solid #F8C9A4",
-                }}
-              >
-                <Zap size={16} color={ORANGE} strokeWidth={2.5} fill={ORANGE} />
-              </span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{
-                  display: "block",
-                  fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-                  textTransform: "uppercase", color: INK_SOFT, marginBottom: 2,
-                }}>
-                  Soonest opening
-                </span>
-                <span style={{
-                  display: "block",
-                  fontFamily: "Oswald, Inter, sans-serif",
-                  fontWeight: 700, fontSize: 17, color: INK, letterSpacing: "0.01em",
-                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                }}>
-                  {nextAvailable
-                    ? `${nextAvailable.date.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE })} · ${fmtTimeParts(nextAvailable.iso).time} ${fmtTimeParts(nextAvailable.iso).ampm} ET`
-                    : "No openings in the next 5 days"}
-                </span>
-              </span>
-              <span style={{
-                flexShrink: 0,
-                fontSize: 13, fontWeight: 700, color: ORANGE,
-                whiteSpace: "nowrap",
-              }}>
-                {nextAvailable ? "Book this →" : "Show next 5 →"}
-              </span>
-            </button>
-          </div>
-        )}
+
 
         {/* WEEK NAV */}
         <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
