@@ -1,52 +1,123 @@
 import { Link } from "react-router-dom";
 
-export const TRTFooter = () => (
-  <footer style={{ background: "#000033", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-    <div className="max-w-[1200px] mx-auto px-6 py-14">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Left: Logo + intro */}
-        <div>
-          <img src="/logos/Text_Logo_white.png" alt="Men's Wellness Centers" className="h-7 w-auto" />
-          <p className="mt-5 text-sm leading-relaxed max-w-[480px]" style={{ color: "rgba(255,255,255,0.78)", fontFamily: "Inter, sans-serif" }}>
-            Virginia's trusted men's health centers since 2015. Physician-supervised TRT at our{" "}
-            <Link to="/locations/richmond" className="underline underline-offset-2 hover:text-white">Richmond</Link>,{" "}
-            <Link to="/locations/newport-news" className="underline underline-offset-2 hover:text-white">Newport News</Link>, and{" "}
-            <Link to="/locations/virginia-beach" className="underline underline-offset-2 hover:text-white">Virginia Beach</Link> locations.
+/**
+ * Common footer used across landing pages (/new, /new-wl, /new-ed).
+ * Mirrors the structure and dark-navy aesthetic of menswellnesscenters.com,
+ * trimmed to required links only.
+ */
+export const TRTFooter = () => {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer style={{ background: "#000033", color: "rgba(255,255,255,0.78)", fontFamily: "Inter, sans-serif" }}>
+      <div className="max-w-[1200px] mx-auto px-6 pt-14 pb-10">
+        {/* Top: Brand + 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <img
+              src="/logos/Text_Logo_white.png"
+              alt="Men's Wellness Centers"
+              className="h-10 w-auto"
+            />
+            <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>
+              Copyright © {year}
+            </p>
+            <a
+              href="tel:8663444955"
+              className="block mt-4 text-sm hover:text-white transition-colors"
+              style={{ color: "rgba(255,255,255,0.85)" }}
+            >
+              866-344-4955
+            </a>
+          </div>
+
+          {/* Locations */}
+          <div>
+            <div
+              className="text-xs font-semibold uppercase mb-4"
+              style={{ color: "#FFFFFF", letterSpacing: "0.12em" }}
+            >
+              Locations
+            </div>
+            <ul className="space-y-3 text-sm">
+              <li><Link to="/locations/richmond" className="hover:text-white transition-colors">Richmond</Link></li>
+              <li><Link to="/locations/newport-news" className="hover:text-white transition-colors">Newport News</Link></li>
+              <li><Link to="/locations/virginia-beach" className="hover:text-white transition-colors">Virginia Beach</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <div
+              className="text-xs font-semibold uppercase mb-4"
+              style={{ color: "#FFFFFF", letterSpacing: "0.12em" }}
+            >
+              Contact
+            </div>
+            <ul className="space-y-3 text-sm">
+              <li>Richmond: <a href="tel:8043464636" className="hover:text-white transition-colors">804-346-4636</a></li>
+              <li>Newport News: <a href="tel:7578066263" className="hover:text-white transition-colors">757-806-6263</a></li>
+              <li>Virginia Beach: <a href="tel:7578066263" className="hover:text-white transition-colors">757-806-6263</a></li>
+              <li><a href="mailto:info@menswellnesscenters.com" className="hover:text-white transition-colors">info@menswellnesscenters.com</a></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <div
+              className="text-xs font-semibold uppercase mb-4"
+              style={{ color: "#FFFFFF", letterSpacing: "0.12em" }}
+            >
+              Legal
+            </div>
+            <ul className="space-y-3 text-sm">
+              <li><Link to="/prescribing-policy" className="hover:text-white transition-colors">Safety Policy</Link></li>
+              <li><Link to="/terms-of-service" className="hover:text-white transition-colors">Terms &amp; Agreement</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-white transition-colors">Notice of Privacy Practices</Link></li>
+              <li><Link to="/tcpa" className="hover:text-white transition-colors">TCPA Disclosure</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Badge row */}
+        <div className="mt-12 flex justify-center">
+          <a
+            href="https://www.legitscript.com/websites/?checker_keywords=menswellnesscenters.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Verify LegitScript Certification"
+            className="inline-block transition-opacity hover:opacity-80"
+          >
+            <img
+              src="/images/badges/legitscript.png"
+              alt="LegitScript Certified"
+              className="h-20 w-auto"
+              loading="lazy"
+            />
+          </a>
+        </div>
+
+        {/* Disclaimers */}
+        <div className="mt-10 pt-8 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+            The information presented on this website is provided for general informational purposes only and is not intended to constitute medical advice, diagnosis, or treatment. Men's Wellness Centers does not provide medical advice through this website. All content is informational in nature only. Men's Wellness Centers operates physical center locations only. Medical services are provided exclusively in person following an individualized evaluation and are rendered by licensed medical professionals exercising independent clinical judgment. Testimonials and reviews reflect individual experiences only and are not intended to represent typical outcomes. Individual results vary.
           </p>
         </div>
 
-        {/* Right: Contact */}
-        <div>
-          <div className="text-xs font-semibold uppercase mb-4" style={{ color: "rgba(255,255,255,0.55)", letterSpacing: "0.12em", fontFamily: "Inter, sans-serif" }}>
-            Contact
+        {/* Bottom bar */}
+        <div
+          className="mt-8 pt-6 border-t flex flex-col md:flex-row items-center justify-between gap-3 text-xs uppercase"
+          style={{ borderColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)", letterSpacing: "0.12em" }}
+        >
+          <div>© {year} Men's Wellness Centers. All rights reserved.</div>
+          <div className="flex gap-6">
+            <Link to="/prescribing-policy" className="hover:text-white transition-colors">Safety</Link>
+            <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
           </div>
-          <ul className="space-y-3 text-sm" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif" }}>
-            <li>Richmond: <a href="tel:8043464636" className="hover:text-white">804-346-4636</a></li>
-            <li>Newport News: <a href="tel:7578066263" className="hover:text-white">757-806-6263</a></li>
-            <li>Virginia Beach: <a href="tel:7578066263" className="hover:text-white">757-806-6263</a></li>
-            <li><a href="mailto:info@menswellnesscenters.com" className="hover:text-white">info@menswellnesscenters.com</a></li>
-          </ul>
         </div>
       </div>
-
-      <div className="mt-10 pt-8 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-        <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif" }}>
-          The information presented on this website is provided for general informational purposes only and is not intended to constitute medical advice, diagnosis, or treatment. Men's Wellness Centers does not provide medical advice through this website. All content is informational in nature only. Men's Wellness Centers operates physical center locations only. Medical services are provided exclusively in person following an individualized evaluation and are rendered by licensed medical professionals exercising independent clinical judgment. Testimonials and reviews reflect individual experiences only and are not intended to represent typical outcomes.
-        </p>
-      </div>
-
-      <div className="mt-8 pt-6 border-t flex flex-wrap items-center justify-between gap-4 text-xs uppercase" style={{ borderColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)", letterSpacing: "0.12em", fontFamily: "Inter, sans-serif" }}>
-        <div>© {new Date().getFullYear()} Men's Wellness Centers. All rights reserved.</div>
-        <div className="flex gap-8">
-          <Link to="/prescribing-policy" className="hover:text-white">Safety Policy</Link>
-          <Link to="/terms-of-service" className="hover:text-white">Terms</Link>
-          <Link to="/privacy-policy" className="hover:text-white">Privacy</Link>
-        </div>
-      </div>
-
-      <div className="mt-10 flex justify-center">
-        <img src="/images/badges/legitscript.png" alt="LegitScript Certified" className="h-20 w-auto" loading="lazy" />
-      </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};
