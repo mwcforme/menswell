@@ -314,7 +314,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
     width: "100%",
     height: 50,
     background: "rgba(11,16,41,0.6)",
-    border: `1px solid ${focused === field ? "#E8670A" : "rgba(245,240,235,0.20)"}`,
+    border: `1px solid ${focused === field ? "#E8670A" : "rgba(245,240,235,0.40)"}`,
     borderRadius: 8,
     padding: "0 16px",
     fontSize: 15,
@@ -339,7 +339,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
       <p className="mt-5 text-base md:text-lg max-w-[640px]" style={{ color: "rgba(245,240,235,0.92)" }}>
         {result.note}
       </p>
-      <p className="mt-3 text-xs" style={{ color: "rgba(245,240,235,0.55)" }}>
+      <p className="mt-3 text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>
         This is not a diagnosis. Only a blood panel and clinical evaluation can confirm low testosterone. Individual results vary.
       </p>
 
@@ -347,7 +347,7 @@ function ResultsPhase({ total, result }: { total: number; result: ReturnType<typ
         <h2 className="font-bold uppercase mb-2" style={{ fontFamily: "Oswald, sans-serif", fontSize: 22, letterSpacing: "0.02em" }}>
           See your results with a provider
         </h2>
-        <p className="text-sm mb-6" style={{ color: "rgba(245,240,235,0.7)" }}>
+        <p className="text-sm mb-5 md:mb-6" style={{ color: "rgba(245,240,235,0.85)" }}>
           Tell us where to send your results and we will hold a time at the center nearest you.
         </p>
 
