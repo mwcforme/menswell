@@ -10,6 +10,7 @@ import {
   COMPLIANCE_PAGES,
   type LandingPageEntry,
 } from "@/data/landingPages";
+import { ATTRIBUTION_KEYS, getAttribution } from "@/lib/attribution";
 
 type Health = "ok" | "fail" | "pending";
 
@@ -335,6 +336,40 @@ const LpDirectory = () => {
                 <Dot state={c.state} />
               </div>
             ))}
+          </div>
+
+          {/* Attribution capture */}
+          <SectionTitle>Attribution capture (cookies + URL)</SectionTitle>
+          <p className="text-xs mb-4" style={{ color: "rgba(245,240,235,0.55)" }}>
+            Hidden fields auto-populated from URL params on first visit and persisted to a 90-day first-party cookie.
+            Override the visible First/Last Name on submit when present.
+            Try: <span className="font-mono">/new?utm_source=meta&utm_campaign=test&gclid=ABC123&first_name=John</span>
+          </p>
+          <div
+            className="rounded-xl overflow-hidden mb-12"
+            style={{ border: "1px solid rgba(255,255,255,0.10)" }}
+          >
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ background: "rgba(255,255,255,0.04)" }}>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "rgba(245,240,235,0.60)", fontSize: 11, letterSpacing: "0.08em" }}>FIELD</th>
+                  <th className="text-left px-4 py-3 font-semibold" style={{ color: "rgba(245,240,235,0.60)", fontSize: 11, letterSpacing: "0.08em" }}>VALUE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ATTRIBUTION_KEYS.map((k, i) => {
+                  const v = getAttribution()[k];
+                  return (
+                    <tr key={k} style={{ borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.06)" }}>
+                      <td className="px-4 py-3 font-mono text-xs" style={{ color: "rgba(245,240,235,0.75)" }}>{k}</td>
+                      <td className="px-4 py-3 font-mono text-xs" style={{ color: v ? COLORS.cream : "rgba(245,240,235,0.35)" }}>
+                        {v ?? "(empty)"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
 
           <div className="text-center text-xs pt-8" style={{ color: "rgba(245,240,235,0.45)" }}>

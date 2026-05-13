@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import type { ZodSchema } from "zod";
 import { useServices } from "@/app/providers/ServicesProvider";
 import { updateBookingState } from "@/lib/bookingState";
+import { getAttribution, attributionTags } from "@/lib/attribution";
 import type { LeadInput, LeadResult } from "@/services/contracts/ILeadSubmitter";
 
 export type LeadSubmitStatus = "idle" | "submitting" | "success" | "error";
@@ -81,10 +82,17 @@ export function useLeadSubmitController<TInput>(
       inFlight.current = true;
 
       const validated = parsed.data;
+      const base = opts.toLeadInput(validated);
+      const attr = getAttribution();
+
+      // Hidden attribution fields override the visible First/Last Name when
+      // present (e.g. CRM-pre-filled URL or cookie from a prior visit).
       const leadInput: LeadInput = {
-        ...opts.toLeadInput(validated),
-        source: opts.source ?? "lead-form",
-        ...(opts.tags ? { tags: opts.tags } : {}),
+        ...base,
+        ...(attr.first_name ? { firstName: attr.first_name } : {}),
+        ...(attr.last_name ? { lastName: attr.last_name } : (base.lastName ? { lastName: base.lastName } : {})),
+        source: opts.source ?? base.source ?? "lead-form",
+        tags: [...(opts.tags ?? []), ...(base.tags ?? []), ...attributionTags(attr)],
       };
 
       try {
