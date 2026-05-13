@@ -118,8 +118,8 @@ describe("Internal directory hardening", () => {
 });
 
 describe("Sitewide noindex", () => {
-  const INDEX_HTML = readFileSync(resolve(__dirname, "../../index.html"), "utf8");
-  const ROBOTS = readFileSync(resolve(__dirname, "../../public/robots.txt"), "utf8");
+  const INDEX_HTML = readFileSync(path.resolve(__dirname, "../../index.html"), "utf8");
+  const ROBOTS = readFileSync(path.resolve(__dirname, "../../public/robots.txt"), "utf8");
   it("index.html declares noindex for paid LP subdomain", () => {
     expect(INDEX_HTML).toMatch(/name="robots"[^>]*noindex/);
   });
