@@ -3,6 +3,7 @@ import { useServices } from "@/app/providers/ServicesProvider";
 import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
 import { confirmLeadSchema, type ConfirmLeadInput } from "@/domain/leads/leadFormSchema";
 import type { LocationKey } from "@/lib/ghlCalendars";
+import { trackConversion } from "@/lib/capi";
 
 export interface ConfirmInput {
   slotIso: string;
@@ -161,6 +162,20 @@ export function useConfirmAppointment(opts?: {
           notes: input.notes,
         });
         setStatus("success");
+        void trackConversion("Schedule", {
+          user_data: {
+            email: input.email,
+            phone: input.phone,
+            first_name: input.firstName,
+            last_name: input.lastName,
+            state: "VA",
+            external_id: contactId,
+          },
+          custom_data: {
+            content_name: `book-${input.location}`,
+            content_category: "appointment",
+          },
+        });
         opts?.onBooked?.(input.slotIso);
         return true;
       } catch (bookErr) {
