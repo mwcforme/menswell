@@ -1,13 +1,14 @@
 import { TRTHeader } from "@/components/landing/trt/TRTHeader";
-import { TRTTrustBar } from "@/components/landing/trt/TRTTrustBar";
+import { CredibilityBand } from "@/components/landing/trt/CredibilityBand";
 import { TRTPillars } from "@/components/landing/trt/TRTPillars";
 import { TRTMarquee } from "@/components/landing/trt/TRTMarquee";
 import { TRTLocations } from "@/components/landing/trt/TRTLocations";
 import { TRTResults } from "@/components/landing/trt/TRTResults";
 import { TRTFooter } from "@/components/landing/trt/TRTFooter";
-import { TRTMobileCTA } from "@/components/landing/trt/TRTMobileCTA";
+import { StickyMobileCTA } from "@/components/landing/trt/StickyMobileCTA";
 import { SectionReveal } from "@/components/landing/trt/SectionReveal";
 import { SEO } from "@/components/SEO";
+import { useScrollDepth } from "@/hooks/useAnalytics";
 import { WLHero } from "@/components/landing/wl/WLHero";
 import { WLHowItWorks } from "@/components/landing/wl/WLHowItWorks";
 import { WLManifesto } from "@/components/landing/wl/WLManifesto";

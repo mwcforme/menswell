@@ -1,6 +1,6 @@
 import { TRTHeader } from "@/components/landing/trt/TRTHeader";
 import { TRTHero } from "@/components/landing/trt/TRTHero";
-import { TRTTrustBar } from "@/components/landing/trt/TRTTrustBar";
+import { CredibilityBand } from "@/components/landing/trt/CredibilityBand";
 import { TRTHowItWorks } from "@/components/landing/trt/TRTHowItWorks";
 import { TRTResults } from "@/components/landing/trt/TRTResults";
 import { TRTManifesto } from "@/components/landing/trt/TRTManifesto";
@@ -10,11 +10,13 @@ import { TRTFinalCTA } from "@/components/landing/trt/TRTFinalCTA";
 import { TRTLocations } from "@/components/landing/trt/TRTLocations";
 import { TRTFAQ } from "@/components/landing/trt/TRTFAQ";
 import { TRTFooter } from "@/components/landing/trt/TRTFooter";
-import { TRTMobileCTA } from "@/components/landing/trt/TRTMobileCTA";
+import { StickyMobileCTA } from "@/components/landing/trt/StickyMobileCTA";
 import { SectionReveal } from "@/components/landing/trt/SectionReveal";
 import { SEO } from "@/components/SEO";
+import { useScrollDepth } from "@/hooks/useAnalytics";
 
 const NewLandingPage = () => {
+  useScrollDepth();
   return (
     <div className="min-h-screen flex flex-col" style={{ fontFamily: "Inter, sans-serif" }}>
       <SEO
@@ -24,7 +26,7 @@ const NewLandingPage = () => {
       <TRTHeader />
       <main className="flex-1">
         <TRTHero />
-        <SectionReveal><TRTTrustBar /></SectionReveal>
+        <SectionReveal><CredibilityBand /></SectionReveal>
         <SectionReveal><TRTHowItWorks /></SectionReveal>
         <SectionReveal><TRTManifesto /></SectionReveal>
         <SectionReveal><TRTResults /></SectionReveal>
@@ -35,11 +37,12 @@ const NewLandingPage = () => {
         <SectionReveal><TRTFinalCTA /></SectionReveal>
       </main>
       <TRTFooter />
-      <TRTMobileCTA />
-      <div className="md:hidden" style={{ height: 56 }} aria-hidden="true" />
+      <StickyMobileCTA />
+      <div className="md:hidden" style={{ height: 64 }} aria-hidden="true" />
     </div>
   );
 };
 
 export default NewLandingPage;
+
 
