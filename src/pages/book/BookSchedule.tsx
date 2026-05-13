@@ -26,13 +26,6 @@ const URGENCY_SUB: Record<UrgencyTier, string> = {
 const BookSchedule = () => {
   const navigate = useNavigate();
   const state = useBookingSync();
-  const missing = !state.symptom || !state.duration;
-
-  useEffect(() => {
-    if (missing) {
-      navigate("/book/symptom", { replace: true });
-    }
-  }, [missing, navigate]);
 
   const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
   const subhead = state.urgencyTier
@@ -49,7 +42,6 @@ const BookSchedule = () => {
   const [firstName = "", ...lastParts] = (state.name || "").trim().split(/\s+/);
   const lastName = lastParts.join(" ");
 
-  if (missing) return null;
 
   return (
     <BookLayout page="schedule" title="Pick your consult time | Men's Wellness Centers">
