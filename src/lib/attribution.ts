@@ -1,27 +1,18 @@
 /**
  * Marketing attribution capture.
  *
- * On first page load, reads URL params and persists them to a first-party
- * cookie + sessionStorage so they survive across the funnel and follow the
- * user into GHL on lead submit. URL values always win over stored values
- * (a fresh ad click should clobber a stale session).
+ * v2: PHI-aware refactor. Names are NEVER stored in this cookie. Even if a
+ * legacy URL drops `first_name=`/`last_name=`/`fn=`/`ln=`, those values are
+ * intentionally ignored. The cookie holds only campaign / click identifiers.
  *
- * Hidden fields (per spec) auto-populated from URL/cookies:
- *   first_name, last_name, page_id,
- *   utm_source, utm_medium, utm_campaign, utm_content, utm_term,
- *   gclid, msclkid, fbclid
- *
- * When `first_name` / `last_name` are present in attribution, they OVERRIDE
- * whatever the user typed in the visible form (this is by request, e.g. when
- * a CRM-pre-filled link drops the user on the LP).
+ * Cookie name was bumped to `mwc_attr_v2`; the legacy `mwc_attr` cookie is
+ * cleared at app boot from `src/main.tsx`.
  */
 
-const COOKIE_NAME = "mwc_attr";
+const COOKIE_NAME = "mwc_attr_v2";
 const COOKIE_MAX_AGE_DAYS = 90;
 
 export const ATTRIBUTION_KEYS = [
-  "first_name",
-  "last_name",
   "page_id",
   "utm_source",
   "utm_medium",
@@ -84,28 +75,14 @@ const readUrl = (): Attribution => {
     const v = safe(params.get(k));
     if (v) out[k] = v;
   }
-  // Common alias: ?fn=, ?ln= — accept as fallback for short URLs.
-  if (!out.first_name) {
-    const fn = safe(params.get("fn"));
-    if (fn) out.first_name = fn;
-  }
-  if (!out.last_name) {
-    const ln = safe(params.get("ln"));
-    if (ln) out.last_name = ln;
-  }
   return out;
 };
 
 let cached: Attribution | null = null;
 
-/**
- * Initialise attribution capture. Call once on app boot. URL params win,
- * cookie fills gaps, result is persisted back to cookie + sessionStorage.
- */
 export function initAttribution(): Attribution {
   const fromCookie = readCookie();
   const fromUrl = readUrl();
-  // URL wins per-key; missing URL keys fall back to cookie.
   const merged: Attribution = { ...fromCookie, ...fromUrl };
   cached = merged;
   if (Object.keys(merged).length > 0) {
@@ -130,8 +107,6 @@ export function attributionTags(attr: Attribution = getAttribution()): string[] 
   for (const k of ATTRIBUTION_KEYS) {
     const v = attr[k];
     if (!v) continue;
-    if (k === "first_name" || k === "last_name") continue; // not useful as tags
-    // GHL tag length cap is generous; truncate defensively.
     tags.push(`${k}:${v}`.slice(0, 100));
   }
   return tags;
