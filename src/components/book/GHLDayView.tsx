@@ -221,9 +221,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const cal = CENTER_CALENDARS[location];
 
-  // Visible window: 4 days from weekStart.
+  // Visible window: 7 days from weekStart.
   const days = useMemo(() => {
-    return Array.from({ length: 4 })
+    return Array.from({ length: 7 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
@@ -235,7 +235,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 4); end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -360,7 +360,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 4); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -376,7 +376,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <div style={{ flex: 1 }} />
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 4); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -402,11 +402,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              className="md:grid md:grid-cols-7 flex md:gap-2 gap-2 overflow-x-auto md:overflow-visible"
+              className="flex gap-2 overflow-x-auto"
               style={{
                 scrollSnapType: "x mandatory",
                 WebkitOverflowScrolling: "touch",
                 paddingBottom: 4,
+                scrollbarWidth: "none",
               }}
             >
               {days.map((d) => {
@@ -444,8 +445,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
-                      flex: "1 1 0",
-                      minWidth: 0,
+                      flex: "0 0 92px",
+                      minWidth: 92,
                       scrollSnapAlign: "start",
                       background: selected ? ORANGE : isSunday || !available ? "#F1F2F6" : INK,
                       border: "none",
