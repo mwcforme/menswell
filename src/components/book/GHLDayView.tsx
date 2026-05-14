@@ -61,9 +61,10 @@ const LINE = "#E5E7EB";
 const BORDER = "#8B92A0";
 const SURFACE = "#FFFFFF";
 const CANVAS = "#F7F8FB";
-const ORANGE = "#E8670A";
-const ORANGE_DEEP = "#C2410C"; // selected time-slot bg only — preserves AA for small AM/PM text
-const ORANGE_SOFT = "#FFF1E6";
+// Brand orange tokens only — see mem://style/color-palette.
+const ORANGE = "#E8670A";       // primary CTA / accent
+const ORANGE_ALT = "#F97316";   // approved alt (Tailwind orange-500)
+const ORANGE_SOFT = "#FFF1E6";  // tint of #E8670A, decorative bg only
 
 // Business hours
 const HOUR_MIN = 8;   // 8 AM ET
