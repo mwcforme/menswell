@@ -32,7 +32,7 @@ function envCreds(env: AppEnv): { apiKey: string | undefined; locationId: string
   if (env === "stage") {
     return {
       apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
-      locationId: Deno.env.get("GHL_LOCATION_ID_STAGE") ?? "",
+      locationId: Deno.env.get("GHL_LOCATION_ID_STAGE_1") ?? Deno.env.get("GHL_LOCATION_ID_STAGE") ?? "",
     };
   }
   return {
