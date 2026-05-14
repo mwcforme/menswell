@@ -1,4 +1,4 @@
-// ghl-proxy v4 — env-aware (prod vs stage) + route allowlist + manual CORS
+// ghl-proxy v5 — env-aware (prod vs stage) + route allowlist + manual CORS
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -31,7 +31,7 @@ function detectEnv(req: Request, hint?: unknown): AppEnv {
 function envCreds(env: AppEnv): { apiKey: string | undefined; locationId: string } {
   if (env === "stage") {
     return {
-      apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
+      apiKey: Deno.env.get("GHL_API_KEY_STAGE_1") ?? Deno.env.get("GHL_API_KEY_STAGE"),
       locationId: Deno.env.get("GHL_LOCATION_ID_STAGE_1") ?? Deno.env.get("GHL_LOCATION_ID_STAGE") ?? "",
     };
   }
@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
     if (k === "locationId") continue; // server-injected only
     search.set(k, String(v));
   }
-  if (method === "GET" && !search.has("locationId")) search.set("locationId", locationId);
+  if (method === "GET" && payload.injectLocationId !== false && !search.has("locationId")) search.set("locationId", locationId);
 
   const url = `${API_BASE}${cleanPath}${search.toString() ? `?${search}` : ""}`;
 
@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
     }
     // Always return 200 so the supabase-js client surfaces the body to callers.
     // Real upstream status lives in the JSON payload.
-    return json(200, { ok: upstream.ok, status: upstream.status, data, upstreamBody: upstream.ok ? undefined : text.slice(0, 800) });
+    return json(200, { ok: upstream.ok, status: upstream.status, data });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return json(502, { error: `GHL request failed: ${message}` });
