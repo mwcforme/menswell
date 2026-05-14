@@ -19,6 +19,12 @@ const SYMPTOM_CHIP: Record<string, string> = {
   other: "🩺 General wellness",
 };
 
+const LOCATION_LABEL: Record<string, string> = {
+  richmond: "Richmond clinic",
+  "virginia-beach": "Virginia Beach clinic",
+  "newport-news": "Newport News clinic",
+};
+
 const LOCATION_CHIP: Record<string, string> = {
   richmond: "📍 Richmond",
   "virginia-beach": "📍 Virginia Beach",
