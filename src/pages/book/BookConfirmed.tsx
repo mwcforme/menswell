@@ -1,4 +1,4 @@
-import { CheckCircle2, MapPin, Phone, Play, FlaskConical, ExternalLink } from "lucide-react";
+import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingSync } from "@/lib/bookingState";
 
@@ -38,15 +38,34 @@ const CENTERS: Record<string, CenterInfo> = {
 
 const DEFAULT_CENTER = CENTERS["newport-news"];
 
+const formatAppointment = (raw?: string): string => {
+  if (!raw) return "Time to be confirmed";
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return "Time to be confirmed";
+  const datePart = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: "America/New_York",
+  }).format(d);
+  const timePart = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "America/New_York",
+  }).format(d);
+  return `${datePart}  ·  ${timePart} ET`;
+};
+
 const BookConfirmed = () => {
   const state = useBookingSync();
-  const apptTime = state.appointmentTime || "Tuesday, May 12 at 10:30 AM";
+  const apptTime = formatAppointment(state.appointmentTime);
   const center = (state.location && CENTERS[state.location]) || DEFAULT_CENTER;
   const fullAddress = `${center.centerName}, ${center.street}, ${center.cityStateZip}`;
   const mapsQuery = encodeURIComponent(fullAddress);
   const PHONE_DISPLAY = center.phoneDisplay;
   const PHONE_TEL = center.phoneTel;
-  const firstName = state.name ? state.name.split(" ")[0] : "";
+  const fullName = state.name || "";
 
 
   return (
