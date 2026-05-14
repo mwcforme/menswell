@@ -427,11 +427,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           >
             <ChevronLeft size={16} /> Prev
           </button>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
-              {fmtWeekRange(weekStart)}
-            </div>
-          </div>
+          <div style={{ flex: 1 }} />
           <button
             type="button"
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 4); setWeekStart(w); }}
@@ -578,54 +574,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         </div>
 
         {/* TIMES */}
-        <div className="px-5 md:px-7 pb-6" style={{ borderTop: `1px solid ${LINE}`, paddingTop: 22, background: CANVAS }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
-            <div>
-              <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.4vw, 22px)", letterSpacing: "0.01em", color: INK }}>
-                {selectedDay ? fmtFullDay(new Date(selectedDay + "T12:00:00")) : "Select a day"}
-              </div>
-              <div style={{ color: MUTED, fontSize: 13, marginTop: 4 }}>
-                All times shown in ET.
-              </div>
-            </div>
-            {(() => {
-              const reasonLabel: Record<typeof lastReason, string> = {
-                initial: "first load",
-                timer: "30 min auto-refresh",
-                focus: "tab focus",
-                manual: "manual refresh",
-              };
-              let agoText = "just now";
-              if (lastUpdated) {
-                const secs = Math.max(0, Math.round((nowTick - lastUpdated.getTime()) / 1000));
-                if (secs < 5) agoText = "just now";
-                else if (secs < 60) agoText = `${secs}s ago`;
-                else { const m = Math.floor(secs / 60); agoText = `${m}m ago`; }
-              }
-              const tooltip = lastUpdated
-                ? `Updated ${lastUpdated.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" })} via ${reasonLabel[lastReason]}. Auto-refreshes every 30 min and on tab focus.`
-                : "Loading availability...";
-              return (
-                <button
-                  type="button"
-                  title={tooltip}
-                  aria-label={tooltip}
-                  onClick={() => setRefreshNonce((n) => n + 1)}
-                  disabled={loading}
-                  style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    background: SURFACE, border: `1px solid ${BORDER}`,
-                    borderRadius: 999, padding: "6px 10px",
-                    fontSize: 11, fontWeight: 600, letterSpacing: "0.04em",
-                    color: INK_SOFT, cursor: loading ? "wait" : "pointer",
-                  }}
-                >
-                  <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
-                  <span>Updated {agoText}</span>
-                </button>
-              );
-            })()}
-          </div>
+        <div className="px-5 md:px-7 pb-6" style={{ borderTop: `1px solid ${LINE}`, paddingTop: 16, background: CANVAS }}>
 
           {!selectedDay ? (
             <div style={{ color: MUTED, fontSize: 14, fontStyle: "italic", padding: "20px 4px" }}>
