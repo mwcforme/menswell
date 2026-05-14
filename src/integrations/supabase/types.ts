@@ -59,6 +59,33 @@ export type Database = {
         }
         Relationships: []
       }
+      env_change_log: {
+        Row: {
+          changed_at: string
+          from_env: string | null
+          id: string
+          to_env: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          changed_at?: string
+          from_env?: string | null
+          id?: string
+          to_env: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          changed_at?: string
+          from_env?: string | null
+          id?: string
+          to_env?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ghl_free_slots: {
         Row: {
           calendar_id: string

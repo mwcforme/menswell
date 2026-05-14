@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { APP_ENV } from "@/lib/env";
 import { setEnvOverride } from "@/lib/envOverride";
+import { supabase } from "@/integrations/supabase/client";
 
 const CONFIRM_KEY = "mwc_env_switch_confirmed";
 
@@ -28,9 +29,20 @@ export function EnvSwitcher() {
     }
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const target = stageEnabled ? "stage" : "prod";
     if (target === APP_ENV) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      await supabase.from("env_change_log").insert({
+        user_id: session?.user.id ?? null,
+        user_email: session?.user.email ?? null,
+        from_env: APP_ENV,
+        to_env: target,
+      });
+    } catch {
+      /* non-blocking */
+    }
     try {
       window.localStorage.setItem(
         CONFIRM_KEY,

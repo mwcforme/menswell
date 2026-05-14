@@ -3,6 +3,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { APP_ENV } from "@/lib/env";
 import { Loader2, RefreshCw, Play, ShieldCheck } from "lucide-react";
+import { EnvChangeHistory } from "@/components/admin/EnvChangeHistory";
 
 interface Run {
   id: string;
@@ -157,6 +158,10 @@ export default function AdminSync() {
       <p className="mt-3 text-xs text-white/40">
         Showing the most recent 50 sync runs. Auto-refreshes every 30 s while a run is active.
       </p>
+
+      <div className="mt-8">
+        <EnvChangeHistory />
+      </div>
     </AdminLayout>
   );
 }
