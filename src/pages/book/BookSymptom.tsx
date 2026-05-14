@@ -4,7 +4,7 @@ import { Zap, Heart, Scale, HelpCircle } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import SurveyCard from "@/components/book/SurveyCard";
 import OptionRow from "@/components/book/OptionRow";
-import { useBookingSync, updateBookingState, toQueryString } from "@/lib/bookingState";
+import { useBookingStore } from "@/domain/booking/bookingStore";
 
 const OPTIONS = [
   { value: "energy", label: "Low energy or fatigue", icon: Zap },
@@ -15,9 +15,11 @@ const OPTIONS = [
 
 const BookSymptom = () => {
   const navigate = useNavigate();
-  const state = useBookingSync();
-  const [selected, setSelected] = useState<string>(state.symptom || "");
-  const [otherNote, setOtherNote] = useState<string>(state.note || "");
+  const storedSymptom = useBookingStore((s) => s.symptom);
+  const storedNote = useBookingStore((s) => s.note);
+  const setSymptom = useBookingStore((s) => s.setSymptom);
+  const [selected, setSelected] = useState<string>(storedSymptom || "");
+  const [otherNote, setOtherNote] = useState<string>(storedNote || "");
   const advanceTimer = useRef<number | null>(null);
 
   useEffect(() => () => {
@@ -29,22 +31,21 @@ const BookSymptom = () => {
     setSelected(value);
 
     if (value === "other") {
-      // Reveal inline clarifier; do not navigate yet.
-      updateBookingState({ symptom: "other" });
+      setSymptom("other", otherNote);
       return;
     }
 
-    const next = updateBookingState({ symptom: value, note: undefined });
+    setSymptom(value as "energy" | "sexual" | "weight");
     advanceTimer.current = window.setTimeout(() => {
-      navigate(`/book/duration?${toQueryString(next)}`);
+      navigate("/book/duration");
     }, 600);
   };
 
   const handleOtherContinue = () => {
     const note = otherNote.trim();
     if (note.length < 3) return;
-    const next = updateBookingState({ symptom: "other", note });
-    navigate(`/book/duration?${toQueryString(next)}`);
+    setSymptom("other", note);
+    navigate("/book/duration");
   };
 
   const showOtherPanel = selected === "other";
