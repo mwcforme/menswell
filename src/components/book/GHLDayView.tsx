@@ -500,19 +500,19 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       flex: "1 1 0",
                       minWidth: 0,
                       scrollSnapAlign: "start",
-                      background: selected ? SURFACE : isSunday || !available ? "#F1F2F6" : INK,
+                      background: isSunday || !available ? "#F1F2F6" : INK,
                       border: `2px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
                       borderRadius: 12,
                       padding: "8px 4px 10px",
-                      color: selected ? INK : isSunday || !available ? MUTED : "#FFFFFF",
+                      color: isSunday || !available ? MUTED : "#FFFFFF",
                       cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
-                      transition: "background 120ms ease, border-color 120ms ease",
+                      transition: "border-color 120ms ease",
                       position: "relative",
-                      opacity: !available && !selected ? 0.55 : 1,
+                      opacity: !available ? 0.55 : 1,
                     }}
                   >
-                    {/* Selection signaled by orange border + TODAY/TMRW pill — no extra dot */}
+                    {/* Single visual cue for selection: orange border only */}
                     {/* TODAY / TOMORROW pill */}
                     {(isToday || isTomorrow) && (
                       <div
@@ -526,14 +526,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                           marginBottom: 4,
                           maxWidth: "100%",
                           background: isToday ? ORANGE : "transparent",
-                          color: isToday ? "#FFFFFF" : selected ? ORANGE : "#FFFFFF",
-                          border: isTomorrow ? `1px solid ${selected ? ORANGE : "rgba(255,255,255,0.7)"}` : "none",
+                          color: "#FFFFFF",
+                          border: isTomorrow ? `1px solid rgba(255,255,255,0.7)` : "none",
                         }}
                       >
                         {isToday ? "TODAY" : "TMRW"}
                       </div>
                     )}
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? INK_SOFT : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
                       {fmtDayShort(d)}
                     </div>
                     <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
