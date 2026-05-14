@@ -91,6 +91,16 @@ export interface UpsertContactInput {
   phone?: string;
   source?: string;
   tags?: string[];
+  /** PHI-safe structured fields routed to GHL contact custom fields only. */
+  customFields?: Partial<Record<
+    | "mwc_symptom"
+    | "mwc_symptom_duration"
+    | "mwc_urgency_tier"
+    | "mwc_clinical_note"
+    | "mwc_funnel_service"
+    | "mwc_lp_slug",
+    string
+  >>;
 }
 
 /** Upsert a contact and return its id (idempotent on email/phone). */
@@ -105,6 +115,9 @@ export async function upsertContact(input: UpsertContactInput): Promise<string> 
       ...(input.phone ? { phone: input.phone } : {}),
       ...(input.source ? { source: input.source } : {}),
       ...(input.tags && input.tags.length ? { tags: input.tags } : {}),
+      ...(input.customFields && Object.keys(input.customFields).length
+        ? { customFields: input.customFields }
+        : {}),
     },
   });
   const id = res.data?.contact?.id;

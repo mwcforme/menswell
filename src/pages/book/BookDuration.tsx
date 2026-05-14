@@ -4,7 +4,7 @@ import { CalendarClock, CalendarDays, CalendarRange, History } from "lucide-reac
 import BookLayout from "@/components/book/BookLayout";
 import SurveyCard from "@/components/book/SurveyCard";
 import OptionRow from "@/components/book/OptionRow";
-import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
+import { useBookingStore, type UrgencyTier, type Duration } from "@/domain/booking/bookingStore";
 
 const OPTIONS = [
   { value: "lt6mo", label: "Less than 6 months", icon: CalendarClock, urgency: "early" as UrgencyTier },
@@ -15,33 +15,29 @@ const OPTIONS = [
 
 const BookDuration = () => {
   const navigate = useNavigate();
-  const state = useBookingSync();
-  const [selected, setSelected] = useState<string>(state.duration || "");
+  const symptom = useBookingStore((s) => s.symptom);
+  const storedDuration = useBookingStore((s) => s.duration);
+  const setDuration = useBookingStore((s) => s.setDuration);
+  const [selected, setSelected] = useState<string>(storedDuration || "");
   const advanceTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!state.symptom) {
-      navigate("/book/symptom", { replace: true });
-    }
-  }, [state.symptom, navigate]);
+    if (!symptom) navigate("/book/symptom", { replace: true });
+  }, [symptom, navigate]);
 
   useEffect(() => () => {
     if (advanceTimer.current) window.clearTimeout(advanceTimer.current);
   }, []);
 
-  if (!state.symptom) return null;
+  if (!symptom) return null;
 
-  const handleSelect = (value: string, urgency: UrgencyTier) => {
+  const handleSelect = (value: Duration, urgency: UrgencyTier) => {
     if (advanceTimer.current) return;
     setSelected(value);
-    const next = updateBookingState({ duration: value, urgencyTier: urgency });
+    setDuration(value, urgency);
     advanceTimer.current = window.setTimeout(() => {
-      navigate(`/book/schedule?${toQueryString(next)}`);
+      navigate("/book/schedule");
     }, 600);
-  };
-
-  const handlePrev = () => {
-    navigate(`/book/symptom?${toQueryString(state)}`);
   };
 
   return (
@@ -53,7 +49,7 @@ const BookDuration = () => {
         title="How long has this been going on?"
         subtitle="A rough estimate is fine."
         prevLabel="Back"
-        onPrev={handlePrev}
+        onPrev={() => navigate("/book/symptom")}
       >
         {OPTIONS.map((o) => (
           <OptionRow
@@ -61,7 +57,7 @@ const BookDuration = () => {
             icon={o.icon}
             label={o.label}
             selected={selected === o.value}
-            onClick={() => handleSelect(o.value, o.urgency)}
+            onClick={() => handleSelect(o.value as Duration, o.urgency)}
           />
         ))}
       </SurveyCard>

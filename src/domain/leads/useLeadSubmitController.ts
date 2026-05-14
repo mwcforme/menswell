@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "react";
 import { toast } from "sonner";
 import type { ZodSchema } from "zod";
 import { useServices } from "@/app/providers/ServicesProvider";
-import { updateBookingState } from "@/lib/bookingState";
 import { getAttribution, attributionTags } from "@/lib/attribution";
 import { trackConversion } from "@/lib/capi";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,24 +10,14 @@ import type { LeadInput, LeadResult } from "@/services/contracts/ILeadSubmitter"
 export type LeadSubmitStatus = "idle" | "submitting" | "success" | "error";
 
 export interface LeadSubmitOptions<TInput> {
-  /** Zod schema used to validate raw input before submission. */
   schema: ZodSchema<TInput>;
-  /** Maps validated input to the CRM payload shape. */
   toLeadInput: (input: TInput) => LeadInput;
-  /** Default lead source string. */
   source?: string;
-  /** Default tags applied to every submission. */
   tags?: string[];
-  /** Called after a successful submission. */
   onSuccess?: (result: LeadResult, input: TInput) => void | Promise<void>;
-  /** Optional path to navigate to after success. */
   navigateTo?: string;
-  /** Whether to surface errors as a sonner toast. Defaults to true. */
   toastOnError?: boolean;
-  /**
-   * If true (default), captured fields are persisted to the shared
-   * `bookingState` sessionStorage so downstream funnel steps can hydrate.
-   */
+  /** Reserved for future use; persistence is now handled by the booking store. */
   persistToBookingState?: boolean;
 }
 
@@ -41,11 +30,6 @@ export interface LeadSubmitController<TInput> {
   isSubmitting: boolean;
 }
 
-/**
- * Single source of truth for lead-form submission UX.
- * Validates → calls `useServices().leads.submitLead` → manages loading,
- * success, and error state with a consistent toast + inline-error contract.
- */
 export function useLeadSubmitController<TInput>(
   opts: LeadSubmitOptions<TInput>,
 ): LeadSubmitController<TInput> {
@@ -87,17 +71,13 @@ export function useLeadSubmitController<TInput>(
       const base = opts.toLeadInput(validated);
       const attr = getAttribution();
 
-      // Hidden attribution fields override the visible First/Last Name when
-      // present (e.g. CRM-pre-filled URL or cookie from a prior visit).
+      // Names are NEVER read from attribution anymore (PHI: see attribution.ts).
       const leadInput: LeadInput = {
         ...base,
-        ...(attr.first_name ? { firstName: attr.first_name } : {}),
-        ...(attr.last_name ? { lastName: attr.last_name } : (base.lastName ? { lastName: base.lastName } : {})),
         source: opts.source ?? base.source ?? "lead-form",
         tags: [...(opts.tags ?? []), ...(base.tags ?? []), ...attributionTags(attr)],
       };
 
-      // ---- Persist raw capture FIRST (zero data loss if CRM fails) ----
       const v = validated as Record<string, unknown>;
       const captureRow = {
         name: typeof v.name === "string" ? v.name : null,
@@ -115,22 +95,11 @@ export function useLeadSubmitController<TInput>(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await supabase.from("lead_captures").insert(captureRow as any);
       } catch (persistErr) {
-        // Never block submission on capture failure — log only.
         console.warn("[lead-capture] insert failed", persistErr);
       }
 
       try {
         const result = await leads.submitLead(leadInput);
-
-        if (opts.persistToBookingState !== false) {
-          updateBookingState({
-            ...(typeof v.name === "string" ? { name: v.name } : {}),
-            ...(typeof v.phone === "string" ? { phone: v.phone } : {}),
-            ...(typeof v.email === "string" ? { email: v.email } : {}),
-            ...(typeof v.location === "string" ? { location: v.location } : {}),
-            source: leadInput.source,
-          });
-        }
 
         setStatus("success");
 
@@ -140,8 +109,8 @@ export function useLeadSubmitController<TInput>(
           user_data: {
             email: typeof v.email === "string" ? v.email : undefined,
             phone: typeof v.phone === "string" ? v.phone : undefined,
-            first_name: attr.first_name || firstName || undefined,
-            last_name: attr.last_name || (rest.length ? rest.join(" ") : undefined),
+            first_name: firstName || undefined,
+            last_name: rest.length ? rest.join(" ") : undefined,
             state: typeof v.location === "string" ? "VA" : undefined,
             external_id: result.contactId,
           },

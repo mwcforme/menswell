@@ -1,11 +1,16 @@
 /**
  * Contract for submitting a captured lead to the downstream CRM.
- *
- * The current concrete implementation (`GhlProxyLeadSubmitter`) routes through
- * the `ghl-proxy` Supabase edge function and upserts a GoHighLevel contact.
- * Consumers MUST depend on this interface, never on the concrete impl, so the
- * transport can be swapped without touching UI code.
  */
+export type MwcCustomFieldKey =
+  | "mwc_symptom"
+  | "mwc_symptom_duration"
+  | "mwc_urgency_tier"
+  | "mwc_clinical_note"
+  | "mwc_funnel_service"
+  | "mwc_lp_slug";
+
+export type MwcCustomFields = Partial<Record<MwcCustomFieldKey, string>>;
+
 export interface LeadInput {
   firstName: string;
   lastName?: string;
@@ -13,6 +18,8 @@ export interface LeadInput {
   phone?: string;
   source?: string;
   tags?: string[];
+  /** PHI-safe structured fields written to GHL contact custom fields only. */
+  customFields?: MwcCustomFields;
 }
 
 export interface LeadResult {
