@@ -39,7 +39,7 @@ export function AdminLayout({ title, children }: Props) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    nav("/admin/login", { replace: true });
+    nav("/admin", { replace: true });
   };
 
   return (

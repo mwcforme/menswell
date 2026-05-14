@@ -27,11 +27,11 @@ export function RequireAdmin({ children }: Props) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!active) return;
       if (!session) {
-        nav("/admin/login", { replace: true });
+        nav("/admin", { replace: true });
         return;
       }
       if (!isAdminEmail(session.user.email)) {
-        nav("/admin/login?error=forbidden", { replace: true });
+        nav("/admin?error=forbidden", { replace: true });
         return;
       }
       setState("ok");
@@ -39,11 +39,11 @@ export function RequireAdmin({ children }: Props) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!active) return;
       if (!session) {
-        nav("/admin/login", { replace: true });
+        nav("/admin", { replace: true });
         return;
       }
       if (!isAdminEmail(session.user.email)) {
-        nav("/admin/login?error=forbidden", { replace: true });
+        nav("/admin?error=forbidden", { replace: true });
         return;
       }
       setState("ok");
