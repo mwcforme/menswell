@@ -185,6 +185,9 @@ Deno.serve(async (req) => {
 
     const text = await upstream.text();
     const data = text ? safeJson(text) : null;
+    if (!upstream.ok) {
+      console.error(`[ghl-proxy] ${env} ${method} ${cleanPath} -> ${upstream.status}: ${text.slice(0, 500)}`);
+    }
     return json(upstream.status, { ok: upstream.ok, status: upstream.status, data });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
