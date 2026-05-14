@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { CENTER_CALENDARS } from "@/lib/ghlCalendars";
+import { APP_ENV } from "@/lib/env";
 import { Loader2 } from "lucide-react";
 
 interface Stats {
@@ -21,14 +23,15 @@ export default function AdminOverview() {
     (async () => {
       try {
         const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const envCalendarIds = Object.values(CENTER_CALENDARS).map((c) => c.calendarId);
         const [leads24, pendingCrm, failedCrm, lastSync, slotCount, freshest] =
           await Promise.all([
             supabase.from("lead_captures").select("id", { count: "exact", head: true }).gte("created_at", since),
             supabase.from("lead_captures").select("id", { count: "exact", head: true }).eq("crm_status", "pending"),
             supabase.from("lead_captures").select("id", { count: "exact", head: true }).eq("crm_status", "failed"),
             supabase.from("ghl_sync_runs").select("status, finished_at, slot_count").order("started_at", { ascending: false }).limit(1).maybeSingle(),
-            supabase.from("ghl_free_slots").select("calendar_id", { count: "exact", head: true }),
-            supabase.from("ghl_free_slots").select("fetched_at").order("fetched_at", { ascending: false }).limit(1).maybeSingle(),
+            supabase.from("ghl_free_slots").select("calendar_id", { count: "exact", head: true }).in("calendar_id", envCalendarIds),
+            supabase.from("ghl_free_slots").select("fetched_at").in("calendar_id", envCalendarIds).order("fetched_at", { ascending: false }).limit(1).maybeSingle(),
           ]);
 
         if (cancelled) return;
@@ -70,7 +73,7 @@ export default function AdminOverview() {
             sub={stats.lastSync?.finished_at ? new Date(stats.lastSync.finished_at).toLocaleString() : "—"}
             tone={stats.lastSync?.status === "ok" ? "ok" : stats.lastSync ? "bad" : "warn"}
           />
-          <Stat label="Cached open slots" value={stats.freeSlotCount} />
+          <Stat label="Cached open slots" value={stats.freeSlotCount} sub={`env: ${APP_ENV}`} />
           <Stat
             label="Freshest slot fetched"
             value={stats.freshestSlotFetched ? new Date(stats.freshestSlotFetched).toLocaleString() : "—"}

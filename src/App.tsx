@@ -28,6 +28,7 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminLeads from "./pages/admin/AdminLeads";
 import AdminEvents from "./pages/admin/AdminEvents";
+import AdminSync from "./pages/admin/AdminSync";
 import { RequireAdmin } from "./components/admin/RequireAdmin";
 
 const queryClient = new QueryClient();
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="/admin/overview" element={<RequireAdmin><AdminOverview /></RequireAdmin>} />
               <Route path="/admin/leads" element={<RequireAdmin><AdminLeads /></RequireAdmin>} />
               <Route path="/admin/events" element={<RequireAdmin><AdminEvents /></RequireAdmin>} />
+              <Route path="/admin/sync" element={<RequireAdmin><AdminSync /></RequireAdmin>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <MobileFooterBar />

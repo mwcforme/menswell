@@ -1,102 +1,59 @@
+## Root cause for `/admin/sync` not loading
 
-## 0. Cleanup (first, before touching anything else)
+The sidebar in `AdminLayout.tsx` links to `/admin/sync`, but no `AdminSync.tsx` page exists and no matching `<Route>` is registered in `src/App.tsx`. The path falls through to the `NotFound` route.
 
-Delete the 4 unused files from the shelved SOLID refactor:
-- `src/lib/booking/dateTime.ts`
-- `src/lib/booking/freeSlotsRepo.ts`
-- `src/lib/booking/tokens.ts`
-- `src/hooks/useFocusOnTruthy.ts`
+## Admin-section regression — issues found
 
-`/book/schedule` and `/book/schedule2` keep their inlined helpers and stay untouched. Stage env: confirmed no-op (preview already routes to stage GHL via hostname detection).
+| # | Area | Issue | Severity |
+|---|---|---|---|
+| 1 | Routing | `/admin/sync` route + page missing (sidebar links to it) | Bug — confirmed broken |
+| 2 | `AdminOverview` "Cached open slots" stat | Counts every row in `ghl_free_slots`, including slots from the inactive env's calendars. Frontend reads filter by env calendar IDs, so the stat overstates what users actually see. | Inconsistency |
+| 3 | `RequireAdmin` | Both `onAuthStateChange` and `getSession` race to call `setState`. Harmless today but can flash the loader after sign-out. | Minor |
+| 4 | `EnvSwitcher` | Reload-on-toggle works, but there is no visual confirmation of which env actually loaded after the reload (it reads `APP_ENV`, fine), and there's no way to clear the override back to "auto". | Polish |
+| 5 | `AdminLeads` | Filter dropdown options are `ok / pending / failed` but the table also shows other statuses (e.g. blank/`null`). Filtering hides rows with no status. | Minor |
 
-## 1. Auth gate
+## Fixes
 
-- Enable Google OAuth via Lovable Cloud managed (`configure_social_auth`).
-- Hardcoded email allowlist in `src/lib/admin/allowlist.ts` (you give me the list; placeholder = `["chris@menswellnesscenters.com"]`).
-- Server-side allowlist mirror in a Postgres function `public.is_admin_email(text)` so RLS policies can enforce it.
-- Frontend route guard `<RequireAdmin>` — checks session + email against allowlist; bounces unauthorized to `/admin/login`.
-- Edge functions independently re-verify caller JWT + email on every request. Never trust the client.
+### 1. Create `/admin/sync`
+- New `src/pages/admin/AdminSync.tsx`:
+  - Loads last 50 rows from `ghl_sync_runs` ordered by `started_at desc` (id, status, slot_count, started_at, finished_at, error).
+  - Status pill: `ok` green, `running` amber, anything else red.
+  - "Run sync now" button → `supabase.functions.invoke('ghl-sync')`, then refresh.
+  - "Run validation" button → `supabase.functions.invoke('ghl-sync-validate')`, surfaces returned summary (env, expected vs actual calendar IDs, drift count) inline.
+  - Refresh button + 30 s auto-poll while a run is `running`.
+  - Wrapped in `<AdminLayout title="Sync">`.
+- Register route in `src/App.tsx`:
+  ```tsx
+  <Route path="/admin/sync" element={<RequireAdmin><AdminSync /></RequireAdmin>} />
+  ```
 
-## 2. Database changes (one migration)
+### 2. Overview "Cached open slots" accuracy
+- Filter the count query by the active env's calendar IDs (import the same calendar list the booking funnel uses) so the number matches what the frontend actually serves. Add a tiny "(env: stage|prod)" caption under the stat.
 
-```text
-+ FUNCTION public.is_admin_email(email text) → boolean      (SECURITY DEFINER, hardcoded list)
-+ FUNCTION public.current_user_is_admin() → boolean         (wraps above using auth.jwt())
-+ POLICY "admins read leads"      ON lead_captures      FOR SELECT
-+ POLICY "admins update leads"    ON lead_captures      FOR UPDATE
-+ POLICY "admins read events"     ON booking_event_log  FOR SELECT
-  (ghl_sync_runs + ghl_free_slots already public-read, no change)
-```
+### 3. RequireAdmin tightening
+- Drop the redundant `getSession()` block; rely on `onAuthStateChange` (it fires immediately with the current session). Removes the race and simplifies the gate.
 
-No new tables. No data ownership change for end users (lead inserts stay anon).
+### 4. EnvSwitcher polish
+- Add a third `Auto` button that clears `mwc_env_override` from localStorage then reloads, so admins can return to host-based detection.
+- Add a small caption under the toggle: `Active: <APP_ENV>`.
 
-## 3. Routes & UI
+### 5. AdminLeads filter
+- Add `Other` option that filters to rows where `crm_status` is not in (`ok`,`pending`,`failed`), and include null/blank statuses in the default `All` view (already does — verify).
 
-```text
-/admin/login        Google sign-in screen, Lovable dark/orange aesthetic
-/admin              Overview: KPI cards (24h leads, pending CRM pushes,
-                    last sync status, free slot freshness)
-/admin/leads        Searchable + filterable lead_captures table.
-                    Filters: crm_status, service, location, date range.
-                    Row click → drawer with full record + attribution JSON.
-                    Actions: Retry CRM push, Mark as contacted (tag).
-/admin/events       booking_event_log feed. Filters: event_type, location,
-                    date range, has-error. Drawer for meta JSON.
-                    Action: Resend confirmation (for confirmed events).
-/admin/sync         ghl_sync_runs history table. Action: Trigger sync now.
-                    Live-tail the most recent run.
-```
+## Files touched
 
-Layout: persistent sidebar (Leads / Events / Sync), top bar with signed-in email + sign-out. shadcn DataTable, Sheet for drawers, Toaster for action results. CSV export per table.
+- `src/App.tsx` — add AdminSync route + import
+- `src/pages/admin/AdminSync.tsx` — new
+- `src/pages/admin/AdminOverview.tsx` — env-filtered slot count
+- `src/components/admin/RequireAdmin.tsx` — simplify
+- `src/components/admin/EnvSwitcher.tsx` — Auto button + caption
+- `src/pages/admin/AdminLeads.tsx` — Other status filter
 
-## 4. Edge functions (4 new)
+No DB migrations, no edge-function changes (existing `ghl-sync` and `ghl-sync-validate` already deployed and used as-is).
 
-All deploy with `verify_jwt = true`-equivalent in-code (read JWT, look up email, call `is_admin_email`, 403 otherwise). All return CORS headers.
+## Verification
 
-```text
-admin-retry-crm-push     POST { lead_id } → re-runs the CRM push for one lead.
-                          Updates crm_status / crm_error / crm_contact_id.
-admin-trigger-ghl-sync   POST {} → invokes the existing sync routine,
-                          inserts a row into ghl_sync_runs.
-admin-mark-lead          POST { lead_id, tags: string[] } → appends tags.
-admin-resend-confirmation POST { event_id } → re-sends the GHL confirmation
-                          for a booked appointment.
-```
-
-If any backing logic doesn't already exist (e.g. there may be no current "resend confirmation" path), the function will return a clear 501 with a TODO note rather than fake success. I'll flag those in the final summary.
-
-## 5. Out of scope
-
-- No CMS for treatments/locations/providers (kept in `src/data/*.ts`, would be a separate project).
-- No multi-role hierarchy (single "admin" tier via allowlist).
-- No audit log of admin actions in v1 (booking_event_log already captures booking-side mutations).
-- No password reset / non-Google sign-in.
-- No mobile-optimized admin layout (desktop-first, usable on tablet).
-
-## Technical notes
-
-- New folder structure: `src/pages/admin/*`, `src/components/admin/*`, `src/lib/admin/*`, `supabase/functions/admin-*`.
-- Admin pages bypass the marketing site's nav/footer — own minimal `<AdminLayout>`.
-- Allowlist file is the single source of truth for who's an admin; updating it requires a code edit + a one-line SQL change to `is_admin_email`. (Acceptable for v1; can be moved to a DB table later.)
-- All admin queries use the existing `supabase` client with the user's JWT — RLS enforces access. No service-role key in the browser.
-- Edge function pattern: parse JWT → fetch email → `if (!isAdmin(email)) return 403` → do work.
-
-## What I need from you before starting
-
-1. **Email allowlist** — which emails get admin? (I'll use `chris@menswellnesscenters.com` as placeholder if you don't say.)
-2. **CRM push logic** — is there an existing edge function that does the GHL contact upsert, or do I need to write the retry from scratch by reading `lead_captures` and calling the GHL proxy?
-3. **GHL sync routine** — which existing function/cron does the slot sync? (I see `ghl_sync_runs` table but need to find the actual sync code.)
-
-I can start step 0 (cleanup) and steps 1–3 (auth + DB + read-only UI) immediately while you answer 1–3 for the action wiring.
-
-## Order of execution
-
-1. Delete refactor files.
-2. Enable Google OAuth.
-3. Migration (functions + policies).
-4. AdminLayout + RequireAdmin + login page.
-5. Read-only Leads / Events / Sync pages with filters and drawers.
-6. CSV export.
-7. Four edge functions + wired action buttons.
-8. QA pass: sign in as allowlisted email, sign in as non-allowlisted (must 403), trigger each action.
-
+- Navigate to `/admin/sync` while logged in as `eobrien@mwcforme.com` → table renders with recent runs; both buttons trigger their edge functions and the table refreshes.
+- Toggle EnvSwitcher between Stage / Prod / Auto; confirm reload + caption update.
+- Sign out from sidebar → bounces to `/admin` login (no loader flicker).
+- `/admin/overview`, `/admin/leads`, `/admin/events` continue to load with no regressions.
