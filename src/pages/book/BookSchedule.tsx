@@ -77,27 +77,51 @@ const BookSchedule = () => {
     navigate(`/book/duration${qs ? `?${qs}` : ""}`);
   };
 
+  const locationLine = state.location ? LOCATION_LABEL[state.location] : null;
+  const metaLine = [locationLine, "60-min consult", "No charge today"]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <BookLayout page="schedule" title="Pick your consult time | Men's Wellness Centers">
-      <div className="px-3 md:px-6 py-4 md:py-8 space-y-4 md:space-y-6 pb-12">
+      <div className="px-3 md:px-6 py-2 md:py-8 space-y-2 md:space-y-6 pb-12">
 
-        {/* Back link + 3/3 progress bar */}
+        {/* Compact mobile header: Back + progress in one row */}
         <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
-          <button
-            type="button"
-            onClick={goBack}
-            className="flex items-center gap-1"
-            style={{
-              background: "transparent", border: 0, color: "#FFFFFF",
-              fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
-              opacity: 0.85, cursor: "pointer", padding: "4px 0", marginBottom: 6,
-            }}
-            aria-label="Back to previous step"
-          >
-            <ArrowLeft size={14} /> Back
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={goBack}
+              className="flex items-center gap-1 shrink-0"
+              style={{
+                background: "transparent", border: 0, color: "#FFFFFF",
+                fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
+                opacity: 0.85, cursor: "pointer", padding: "4px 0",
+              }}
+              aria-label="Back to previous step"
+            >
+              <ArrowLeft size={14} /> Back
+            </button>
+            <div
+              className="flex gap-1 flex-1"
+              role="progressbar"
+              aria-label="Step 3 of 3"
+              aria-valuemin={0}
+              aria-valuemax={3}
+              aria-valuenow={3}
+            >
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="flex-1"
+                  style={{ height: 3, borderRadius: 2, background: "#E8670A" }}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Desktop-only step label */}
           <div
-            className="text-center mb-2"
+            className="hidden md:block text-center mt-3"
             style={{
               fontSize: 12,
               color: "#FFFFFF",
@@ -109,18 +133,9 @@ const BookSchedule = () => {
           >
             Step 3 of 3 · Pick your time
           </div>
-          <div className="flex gap-1" role="progressbar" aria-valuemin={0} aria-valuemax={3} aria-valuenow={3}>
-            {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="flex-1"
-                style={{ height: 4, borderRadius: 2, background: "#E8670A" }}
-              />
-            ))}
-          </div>
         </div>
 
-        {/* Personalized header */}
+        {/* Headline + meta line (replaces hero + chips) */}
         <section
           className="mx-auto text-center"
           style={{ maxWidth: 720, color: "#FFFFFF" }}
@@ -129,10 +144,10 @@ const BookSchedule = () => {
             style={{
               fontFamily: "Inter, sans-serif",
               fontWeight: 700,
-              fontSize: "clamp(22px, 2.8vw, 28px)",
-              lineHeight: 1.25,
+              fontSize: "clamp(18px, 2.6vw, 26px)",
+              lineHeight: 1.2,
               letterSpacing: "-0.01em",
-              marginBottom: 8,
+              marginBottom: 4,
               color: "#FFFFFF",
               textTransform: "none",
             }}
@@ -142,39 +157,15 @@ const BookSchedule = () => {
           <p
             style={{
               fontFamily: "Inter, sans-serif",
-              fontSize: 16,
-              color: "#E5E7EB",
-              lineHeight: 1.55,
-              maxWidth: 560,
-              margin: "0 auto 12px",
+              fontSize: 13,
+              color: "#9CA3AF",
+              lineHeight: 1.4,
+              margin: 0,
+              letterSpacing: "0.01em",
             }}
           >
-            {subhead}
+            {metaLine}
           </p>
-
-          {/* Captured context chips */}
-          {contextChips.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-2" aria-label="Your selections">
-              {contextChips.map((c) => (
-                <span
-                  key={c}
-                  style={{
-                    border: "1px solid rgba(255,255,255,0.25)",
-                    background: "rgba(255,255,255,0.04)",
-                    color: "#FFFFFF",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    padding: "5px 10px",
-                    borderRadius: 999,
-                    fontFamily: "Inter, sans-serif",
-                    letterSpacing: "0.01em",
-                  }}
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          )}
         </section>
 
         {/* CALENDAR or location picker */}
@@ -220,11 +211,10 @@ const BookSchedule = () => {
           )}
         </section>
 
-        {/* Quiet support row — replaces the inline orange CALL bar that was
-            splitting the day strip from the time grid (B3). The primary CTA
-            inside GHLDayView is now the only loud action on the page. */}
+        {/* Desktop-only quiet support row; mobile relies on the floating
+            phone button in the page header. */}
         <div
-          className="mx-auto text-center"
+          className="hidden md:block mx-auto text-center"
           style={{ maxWidth: 720, color: "#FFFFFF", opacity: 0.85, fontSize: 13, fontFamily: "Inter, sans-serif" }}
         >
           Need help picking a time?{" "}
