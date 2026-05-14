@@ -366,7 +366,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 padding: "14px 16px",
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.06em", color: ORANGE_DEEP, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.06em", color: ORANGE, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
                 ⚡ Earliest available for you
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -393,7 +393,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         color: INK,
                       }}
                     >
-                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: ORANGE_DEEP, textTransform: "uppercase" }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: ORANGE, textTransform: "uppercase" }}>
                         {dayLabel}
                       </div>
                       <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, marginTop: 2 }}>
@@ -596,8 +596,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     type="button"
                     onClick={() => setSelectedSlot(iso)}
                     style={{
-                      background: active ? ORANGE_DEEP : SURFACE,
-                      border: `1px solid ${active ? ORANGE_DEEP : BORDER}`,
+                      background: active ? ORANGE : SURFACE,
+                      border: `1px solid ${active ? ORANGE : BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",

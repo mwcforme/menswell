@@ -50,36 +50,34 @@ const BookSchedule = () => {
 
         {/* Compact mobile header: Back + progress in one row */}
         <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={goBack}
-              className="flex items-center gap-1 shrink-0"
-              style={{
-                background: "transparent", border: 0, color: "#FFFFFF",
-                fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
-                opacity: 0.85, cursor: "pointer", padding: "4px 0",
-              }}
-              aria-label="Back to previous step"
-            >
-              <ArrowLeft size={14} /> Back
-            </button>
-            <div
-              className="flex gap-1 flex-1"
-              role="progressbar"
-              aria-label="Step 3 of 3"
-              aria-valuemin={0}
-              aria-valuemax={3}
-              aria-valuenow={3}
-            >
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={i}
-                  className="flex-1"
-                  style={{ height: 3, borderRadius: 2, background: "#E8670A" }}
-                />
-              ))}
-            </div>
+          <button
+            type="button"
+            onClick={goBack}
+            className="flex items-center gap-1"
+            style={{
+              background: "transparent", border: 0, color: "#FFFFFF",
+              fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
+              opacity: 0.85, cursor: "pointer", padding: "4px 0",
+            }}
+            aria-label="Back to previous step"
+          >
+            <ArrowLeft size={14} /> Back
+          </button>
+          <div
+            className="flex gap-1 mt-2"
+            role="progressbar"
+            aria-label="Step 3 of 3"
+            aria-valuemin={0}
+            aria-valuemax={3}
+            aria-valuenow={3}
+          >
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="flex-1"
+                style={{ height: 3, borderRadius: 2, background: "#E8670A" }}
+              />
+            ))}
           </div>
           {/* Desktop-only step label */}
           <div
