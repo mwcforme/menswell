@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { APP_ENV } from "@/lib/env";
 import { setEnvOverride } from "@/lib/envOverride";
+import { supabase } from "@/integrations/supabase/client";
 
 const CONFIRM_KEY = "mwc_env_switch_confirmed";
 
