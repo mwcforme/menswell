@@ -1,37 +1,40 @@
-# Fix "Failed to send a request to the Edge Function" on Admin → Sync
+# Required GHL scopes for the stage API key
 
-## Diagnosis
+The `ghl-proxy` edge function only calls three GHL endpoints. For each, here is the exact scope GHL requires on a Private Integration Token (Settings → Private Integrations → New).
 
-`AdminSync.tsx` calls `supabase.functions.invoke("ghl-sync")` and awaits the response. The edge-function logs show the function boots but never logs completion, and the browser surfaces "Failed to send a request to the Edge Function" — classic symptom of the client closing the connection before the function returns.
+## Mandatory scopes (check these)
 
-`ghl-sync` walks 6 calendars (3 prod + 3 stage) sequentially via the GHL API plus chunked Supabase upserts. From a browser invoke, that easily exceeds the gateway wait window, even though the cron-triggered run from the database succeeds (rows show `ok` in the table).
+| Purpose | Endpoint | Scope (View) | Scope (Edit) |
+|---|---|---|---|
+| Load free slots on /book/schedule | `GET /calendars/{calendarId}/free-slots` | `calendars/events.readonly` | — |
+| Upsert the lead as a GHL contact | `POST /contacts/upsert` | `contacts.readonly` | `contacts.write` |
+| Create the confirmed appointment | `POST /calendars/events/appointments` | `calendars/events.readonly` | `calendars/events.write` |
+| (Implicit) resolve the location the calendars belong to | n/a | `locations.readonly` | — |
 
-The work itself is fine — only the "wait for full result" pattern from the admin UI is wrong.
+So in the PIT scope picker, tick:
 
-## Fix
+- `View Calendars`  → `calendars.readonly`
+- `View Calendar Events` → `calendars/events.readonly`
+- `Edit Calendar Events` → `calendars/events.write`
+- `View Contacts` → `contacts.readonly`
+- `Edit Contacts` → `contacts.write`
+- `View Locations` → `locations.readonly`
 
-Make manual triggers fire-and-forget:
+That is the full set the current proxy code exercises. Nothing else is needed.
 
-1. **`supabase/functions/ghl-sync/index.ts`**
-   - Insert the `ghl_sync_runs` row (status `running`) synchronously so the UI sees it immediately.
-   - Move the per-env / per-center sync loop into an async function and schedule it with `EdgeRuntime.waitUntil(...)` (Deno Deploy / Supabase Edge supports this for background work after the response is returned).
-   - Return `202 { ok: true, run_id, status: "running" }` right away.
-   - The existing finalization (update row to `ok` / `error`) stays inside the background task. The hourly cron path is unaffected — it doesn't care whether we await.
+## Critical: token must be issued from the right subaccount
 
-2. **`src/pages/admin/AdminSync.tsx`**
-   - After `invoke("ghl-sync")` returns, immediately call `load()` (already done) and start the existing 30s poll loop until no row is `running`.
-   - Treat HTTP 202 as success; only show the red error banner on a real `error` from `invoke`.
-   - Optional small touch: disable the button for a few seconds after click to prevent double-fire.
+The PIT must be created **inside the same subaccount that owns the three calendars** (`CpcOAez2bv3tQTvTdRkO`, `r1IBpjVKT05qyfH2hcwv`, `6cSOOYintvb8y0B42uTc`). A token from any other subaccount will keep returning `"Calendar does not belong to this location"` — which is exactly the error our diagnostic test surfaced, regardless of scopes.
 
-## Acceptance criteria
+While you are in that subaccount, also copy its Location ID (Settings → Business Profile → Location ID) and confirm it matches `GHL_LOCATION_ID_STAGE_1`.
 
-- Clicking "Run sync now" on `/admin/sync` returns within ~1s with no error banner.
-- A new row appears in the table with status `running`, then flips to `ok` (and slot count) within ~30–60s via the auto-poll.
-- The hourly cron job continues to populate `ghl_sync_runs` exactly as before.
-- `ghl-sync-validate` button is unchanged (it's already fast).
+## After you generate the new key
 
-## Out of scope
+1. Update the secret `GHL_API_KEY_STAGE` with the new PIT.
+2. Confirm `GHL_LOCATION_ID_STAGE_1` is the Location ID of that same subaccount.
+3. Tell me when done and I will:
+   - Re-run the diagnostic POST against `/calendars/events/appointments` and the GET against `/free-slots` for all three stage calendars.
+   - Confirm we get `200` / `201` responses.
+   - Report back with the verdict (and clean up the temporary `upstreamBody` debug field on the proxy if everything is green).
 
-- No schema changes.
-- No change to GHL credentials, calendars, or env routing.
-- No change to the `EnvBadge` / `EnvSwitcher` work from the previous turns.
+No code changes are required for this step — only the secret and PIT scopes.
