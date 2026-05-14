@@ -11,6 +11,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Bebas+Neue&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="/favicon.png">
 
+    <!--
+      PHI guard: strip query string + hash from any /book/* URL BEFORE
+      GTM/GA4 load, so document.location.href (read by GA4 Enhanced
+      Measurement events like scroll/click) never carries PII/PHI.
+      Must run synchronously before the GTM snippet below.
+    -->
+    <script>
+      (function () {
+        try {
+          if (location.pathname.indexOf('/book/') === 0 && (location.search || location.hash)) {
+            history.replaceState(null, '', location.pathname);
+          }
+        } catch (e) { /* no-op */ }
+      })();
+    </script>
+
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
