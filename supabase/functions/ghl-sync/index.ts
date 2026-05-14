@@ -84,8 +84,9 @@ function flatten(resp: FreeSlotsResponse): string[] {
 // deno-lint-ignore no-explicit-any
 async function runSync(supabase: any, runId: string) {
   const envs = loadEnvs();
-  const summary: Record<string, number | string> = {};
+  const summary: Record<string, unknown> = {};
   let total = 0;
+  let firstError: string | null = null;
 
   try {
     const cutoff = new Date().toISOString();
@@ -96,10 +97,20 @@ async function runSync(supabase: any, runId: string) {
         continue;
       }
 
+      const envDetail: Record<string, unknown> = {};
       let envCount = 0;
       for (const c of env.centers) {
-        const resp = await fetchSlots(c.calendarId, env.apiKey);
+        let resp: FreeSlotsResponse;
+        try {
+          resp = await fetchSlots(c.calendarId, env.apiKey);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e);
+          envDetail[c.key] = `ERR: ${msg.slice(0, 200)}`;
+          if (!firstError) firstError = `${env.name}/${c.key}: ${msg.slice(0, 200)}`;
+          continue;
+        }
         const slots = flatten(resp);
+        envDetail[c.key] = slots.length;
         const rows = slots.map((iso) => {
           const startD = new Date(iso);
           const endD = new Date(startD.getTime() + 30 * 60 * 1000);
