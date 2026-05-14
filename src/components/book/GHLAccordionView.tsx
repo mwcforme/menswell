@@ -148,7 +148,7 @@ const AccordionDay = memo(function AccordionDay({
   onSelectSlot,
 }: AccordionDayProps) {
   const key = ymd(day);
-  const isSunday = day.getDay() === 0;
+  const isSunday = isSundayInTimeZone(day, TIMEZONE);
   const count = slots.length;
   const available = count > 0 && !isSunday;
   const isExpanded = expanded && available;
@@ -260,9 +260,7 @@ const AccordionDay = memo(function AccordionDay({
 const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => dateFromEtYmd(todayET()), []);
   const days = useMemo(() => {
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date(today); d.setDate(today.getDate() + i); return d;
-    });
+    return Array.from({ length: 7 }).map((_, i) => addDaysInTimeZone(today, i, TIMEZONE));
   }, [today]);
 
   const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
@@ -305,7 +303,7 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
   useEffect(() => {
     let cancelled = false;
     const start = new Date(today);
-    const end = new Date(today); end.setDate(end.getDate() + 7);
+    const end = addDaysInTimeZone(today, 7, TIMEZONE);
     setLoading(true); setLoadError(null);
     fetchCachedSlots(cal.calendarId, start, end)
       .then((parsed) => {
@@ -318,7 +316,7 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
         });
         setSlotsByDay(out);
         if (!initialised.current) {
-          const firstWith = days.find((d) => d.getDay() !== 0 && out[ymd(d)]?.length);
+          const firstWith = days.find((d) => !isSundayInTimeZone(d, TIMEZONE) && out[ymd(d)]?.length);
           if (firstWith) setExpandedDay(ymd(firstWith));
           initialised.current = true;
         }
