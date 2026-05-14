@@ -483,13 +483,11 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         ? `Only ${count} left`
                         : `${count} slots`
                   : "···";
-                const badgeColor = selected
-                  ? INK
-                  : isSunday || !available
-                    ? MUTED
-                    : scarce
-                      ? "#FFB37A" // warm amber that reads on the dark navy card
-                      : "rgba(255,255,255,0.85)"; // light on dark navy — was INK_SOFT (invisible)
+                const badgeColor = isSunday || !available
+                  ? MUTED
+                  : scarce
+                    ? "#FFB37A" // warm amber that reads on the dark navy card
+                    : "rgba(255,255,255,0.85)";
                 return (
                   <button
                     key={key}
@@ -502,19 +500,19 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       flex: "1 1 0",
                       minWidth: 0,
                       scrollSnapAlign: "start",
-                      background: selected ? SURFACE : isSunday || !available ? "#F1F2F6" : INK,
+                      background: isSunday || !available ? "#F1F2F6" : INK,
                       border: `2px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
                       borderRadius: 12,
                       padding: "8px 4px 10px",
-                      color: selected ? INK : isSunday || !available ? MUTED : "#FFFFFF",
+                      color: isSunday || !available ? MUTED : "#FFFFFF",
                       cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
-                      transition: "background 120ms ease, border-color 120ms ease",
+                      transition: "border-color 120ms ease",
                       position: "relative",
-                      opacity: !available && !selected ? 0.55 : 1,
+                      opacity: !available ? 0.55 : 1,
                     }}
                   >
-                    {/* Selection signaled by orange border + TODAY/TMRW pill — no extra dot */}
+                    {/* Single visual cue for selection: orange border only */}
                     {/* TODAY / TOMORROW pill */}
                     {(isToday || isTomorrow) && (
                       <div
@@ -528,14 +526,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                           marginBottom: 4,
                           maxWidth: "100%",
                           background: isToday ? ORANGE : "transparent",
-                          color: isToday ? "#FFFFFF" : selected ? ORANGE : "#FFFFFF",
-                          border: isTomorrow ? `1px solid ${selected ? ORANGE : "rgba(255,255,255,0.7)"}` : "none",
+                          color: "#FFFFFF",
+                          border: isTomorrow ? `1px solid rgba(255,255,255,0.7)` : "none",
                         }}
                       >
                         {isToday ? "TODAY" : "TMRW"}
                       </div>
                     )}
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? INK_SOFT : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
                       {fmtDayShort(d)}
                     </div>
                     <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
@@ -584,22 +582,19 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     type="button"
                     onClick={() => setSelectedSlot(iso)}
                     style={{
-                      background: active ? ORANGE : SURFACE,
-                      border: `1px solid ${active ? ORANGE : BORDER}`,
+                      background: SURFACE,
+                      border: `2px solid ${active ? ORANGE : BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
-                      boxShadow: active
-                        ? "0 8px 20px -10px rgba(194,65,12,0.55)"
-                        : "0 1px 0 rgba(11,16,41,0.02)",
-                      transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
+                      color: INK, cursor: "pointer", textAlign: "center",
+                      transition: "border-color 120ms ease",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
                         {time}
                       </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "#FFFFFF" : MUTED }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: MUTED }}>
                         {ampm}
                       </span>
                     </div>
