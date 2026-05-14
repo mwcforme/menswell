@@ -31,6 +31,7 @@ import AdminLeads from "./pages/admin/AdminLeads";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminSync from "./pages/admin/AdminSync";
 import { RequireAdmin } from "./components/admin/RequireAdmin";
+import { BookingRouteGuard } from "./domain/booking/bookingRouteGuard";
 
 const queryClient = new QueryClient();
 
