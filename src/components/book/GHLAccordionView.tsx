@@ -126,7 +126,7 @@ const SlotButton = memo(function SlotButton({ iso, selected, onSelect }: SlotBut
         <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
           {time}
         </span>
-        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: selected ? "rgba(255,255,255,0.9)" : MUTED }}>
+        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: selected ? INK : MUTED }}>
           {ampm}
         </span>
       </div>
@@ -162,7 +162,7 @@ const AccordionDay = memo(function AccordionDay({
   const ribbon = isToday ? "TODAY" : isTomorrow ? "TMRW" : null;
 
   const headerBg = isExpanded ? ORANGE : INK;
-  const headerColor = "#FFFFFF";
+  const headerColor = isExpanded ? INK : "#FFFFFF";
   const disabled = !available;
   const badgeText = isSunday ? "Closed" : !available ? "Full" : `${count} slots`;
 
@@ -190,7 +190,7 @@ const AccordionDay = memo(function AccordionDay({
           justifyContent: "space-between",
           cursor: disabled ? "not-allowed" : "pointer",
           textAlign: "left",
-          opacity: disabled ? 0.7 : 1,
+          opacity: 1,
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -199,7 +199,7 @@ const AccordionDay = memo(function AccordionDay({
               style={{
                 display: "inline-block",
                 alignSelf: "flex-start",
-                background: isExpanded ? "rgba(255,255,255,0.2)" : ORANGE,
+                background: isExpanded ? INK : ORANGE,
                 color: "#FFFFFF",
                 fontSize: 10,
                 fontWeight: 800,
@@ -212,7 +212,7 @@ const AccordionDay = memo(function AccordionDay({
               {ribbon}
             </span>
           )}
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", opacity: 0.85 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em" }}>
             {fmtDayShort(day)}
           </span>
           <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "0.02em" }}>
@@ -220,7 +220,7 @@ const AccordionDay = memo(function AccordionDay({
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.9 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em" }}>
             {badgeText}
           </span>
           {!disabled && (
