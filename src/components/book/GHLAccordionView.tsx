@@ -380,6 +380,7 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
 
         <div style={{ borderTop: `1px solid ${LINE}`, background: SURFACE, padding: 16 }}>
           <button
+            ref={confirmBtnRef}
             type="button"
             onClick={() => canConfirm && setModalOpen(true)}
             disabled={!canConfirm}
