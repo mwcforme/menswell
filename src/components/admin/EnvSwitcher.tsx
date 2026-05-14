@@ -1,45 +1,85 @@
+import { useState, useEffect } from "react";
 import { APP_ENV } from "@/lib/env";
 import { setEnvOverride } from "@/lib/envOverride";
 
+const CONFIRM_KEY = "mwc_env_switch_confirmed";
+
 /**
- * Admin-only environment selector. Persists choice to localStorage and
- * reloads so all GHL proxy calls + calendar lookups pick up the new env.
- * "Auto" clears the override and reverts to host-based detection.
+ * Admin-only environment selector.
+ * Toggle between Stage / Prod with a submit button.
+ * After switching to Stage, a confirmation message with timestamp is shown.
  */
 export function EnvSwitcher() {
-  const setEnv = setEnvOverride;
+  const [stageEnabled, setStageEnabled] = useState(APP_ENV === "stage");
+  const [confirmation, setConfirmation] = useState<{ message: string; time: string } | null>(null);
 
-  const options: Array<{ key: "stage" | "prod" | "auto"; activeClass: string }> = [
-    { key: "stage", activeClass: "bg-emerald-500 text-white" },
-    { key: "prod",  activeClass: "bg-red-500 text-white" },
-    { key: "auto",  activeClass: "bg-white/20 text-white" },
-  ];
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CONFIRM_KEY);
+      if (raw) {
+        const { env, time } = JSON.parse(raw);
+        if (env === "stage") {
+          setConfirmation({ message: "Stage mode activated", time });
+        }
+        window.localStorage.removeItem(CONFIRM_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const handleSubmit = () => {
+    const target = stageEnabled ? "stage" : "prod";
+    if (target === APP_ENV) return;
+    try {
+      window.localStorage.setItem(
+        CONFIRM_KEY,
+        JSON.stringify({ env: target, time: new Date().toLocaleString() })
+      );
+    } catch {
+      /* ignore */
+    }
+    setEnvOverride(target);
+  };
 
   return (
-    <div className="flex flex-col items-end gap-1">
-      <div className="flex items-center gap-2 rounded-md border border-white/10 bg-white/5 p-1">
-        <span className="px-2 text-[10px] uppercase tracking-wider text-white/50">
-          Env
+    <div className="flex flex-col items-end gap-2">
+      <div className="flex items-center gap-3">
+        <span className="text-[10px] uppercase tracking-wider text-white/50">
+          Stage mode
         </span>
-        {options.map((o) => {
-          const active = o.key !== "auto" && APP_ENV === o.key;
-          return (
-            <button
-              key={o.key}
-              type="button"
-              onClick={() => setEnv(o.key)}
-              className={`rounded px-2 py-1 text-xs font-semibold uppercase tracking-wide transition-colors ${
-                active ? o.activeClass : "text-white/60 hover:text-white"
-              }`}
-            >
-              {o.key}
-            </button>
-          );
-        })}
+        <button
+          type="button"
+          role="switch"
+          aria-checked={stageEnabled}
+          onClick={() => setStageEnabled((v) => !v)}
+          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E8670A] ${
+            stageEnabled ? "bg-emerald-500" : "bg-white/20"
+          }`}
+        >
+          <span
+            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+              stageEnabled ? "translate-x-[18px]" : "translate-x-[2px]"
+            }`}
+          />
+        </button>
       </div>
-      <div className="text-[10px] uppercase tracking-wider text-white/40">
-        Active: {APP_ENV}
-      </div>
+
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={stageEnabled === (APP_ENV === "stage")}
+        className="rounded-md bg-[#E8670A] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-[#E8670A]/90 disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Apply
+      </button>
+
+      {confirmation && (
+        <div className="text-right">
+          <div className="text-xs font-medium text-emerald-400">{confirmation.message}</div>
+          <div className="text-[10px] text-white/40">{confirmation.time}</div>
+        </div>
+      )}
     </div>
   );
 }
