@@ -445,8 +445,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
-                      flex: "1 1 0",
-                      minWidth: 0,
+                      flex: "0 0 92px",
+                      minWidth: 92,
                       scrollSnapAlign: "start",
                       background: selected ? ORANGE : isSunday || !available ? "#F1F2F6" : INK,
                       border: "none",
