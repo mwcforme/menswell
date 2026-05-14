@@ -6,6 +6,13 @@ import {
   TIMEZONE,
   type LocationKey,
 } from "@/lib/ghlCalendars";
+import {
+  addDaysInTimeZone,
+  dateFromYmdInTimeZone,
+  isSundayInTimeZone,
+  timeZoneOffsetMinutes,
+  ymdInTimeZone,
+} from "@/lib/etDate";
 import { supabase } from "@/integrations/supabase/client";
 import { useConfirmAppointment } from "@/domain/booking/useConfirmAppointment";
 
@@ -70,8 +77,7 @@ const ORANGE_SOFT = "#FFF1E6";  // tint of #E8670A, decorative bg only
 const HOUR_MIN = 8;   // 8 AM ET
 const HOUR_MAX = 18;  // exclusive — last slot is 5 PM (17:00)
 
-const ymd = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const ymd = (d: Date) => ymdInTimeZone(d, TIMEZONE);
 
 const startOfWeek = (d: Date) => {
   const x = new Date(d);
