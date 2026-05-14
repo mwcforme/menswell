@@ -324,27 +324,6 @@ const BookConfirmed = () => {
         </div>
       </div>
 
-      {/* Sticky mobile tap-to-call */}
-      <a
-        href={PHONE_TEL}
-        aria-label={`Call ${PHONE_DISPLAY}`}
-        className="md:hidden fixed inset-x-0 bottom-0 flex items-center justify-center gap-3 z-50"
-        style={{
-          background: "#E8670A",
-          color: "#FFFFFF",
-          fontFamily: "Inter, sans-serif",
-          fontWeight: 700,
-          fontSize: 22,
-          textDecoration: "none",
-          minHeight: 72,
-          padding: "16px 20px",
-          paddingBottom: "max(16px, env(safe-area-inset-bottom))",
-          boxShadow: "0 -4px 12px rgba(0,0,0,0.25)",
-        }}
-      >
-        <Phone size={24} strokeWidth={2.5} />
-        <span>CALL {PHONE_DISPLAY}</span>
-      </a>
     </BookLayout>
   );
 };
