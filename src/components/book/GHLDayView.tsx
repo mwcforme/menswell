@@ -6,6 +6,13 @@ import {
   TIMEZONE,
   type LocationKey,
 } from "@/lib/ghlCalendars";
+import {
+  addDaysInTimeZone,
+  dateFromYmdInTimeZone,
+  isSundayInTimeZone,
+  timeZoneOffsetMinutes,
+  ymdInTimeZone,
+} from "@/lib/etDate";
 import { supabase } from "@/integrations/supabase/client";
 import { useConfirmAppointment } from "@/domain/booking/useConfirmAppointment";
 
@@ -70,8 +77,7 @@ const ORANGE_SOFT = "#FFF1E6";  // tint of #E8670A, decorative bg only
 const HOUR_MIN = 8;   // 8 AM ET
 const HOUR_MAX = 18;  // exclusive — last slot is 5 PM (17:00)
 
-const ymd = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const ymd = (d: Date) => ymdInTimeZone(d, TIMEZONE);
 
 const startOfWeek = (d: Date) => {
   const x = new Date(d);
@@ -100,37 +106,13 @@ const fmtTimeParts = (iso: string) => {
 const fmtFullDay = (d: Date) =>
   d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
 
-// Returns the UTC offset (in minutes) of America/New_York for the given UTC instant.
-// e.g. -240 during EDT, -300 during EST. Browser-independent (uses numeric parts only).
-const etOffsetMinutes = (instant: Date): number => {
-  const get = (parts: Intl.DateTimeFormatPart[], type: string) =>
-    parseInt(parts.find((p) => p.type === type)!.value, 10);
-  const fmt = (tz: string) =>
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: tz,
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hour12: false,
-    }).formatToParts(instant);
-  const u = fmt("UTC");
-  const e = fmt(TIMEZONE);
-  const utcMs = Date.UTC(
-    get(u, "year"), get(u, "month") - 1, get(u, "day"),
-    get(u, "hour") % 24, get(u, "minute"),
-  );
-  const etMs = Date.UTC(
-    get(e, "year"), get(e, "month") - 1, get(e, "day"),
-    get(e, "hour") % 24, get(e, "minute"),
-  );
-  return Math.round((etMs - utcMs) / 60000);
-};
-
 // Build a Date for the given ET wall-clock time (YYYY-MM-DD + hour, minute=0).
 // Uses ET's offset on that calendar date so display is always 8 AM..5 PM ET.
 const etWallToDate = (ymdStr: string, hour: number): Date => {
   const [y, m, d] = ymdStr.split("-").map((n) => parseInt(n, 10));
   // Probe at noon UTC on that date to get a stable ET offset (avoids DST edge ambiguity).
   const probe = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
-  const offsetMin = etOffsetMinutes(probe); // e.g. -240
+  const offsetMin = timeZoneOffsetMinutes(probe, TIMEZONE); // e.g. -240
   // ET wall hour H corresponds to UTC = H - offsetMin (in minutes).
   const utcMs = Date.UTC(y, m - 1, d, hour, 0, 0) - offsetMin * 60_000;
   return new Date(utcMs);
@@ -161,13 +143,7 @@ const isTomorrowET = (day: Date): boolean => {
   return tom === ymd(day);
 };
 
-// Build a JS Date for ET midnight of the given YYYY-MM-DD string.
-const dateFromEtYmd = (s: string): Date => {
-  const [y, m, d] = s.split("-").map((n) => parseInt(n, 10));
-  const local = new Date(y, m - 1, d);
-  local.setHours(0, 0, 0, 0);
-  return local;
-};
+const dateFromEtYmd = (s: string): Date => dateFromYmdInTimeZone(s, TIMEZONE);
 
 // banned-wording-allow-next-line — GHL API endpoint name
 // Parse the GHL free-slots payload into a per-day map of ISO start times.
@@ -241,10 +217,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   // Visible window: 7 days from weekStart.
   const days = useMemo(() => {
     return Array.from({ length: 7 })
-      .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
+      .map((_, i) => addDaysInTimeZone(weekStart, i, TIMEZONE))
       .filter((d) => d >= today)
       // Hide closed days (Sunday) from the day strip; only show operating days.
-      .filter((d) => d.getDay() !== 0);
+      .filter((d) => !isSundayInTimeZone(d, TIMEZONE));
   }, [weekStart, today]);
 
   const [refreshNonce, setRefreshNonce] = useState(0);
@@ -253,8 +229,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     let cancelled = false;
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
+    const end = addDaysInTimeZone(weekStart, 7, TIMEZONE);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -379,7 +354,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
+            onClick={() => setWeekStart(addDaysInTimeZone(weekStart, -7, TIMEZONE))}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -395,7 +370,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <div style={{ flex: 1 }} />
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
+            onClick={() => setWeekStart(addDaysInTimeZone(weekStart, 7, TIMEZONE))}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -433,7 +408,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 const key = ymd(d);
                 const actualCount = slotsByDay[key]?.length || 0;
                 const count = actualCount;
-                const isSunday = d.getDay() === 0;
+                const isSunday = isSundayInTimeZone(d, TIMEZONE);
                 const available = actualCount > 0 && !isSunday;
                 const selected = selectedDay === key;
                 const isToday = isTodayET(d);
