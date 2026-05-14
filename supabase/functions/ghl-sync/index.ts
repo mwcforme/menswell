@@ -25,18 +25,18 @@ function loadEnvs(): Env[] {
       name: "prod",
       apiKey: Deno.env.get("GHL_API_KEY"),
       centers: [
-        { key: "richmond",        calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
-        { key: "virginia-beach",  calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
-        { key: "newport-news",    calendarId: "lBaRbjUpEmesxEloFBME" },
+        { key: "richmond", calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
+        { key: "virginia-beach", calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
+        { key: "newport-news", calendarId: "lBaRbjUpEmesxEloFBME" },
       ],
     },
     {
       name: "stage",
-      apiKey: Deno.env.get("GHL_API_KEY_STAGE_1") ?? Deno.env.get("GHL_API_KEY_STAGE"),
+      apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
       centers: [
-        { key: "richmond",        calendarId: "CpcOAez2bv3tQTvTdRkO" },
-        { key: "virginia-beach",  calendarId: "r1lBpjVKT05qyfH2hcwv" },
-        { key: "newport-news",    calendarId: "6cSOOYintvb8y0B42uTc" },
+        { key: "richmond", calendarId: "CpcOAez2bv3tQTvTdRkO" },
+        { key: "virginia-beach", calendarId: "r1IBpjVKT05qyfH2hcwv" },
+        { key: "newport-news", calendarId: "6cSOOYintvb8y0B42uTc" },
       ],
     },
   ];
@@ -123,10 +123,7 @@ async function runSync(supabase: any, runId: string) {
           };
         });
 
-        await supabase
-          .from("ghl_free_slots")
-          .delete()
-          .eq("calendar_id", c.calendarId);
+        await supabase.from("ghl_free_slots").delete().eq("calendar_id", c.calendarId);
 
         if (rows.length) {
           for (let i = 0; i < rows.length; i += 500) {
