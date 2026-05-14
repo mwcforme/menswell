@@ -162,7 +162,7 @@ Deno.serve(async (req) => {
     if (k === "locationId") continue; // server-injected only
     search.set(k, String(v));
   }
-  if (method === "GET" && !search.has("locationId")) search.set("locationId", locationId);
+  if (method === "GET" && payload.injectLocationId !== false && !search.has("locationId")) search.set("locationId", locationId);
 
   const url = `${API_BASE}${cleanPath}${search.toString() ? `?${search}` : ""}`;
 
