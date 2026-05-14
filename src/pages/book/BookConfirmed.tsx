@@ -1,6 +1,6 @@
 import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
-import { useBookingSync } from "@/lib/bookingState";
+import { useBookingStore } from "@/domain/booking/bookingStore";
 
 const EXPECT_VIDEO_SRC = "/videos/what-to-expect.mp4";
 
@@ -71,14 +71,16 @@ const formatAppointment = (raw?: string): string => {
 };
 
 const BookConfirmed = () => {
-  const state = useBookingSync();
-  const apptTime = formatAppointment(state.appointmentTime);
-  const center = (state.location && CENTERS[state.location]) || DEFAULT_CENTER;
+  const appointmentTime = useBookingStore((s) => s.appointmentTime);
+  const location = useBookingStore((s) => s.location);
+  const identity = useBookingStore((s) => s.identity);
+  const apptTime = formatAppointment(appointmentTime);
+  const center = (location && CENTERS[location]) || DEFAULT_CENTER;
   const fullAddress = `${center.centerName}, ${center.street}, ${center.cityStateZip}`;
   const mapsQuery = encodeURIComponent(fullAddress);
   const PHONE_DISPLAY = center.phoneDisplay;
   const PHONE_TEL = center.phoneTel;
-  const fullName = state.name || "";
+  const fullName = [identity?.firstName, identity?.lastName].filter(Boolean).join(" ");
 
 
   return (

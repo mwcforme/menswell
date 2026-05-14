@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import GHLDayView from "@/components/book/GHLDayView";
-import { useBookingSync, updateBookingState, toQueryString } from "@/lib/bookingState";
+import { useBookingStore } from "@/domain/booking/bookingStore";
 import { CENTER_CALENDARS, type LocationKey } from "@/lib/ghlCalendars";
 
 const LOCATION_LABEL: Record<string, string> = {
@@ -11,48 +11,49 @@ const LOCATION_LABEL: Record<string, string> = {
   "newport-news": "Newport News clinic",
 };
 
-// First name only, URL-decoded. React text-node escaping handles XSS.
-const firstNameOnly = (name?: string): string => {
-  if (!name) return "";
-  try {
-    const decoded = decodeURIComponent(name);
-    return decoded.trim().split(/\s+/)[0] || "";
-  } catch {
-    return name.trim().split(/\s+/)[0] || "";
-  }
-};
-
 const BookSchedule = () => {
   const navigate = useNavigate();
-  const state = useBookingSync();
+  const identity = useBookingStore((s) => s.identity);
+  const location = useBookingStore((s) => s.location);
+  const symptom = useBookingStore((s) => s.symptom);
+  const note = useBookingStore((s) => s.note);
+  const duration = useBookingStore((s) => s.duration);
+  const urgencyTier = useBookingStore((s) => s.urgencyTier);
+  const service = useBookingStore((s) => s.service);
+  const lpSlug = useBookingStore((s) => s.lpSlug);
+  const source = useBookingStore((s) => s.source);
+  const setLocation = useBookingStore((s) => s.setLocation);
+  const setAppointmentTime = useBookingStore((s) => s.setAppointmentTime);
 
-  const [firstName = "", ...lastParts] = (state.name || "").trim().split(/\s+/);
-  const lastName = lastParts.join(" ");
-  const personalFirstName = firstNameOnly(state.name);
+  const firstName = identity?.firstName || "";
+  const lastName = identity?.lastName || "";
 
-  const heading = personalFirstName
-    ? `${personalFirstName}, pick a time.`
-    : `Pick a time.`;
+  const heading = firstName ? `${firstName}, pick a time.` : `Pick a time.`;
 
-  const goBack = () => {
-    const qs = toQueryString(state);
-    navigate(`/book/duration${qs ? `?${qs}` : ""}`);
-  };
-
-  const locationLine = state.location ? LOCATION_LABEL[state.location] : null;
+  const locationLine = location ? LOCATION_LABEL[location] : null;
   const metaLine = [locationLine, "60-min consult", "No charge today"]
     .filter(Boolean)
     .join(" · ");
+
+  // Structured PHI for the GHL contact custom fields.
+  // PHI: never include in URL or appointment notes — see ghl-proxy validator.
+  const customFields = {
+    ...(symptom ? { mwc_symptom: symptom } : {}),
+    ...(duration ? { mwc_symptom_duration: duration } : {}),
+    ...(urgencyTier ? { mwc_urgency_tier: urgencyTier } : {}),
+    ...(note ? { mwc_clinical_note: note.slice(0, 500) } : {}),
+    ...(service ? { mwc_funnel_service: service } : {}),
+    ...(lpSlug ? { mwc_lp_slug: lpSlug } : {}),
+  };
 
   return (
     <BookLayout page="schedule" title="Pick your consult time | Men's Wellness Centers">
       <div className="px-3 md:px-6 py-2 md:py-8 space-y-2 md:space-y-6 pb-12">
 
-        {/* Compact mobile header: Back + progress in one row */}
         <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
           <button
             type="button"
-            onClick={goBack}
+            onClick={() => navigate("/book/duration")}
             className="flex items-center gap-1"
             style={{
               background: "transparent", border: 0, color: "#FFFFFF",
@@ -79,7 +80,6 @@ const BookSchedule = () => {
               />
             ))}
           </div>
-          {/* Desktop-only step label */}
           <div
             className="hidden md:block text-center mt-3"
             style={{
@@ -95,11 +95,7 @@ const BookSchedule = () => {
           </div>
         </div>
 
-        {/* Headline + meta line (replaces hero + chips) */}
-        <section
-          className="mx-auto text-center"
-          style={{ maxWidth: 720, color: "#FFFFFF" }}
-        >
+        <section className="mx-auto text-center" style={{ maxWidth: 720, color: "#FFFFFF" }}>
           <h1
             style={{
               fontFamily: "Inter, sans-serif",
@@ -128,26 +124,20 @@ const BookSchedule = () => {
           </p>
         </section>
 
-        {/* CALENDAR or location picker */}
         <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
-          {state.location && state.location in CENTER_CALENDARS ? (
+          {location && location in CENTER_CALENDARS ? (
             <GHLDayView
-              location={state.location as LocationKey}
+              location={location as LocationKey}
               firstName={firstName}
               lastName={lastName}
-              email={state.email}
-              phone={state.phone}
-              source={state.source || "mwc-book-funnel"}
-              urgencyTier={state.urgencyTier}
-              notes={[
-                state.symptom && `Concern: ${state.symptom}`,
-                state.duration && `Duration: ${state.duration}`,
-                state.urgencyTier && `Urgency: ${state.urgencyTier}`,
-                state.note,
-              ].filter(Boolean).join(" | ")}
+              email={identity?.email}
+              phone={identity?.phone}
+              source={source || "mwc-book-funnel"}
+              urgencyTier={urgencyTier}
+              customFields={customFields}
               onBooked={(slotIso) => {
-                const next = updateBookingState({ appointmentTime: slotIso });
-                navigate(`/book/confirmed?${toQueryString(next)}`);
+                setAppointmentTime(slotIso);
+                navigate("/book/confirmed");
               }}
             />
           ) : (
@@ -160,7 +150,7 @@ const BookSchedule = () => {
                   <button
                     key={c.key}
                     type="button"
-                    onClick={() => updateBookingState({ location: c.key })}
+                    onClick={() => setLocation(c.key)}
                     style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid #D1D5DB", background: "#FFFFFF", color: "#0B1029", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer" }}
                   >
                     {c.label}
@@ -171,8 +161,6 @@ const BookSchedule = () => {
           )}
         </section>
 
-        {/* Desktop-only quiet support row; mobile relies on the floating
-            phone button in the page header. */}
         <div
           className="hidden md:block mx-auto text-center"
           style={{ maxWidth: 720, color: "#FFFFFF", opacity: 0.85, fontSize: 13, fontFamily: "Inter, sans-serif" }}
