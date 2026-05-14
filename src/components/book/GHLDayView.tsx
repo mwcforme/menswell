@@ -221,9 +221,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const cal = CENTER_CALENDARS[location];
 
-  // Visible window: 4 days from weekStart.
+  // Visible window: 7 days from weekStart.
   const days = useMemo(() => {
-    return Array.from({ length: 4 })
+    return Array.from({ length: 7 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
