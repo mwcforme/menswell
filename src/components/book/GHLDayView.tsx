@@ -704,8 +704,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             }}
           >
             {canConfirm && selectedSlot
-              ? `Confirm ${fmtTimeParts(selectedSlot).time} ${fmtTimeParts(selectedSlot).ampm}`
-              : "Select a time to continue"}
+              ? (() => {
+                  const day = new Date(selectedSlot);
+                  const dayLabel = day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
+                  const { time, ampm } = fmtTimeParts(selectedSlot);
+                  return `Confirm ${dayLabel} · ${time} ${ampm} →`;
+                })()
+              : "Tap a time above to continue"}
           </button>
         </div>
       </div>
