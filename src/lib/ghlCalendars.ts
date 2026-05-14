@@ -19,7 +19,7 @@ const PROD_CALENDARS: Record<LocationKey, CenterCalendar> = {
 // Stage calendars (sandbox GHL location CKDRQ73SXifxYOqPLLq0).
 const STAGE_CALENDARS: Record<LocationKey, CenterCalendar> = {
   richmond: { key: "richmond", label: "Richmond", calendarId: "CpcOAez2bv3tQTvTdRkO" },
-  "virginia-beach": { key: "virginia-beach", label: "Virginia Beach", calendarId: "r1lBpjVKT05qyfH2hcwv" },
+  "virginia-beach": { key: "virginia-beach", label: "Virginia Beach", calendarId: "r1IBpjVKT05qyfH2hcwv" },
   "newport-news": { key: "newport-news", label: "Newport News", calendarId: "6cSOOYintvb8y0B42uTc" },
 };
 
