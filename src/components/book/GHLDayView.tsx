@@ -483,11 +483,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         ? `Only ${count} left`
                         : `${count} slots`
                   : "···";
-                const badgeColor = isSunday || !available
-                  ? MUTED
-                  : scarce
-                    ? "#FFB37A" // warm amber that reads on the dark navy card
-                    : "rgba(255,255,255,0.85)";
+                const badgeColor = selected
+                  ? "rgba(255,255,255,0.85)"
+                  : isSunday || !available
+                    ? MUTED
+                    : scarce
+                      ? "#FFB37A"
+                      : "rgba(255,255,255,0.85)";
                 return (
                   <button
                     key={key}
@@ -500,19 +502,19 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       flex: "1 1 0",
                       minWidth: 0,
                       scrollSnapAlign: "start",
-                      background: isSunday || !available ? "#F1F2F6" : INK,
-                      border: `2px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
+                      background: selected ? ORANGE : isSunday || !available ? "#F1F2F6" : INK,
+                      border: "none",
                       borderRadius: 12,
                       padding: "8px 4px 10px",
-                      color: isSunday || !available ? MUTED : "#FFFFFF",
+                      color: selected ? "#FFFFFF" : isSunday || !available ? MUTED : "#FFFFFF",
                       cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
-                      transition: "border-color 120ms ease",
+                      transition: "background-color 120ms ease",
                       position: "relative",
-                      opacity: !available ? 0.55 : 1,
+                      opacity: !available && !selected ? 0.55 : 1,
                     }}
                   >
-                    {/* Single visual cue for selection: orange border only */}
+                    {/* iOS-style: filled accent is the single selection cue */}
                     {/* TODAY / TOMORROW pill */}
                     {(isToday || isTomorrow) && (
                       <div
@@ -525,15 +527,15 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                           display: "inline-block",
                           marginBottom: 4,
                           maxWidth: "100%",
-                          background: isToday ? ORANGE : "transparent",
+                          background: isToday && !selected ? ORANGE : "transparent",
                           color: "#FFFFFF",
-                          border: isTomorrow ? `1px solid rgba(255,255,255,0.7)` : "none",
+                          border: isTomorrow && !selected ? `1px solid rgba(255,255,255,0.7)` : "none",
                         }}
                       >
                         {isToday ? "TODAY" : "TMRW"}
                       </div>
                     )}
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
                       {fmtDayShort(d)}
                     </div>
                     <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
