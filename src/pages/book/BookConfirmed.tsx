@@ -1,42 +1,55 @@
-import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink } from "lucide-react";
+import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingSync } from "@/lib/bookingState";
 
 const EXPECT_VIDEO_SRC = "/videos/what-to-expect.mp4";
 
 type CenterInfo = {
+  city: string;
   centerName: string;
   street: string;
   cityStateZip: string;
+  proximity: string;
+  hours: string;
   phoneDisplay: string;
   phoneTel: string;
 };
 
 const CENTERS: Record<string, CenterInfo> = {
   "newport-news": {
+    city: "Newport News",
     centerName: "Men's Wellness Centers, Newport News",
     street: "827 Diligence Drive, Suite 206",
     cityStateZip: "Newport News, VA 23606",
+    proximity: "2 min from I-64",
+    hours: "Mon-Sat 9:00 AM - 5:00 PM",
     phoneDisplay: "(757) 806-6263",
     phoneTel: "tel:7578066263",
   },
   "virginia-beach": {
+    city: "Virginia Beach",
     centerName: "Men's Wellness Centers, Virginia Beach",
     street: "996 First Colonial Road",
     cityStateZip: "Virginia Beach, VA 23454",
+    proximity: "3 min from I-264",
+    hours: "Mon-Sat 9:00 AM - 5:00 PM",
     phoneDisplay: "(757) 806-6263",
     phoneTel: "tel:7578066263",
   },
   "richmond": {
+    city: "Glen Allen",
     centerName: "Men's Wellness Centers, Richmond",
     street: "4050 Innslake Dr, Suite 360",
     cityStateZip: "Glen Allen, VA 23060",
+    proximity: "5 min from I-64",
+    hours: "Mon-Sat 9:00 AM - 5:00 PM",
     phoneDisplay: "(804) 346-4636",
     phoneTel: "tel:8043464636",
   },
 };
 
 const DEFAULT_CENTER = CENTERS["newport-news"];
+
 
 const formatAppointment = (raw?: string): string => {
   if (!raw) return "Time to be confirmed";
@@ -131,80 +144,107 @@ const BookConfirmed = () => {
           {/* Two-column grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
 
-            {/* Address Card */}
+            {/* Location Tile */}
             <div
-              className="relative flex flex-col justify-between overflow-hidden"
+              className="relative flex flex-col overflow-hidden"
               style={{
                 background: "#FFFFFF",
                 borderRadius: 14,
                 padding: "32px 28px",
+                border: "1px solid rgba(11,16,41,0.10)",
                 boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
               }}
             >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "#E8670A" }} />
+              <h2
+                style={{
+                  fontFamily: "Oswald, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "clamp(26px, 3vw, 34px)",
+                  color: "#0B1029",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.02em",
+                  lineHeight: 1.05,
+                  marginBottom: 8,
+                }}
+              >
+                {center.city}
+              </h2>
+              <p
+                style={{
+                  color: "#5B6478",
+                  fontSize: 15,
+                  fontWeight: 500,
+                  marginBottom: 18,
+                }}
+              >
+                {center.centerName}
+              </p>
 
-              <div>
-                <h2
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <MapPin size={18} strokeWidth={2.5} style={{ color: "#E8670A", flexShrink: 0, marginTop: 2 }} />
+                  <span
+                    style={{
+                      color: "#E8670A",
+                      fontWeight: 700,
+                      fontSize: 14,
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {center.proximity}
+                  </span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <MapPin size={18} strokeWidth={2.5} style={{ color: "#E8670A", flexShrink: 0, marginTop: 3 }} />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "#0B1029",
+                      fontWeight: 600,
+                      fontSize: 16,
+                      lineHeight: 1.4,
+                      textDecoration: "underline",
+                      textUnderlineOffset: 3,
+                    }}
+                  >
+                    {center.street}<br />
+                    {center.cityStateZip}
+                  </a>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Clock size={18} strokeWidth={2.5} style={{ color: "#E8670A", flexShrink: 0, marginTop: 3 }} />
+                  <span style={{ color: "#0B1029", fontSize: 16, fontWeight: 500 }}>
+                    {center.hours}
+                  </span>
+                </div>
+                <div
+                  className="inline-flex items-center gap-1.5 self-start mt-1"
                   style={{
-                    fontFamily: "Oswald, sans-serif",
-                    fontWeight: 600,
-                    fontSize: "clamp(20px, 2.4vw, 26px)",
-                    color: "#0B1029",
+                    background: "rgba(34,197,94,0.10)",
+                    border: "1px solid rgba(34,197,94,0.35)",
+                    color: "#0F7A3A",
+                    padding: "4px 10px",
+                    borderRadius: 999,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: "0.12em",
                     textTransform: "uppercase",
-                    letterSpacing: "0.02em",
-                    marginBottom: 20,
                   }}
                 >
-                  Center Location
-                </h2>
-                <div className="flex items-start gap-4">
-                  <MapPin size={26} strokeWidth={2.25} style={{ color: "#E8670A", flexShrink: 0, marginTop: 4 }} />
-                  <div>
-                    <p
-                      className="text-lg md:text-xl"
-                      style={{
-                        color: "#0B1029",
-                        fontWeight: 600,
-                        lineHeight: 1.25,
-                        marginBottom: 4,
-                      }}
-                    >
-                      {center.centerName}
-                    </p>
-                    <p
-                      className="text-base md:text-lg"
-                      style={{ color: "#3A4258", lineHeight: 1.5, fontWeight: 500 }}
-                    >
-                      {center.street}<br />
-                      {center.cityStateZip}
-                    </p>
-                    <div
-                      className="inline-flex items-center gap-1.5 mt-3"
-                      style={{
-                        background: "rgba(34,197,94,0.10)",
-                        border: "1px solid rgba(34,197,94,0.35)",
-                        color: "#0F7A3A",
-                        padding: "4px 10px",
-                        borderRadius: 999,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      <FlaskConical size={12} strokeWidth={2.5} />
-                      Same-Day Labs On Site
-                    </div>
-                  </div>
+                  <FlaskConical size={12} strokeWidth={2.5} />
+                  Same-Day Labs On Site
                 </div>
               </div>
 
               <div
-                className="relative mt-8 w-full overflow-hidden"
+                className="relative mt-6 w-full overflow-hidden"
                 style={{
                   borderRadius: 12,
                   border: "1px solid rgba(11,16,41,0.12)",
-                  height: 280,
+                  height: 260,
                 }}
               >
                 <iframe
@@ -248,8 +288,6 @@ const BookConfirmed = () => {
                 boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
               }}
             >
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "#0B1029", zIndex: 2 }} />
-
               <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", background: "#000" }}>
                 <video
                   src={EXPECT_VIDEO_SRC}
