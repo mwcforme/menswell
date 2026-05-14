@@ -39,7 +39,11 @@ export default function AdminLeads() {
         .select("id,created_at,name,email,phone,service,location,source,crm_status,crm_error,page_url")
         .order("created_at", { ascending: false })
         .limit(500);
-      if (filter !== "all") query = query.eq("crm_status", filter);
+      if (filter === "other") {
+        query = query.not("crm_status", "in", "(ok,pending,failed)");
+      } else if (filter !== "all") {
+        query = query.eq("crm_status", filter);
+      }
       const { data, error } = await query;
       if (cancelled) return;
       if (error) { setError(error.message); return; }
@@ -88,6 +92,7 @@ export default function AdminLeads() {
           <option value="ok">OK</option>
           <option value="pending">Pending</option>
           <option value="failed">Failed</option>
+          <option value="other">Other</option>
         </select>
         <button
           type="button"

@@ -10,10 +10,9 @@ interface Props {
 
 /**
  * Route guard for /admin/*.
- * - Sets up an auth state listener BEFORE checking the current session.
- * - Bounces unauthenticated users to /admin/login.
- * - Bounces authenticated-but-not-allowlisted users to /admin/login with an
- *   `?error=forbidden` flag so the login screen can explain the rejection.
+ * onAuthStateChange fires immediately with the current session, so a single
+ * subscription is enough — no need to also call getSession() (which raced
+ * setState and caused a brief loader flash on sign-out).
  *
  * NOTE: this is a client-side gate for UX. The DB-side gate
  * (current_user_is_admin + RLS policies) is what actually enforces access.
@@ -23,9 +22,7 @@ export function RequireAdmin({ children }: Props) {
   const [state, setState] = useState<"loading" | "ok">("loading");
 
   useEffect(() => {
-    let active = true;
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!active) return;
       if (!session) {
         nav("/admin", { replace: true });
         return;
@@ -36,22 +33,7 @@ export function RequireAdmin({ children }: Props) {
       }
       setState("ok");
     });
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!active) return;
-      if (!session) {
-        nav("/admin", { replace: true });
-        return;
-      }
-      if (!isAdminEmail(session.user.email)) {
-        nav("/admin?error=forbidden", { replace: true });
-        return;
-      }
-      setState("ok");
-    });
-    return () => {
-      active = false;
-      sub.subscription.unsubscribe();
-    };
+    return () => sub.subscription.unsubscribe();
   }, [nav]);
 
   if (state === "loading") {
