@@ -43,11 +43,12 @@ function readOverride(): "prod" | "stage" | null {
 }
 
 function detect(): "prod" | "stage" {
-  if (typeof window === "undefined") return "stage";
+  if (typeof window === "undefined") return "prod";
   const override = readOverride();
   if (override) return override;
-  const host = window.location.hostname.toLowerCase();
-  return PROD_HOSTS.has(host) ? "prod" : "stage";
+  // Default everywhere to prod so the preview shows real GHL availability.
+  // Append `?env=stage` to any URL to flip back to the sandbox location.
+  return "prod";
 }
 
 export const APP_ENV: "prod" | "stage" = detect();
