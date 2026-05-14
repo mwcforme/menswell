@@ -92,15 +92,10 @@ export const TRTFooter = () => {
 
         {/* Bottom bar */}
         <div
-          className="mt-8 pt-6 border-t flex flex-col md:flex-row items-center justify-between gap-3 text-xs uppercase"
+          className="mt-8 pt-6 border-t text-xs uppercase text-center"
           style={{ borderColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)", letterSpacing: "0.12em" }}
         >
-          <div>© {year} Men's Wellness Centers. All rights reserved.</div>
-          <div className="flex gap-6">
-            <Link to="/prescribing-policy" className="hover:text-white transition-colors">Safety</Link>
-            <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms</Link>
-            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy</Link>
-          </div>
+          © {year} Men's Wellness Centers. All rights reserved.
         </div>
       </div>
     </footer>
