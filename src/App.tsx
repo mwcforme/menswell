@@ -23,6 +23,7 @@ import TermsOfService from "./pages/legal/TermsOfService";
 import TcpaDisclosure from "./pages/legal/TcpaDisclosure";
 import PrescribingPolicy from "./pages/legal/PrescribingPolicy";
 import { MobileFooterBar } from "./components/shared/MobileFooterBar";
+import { EnvBadge } from "./components/shared/EnvBadge";
 import { SentryTestTrigger } from "./components/SentryTestTrigger";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -115,6 +116,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
             <MobileFooterBar />
+            <EnvBadge />
             <SentryTestTrigger />
           </ServicesProvider>
         </BrowserRouter>
