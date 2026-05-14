@@ -105,20 +105,25 @@ const BookConfirmed = () => {
             >
               Appointment Confirmed
             </h1>
-            <div
-              className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-base md:text-lg"
-              style={{ color: "rgba(255,255,255,0.55)" }}
-            >
-              {firstName && (
-                <>
-                  <span style={{ color: "#FFFFFF", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.02em" }}>
-                    {firstName}
-                  </span>
-                  <span style={{ opacity: 0.3 }}>|</span>
-                </>
+            <div className="flex flex-col items-center gap-1.5">
+              {fullName && (
+                <span
+                  className="text-base md:text-lg"
+                  style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif", fontWeight: 600 }}
+                >
+                  {fullName}
+                </span>
               )}
-              <span>
-                <span style={{ color: "#FFFFFF", fontWeight: 600 }}>{apptTime}</span>
+              <span
+                className="text-lg md:text-xl"
+                style={{
+                  fontFamily: "Oswald, sans-serif",
+                  fontWeight: 500,
+                  letterSpacing: "0.02em",
+                  color: "rgba(255,255,255,0.85)",
+                }}
+              >
+                {apptTime}
               </span>
             </div>
           </div>
