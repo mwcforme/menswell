@@ -536,17 +536,18 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                         style={{
                           fontSize: 9,
                           fontWeight: 800,
-                          letterSpacing: "0.08em",
-                          padding: "2px 6px",
+                          letterSpacing: "0.04em",
+                          padding: "1px 4px",
                           borderRadius: 999,
                           display: "inline-block",
                           marginBottom: 4,
+                          maxWidth: "100%",
                           background: isToday ? ORANGE : "transparent",
                           color: isToday ? "#FFFFFF" : selected ? ORANGE : "#FFFFFF",
                           border: isTomorrow ? `1px solid ${selected ? ORANGE : "rgba(255,255,255,0.7)"}` : "none",
                         }}
                       >
-                        {isToday ? "TODAY" : "TOMORROW"}
+                        {isToday ? "TODAY" : "TMRW"}
                       </div>
                     )}
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? INK_SOFT : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
