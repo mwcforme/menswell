@@ -69,9 +69,9 @@ const BookConfirmed = () => {
 
 
   return (
-    <BookLayout page="confirmed" title="You're booked | Men's Wellness Centers">
+    <BookLayout page="confirmed" variant="confirmation" title="You're booked | Men's Wellness Centers">
       <div
-        className="px-4 md:px-8 py-6 md:py-10 pb-28 md:pb-12"
+        className="px-4 md:px-8 py-6 md:py-10 pb-12"
         style={{ background: "#000814" }}
       >
         <div className="mx-auto flex flex-col gap-8 md:gap-10" style={{ maxWidth: 1100, fontFamily: "Inter, sans-serif" }}>
