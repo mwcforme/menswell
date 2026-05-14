@@ -517,16 +517,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       opacity: !available && !selected ? 0.55 : 1,
                     }}
                   >
-                    {/* Selected dot */}
-                    {selected && (
-                      <div
-                        aria-hidden
-                        style={{
-                          position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)",
-                          width: 6, height: 6, borderRadius: 999, background: ORANGE,
-                        }}
-                      />
-                    )}
+                    {/* Selection signaled by orange border + TODAY/TMRW pill — no extra dot */}
                     {/* TODAY / TOMORROW pill */}
                     {(isToday || isTomorrow) && (
                       <div
