@@ -190,7 +190,7 @@ const AccordionDay = memo(function AccordionDay({
           justifyContent: "space-between",
           cursor: disabled ? "not-allowed" : "pointer",
           textAlign: "left",
-          opacity: disabled ? 0.7 : 1,
+          opacity: 1,
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
