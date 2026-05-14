@@ -356,7 +356,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
         {/* RECOMMENDED EARLIEST SLOTS (urgency-driven) */}
         {showRecommended && recommendedSlots.length > 0 && (
-          <div className="px-5 md:px-7 pt-5">
+          <div className="hidden md:block px-5 md:px-7 pt-5">
             <div
               style={{
                 background: ORANGE_SOFT,
