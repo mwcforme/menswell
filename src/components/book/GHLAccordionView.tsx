@@ -199,7 +199,7 @@ const AccordionDay = memo(function AccordionDay({
               style={{
                 display: "inline-block",
                 alignSelf: "flex-start",
-                background: isExpanded ? "rgba(255,255,255,0.2)" : ORANGE,
+                background: isExpanded ? INK : ORANGE,
                 color: "#FFFFFF",
                 fontSize: 10,
                 fontWeight: 800,
