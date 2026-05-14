@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Lock, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
 import { heroLeadSchema, type HeroLeadInput } from "@/domain/leads/leadFormSchema";
-import { getBookingState, toQueryString } from "@/lib/bookingState";
+import { enterBookingFunnel } from "@/domain/booking/bookingEntry";
 import { COPY } from "@/data/copy";
 
 const formatPhone = (v: string) => {
@@ -33,6 +34,7 @@ export const TRTHeroForm = ({
   const [location, setLocation] = useState("");
   const [tcpa, setTcpa] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const controller = useLeadSubmitController<HeroLeadInput>({
     schema: heroLeadSchema,
@@ -46,14 +48,27 @@ export const TRTHeroForm = ({
         phone: v.phone,
       };
     },
-    onSuccess: (_r, v) => {
-      // Persist service tag and route to symptom step with full state in URL.
-      const merged = getBookingState();
-      const qs = toQueryString({ ...merged, location: v.location, service });
-      // Use replace-style nav via window so back-button doesn't trap on the LP form.
-      window.location.assign(`/book/symptom?${qs}`);
+    onSuccess: (result, v) => {
+      // Hand off to the booking funnel via the in-memory store.
+      // PHI: never include identity in URL — see BookingRouteGuard.
+      const [first, ...rest] = v.name.trim().split(/\s+/);
+      enterBookingFunnel(
+        {
+          identity: {
+            firstName: first || "Guest",
+            lastName: rest.join(" ") || undefined,
+            email: v.email,
+            phone: v.phone,
+            ghlContactId: result.contactId,
+          },
+          service,
+          location: v.location,
+          source: "landing-page-hero",
+          lpSlug: typeof window !== "undefined" ? window.location.pathname : undefined,
+        },
+        navigate,
+      );
     },
-    // Hero form shows inline errors only. Keep the legacy "no toast" behavior.
     toastOnError: false,
   });
 
