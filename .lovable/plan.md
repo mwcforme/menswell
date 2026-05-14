@@ -1,33 +1,37 @@
-## Goal
-Show a small floating "ENV: STAGE" badge on funnels and landing pages whenever the app is not running against prod GHL, and let it open the existing env switcher.
+# Fix "Failed to send a request to the Edge Function" on Admin → Sync
 
-## Scope
-Visible on: `/`, `/wl`, `/ed`, `/quiz/*`, `/book/*`, and any `/lp/*`.
-Hidden on: `/admin/*` (admin already has `EnvSwitcher` in the layout), legal pages, 404.
+## Diagnosis
 
-## Behavior
-- Render only when `APP_ENV !== "prod"` OR `localStorage.mwc_env_override` is set (so an admin who forced `?env=stage` on the prod domain also sees it).
-- Fixed-position pill, bottom-left on desktop, above the `MobileFooterBar` (56px) on mobile so it never overlaps existing CTAs.
-- Click opens a small popover containing the same three actions as the admin `EnvSwitcher` (Stage / Prod / Auto), reusing its logic. Reload on selection (matches existing behavior).
-- Color: amber/emerald pill for stage, red for prod-on-non-prod-host (manual override). Uses inline styles consistent with funnel chrome (no new tokens).
-- Non-blocking: `pointer-events-auto` on the pill itself, `aria-label="Environment switcher"`.
+`AdminSync.tsx` calls `supabase.functions.invoke("ghl-sync")` and awaits the response. The edge-function logs show the function boots but never logs completion, and the browser surfaces "Failed to send a request to the Edge Function" — classic symptom of the client closing the connection before the function returns.
 
-## Files
-- New `src/components/shared/EnvBadge.tsx` — floating pill + popover. Internally calls the same `setEnv` logic (extract to a tiny shared helper).
-- New `src/lib/envOverride.ts` — exports `setEnvOverride(next)` and `hasEnvOverride()` so both `EnvBadge` and `admin/EnvSwitcher` share one source of truth.
-- Edit `src/components/admin/EnvSwitcher.tsx` — use the shared helper (no behavior change).
-- Edit `src/App.tsx` — mount `<EnvBadge />` next to `<MobileFooterBar />`. The badge component itself decides visibility based on route prefix + env, so App.tsx stays clean.
+`ghl-sync` walks 6 calendars (3 prod + 3 stage) sequentially via the GHL API plus chunked Supabase upserts. From a browser invoke, that easily exceeds the gateway wait window, even though the cron-triggered run from the database succeeds (rows show `ok` in the table).
 
-## Route allowlist (inside EnvBadge)
-```
-const ALLOWED_PREFIXES = ["/", "/wl", "/ed", "/quiz", "/book", "/lp"];
-// match exact "/" or startsWith "<prefix>/" / "<prefix>"
-// explicitly skip "/admin"
-```
+The work itself is fine — only the "wait for full result" pattern from the admin UI is wrong.
 
-## Acceptance
-- On `menswell.lovable.app/` a small "ENV: STAGE" pill is visible bottom-left.
-- Clicking it opens a popover with Stage / Prod / Auto; choosing one reloads and updates the pill.
-- On `book.menswellnesscenters.com/` (prod, no override) the badge does not render.
-- On `/admin/*` the badge does not render (existing admin switcher remains).
-- No layout shift; pill sits above mobile footer bar.
+## Fix
+
+Make manual triggers fire-and-forget:
+
+1. **`supabase/functions/ghl-sync/index.ts`**
+   - Insert the `ghl_sync_runs` row (status `running`) synchronously so the UI sees it immediately.
+   - Move the per-env / per-center sync loop into an async function and schedule it with `EdgeRuntime.waitUntil(...)` (Deno Deploy / Supabase Edge supports this for background work after the response is returned).
+   - Return `202 { ok: true, run_id, status: "running" }` right away.
+   - The existing finalization (update row to `ok` / `error`) stays inside the background task. The hourly cron path is unaffected — it doesn't care whether we await.
+
+2. **`src/pages/admin/AdminSync.tsx`**
+   - After `invoke("ghl-sync")` returns, immediately call `load()` (already done) and start the existing 30s poll loop until no row is `running`.
+   - Treat HTTP 202 as success; only show the red error banner on a real `error` from `invoke`.
+   - Optional small touch: disable the button for a few seconds after click to prevent double-fire.
+
+## Acceptance criteria
+
+- Clicking "Run sync now" on `/admin/sync` returns within ~1s with no error banner.
+- A new row appears in the table with status `running`, then flips to `ok` (and slot count) within ~30–60s via the auto-poll.
+- The hourly cron job continues to populate `ghl_sync_runs` exactly as before.
+- `ghl-sync-validate` button is unchanged (it's already fast).
+
+## Out of scope
+
+- No schema changes.
+- No change to GHL credentials, calendars, or env routing.
+- No change to the `EnvBadge` / `EnvSwitcher` work from the previous turns.
