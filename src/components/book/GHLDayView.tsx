@@ -235,7 +235,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 4); end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
