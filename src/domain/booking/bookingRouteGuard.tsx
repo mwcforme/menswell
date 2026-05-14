@@ -34,7 +34,6 @@ const lpFor = (service?: string): string => {
 
 export const BookingRouteGuard = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const identity = useBookingStore((s) => s.identity);
   const symptom = useBookingStore((s) => s.symptom);
   const service = useBookingStore((s) => s.service);
@@ -60,7 +59,7 @@ export const BookingRouteGuard = () => {
 
   // No identity → must re-enter through the LP hero form.
   if (!isPublic && !identity) {
-    return <Navigate to={lpFor({ service, fallback: "/" })} replace />;
+    return <Navigate to={lpFor(service)} replace />;
   }
 
   // Step prerequisites: any step past /book/symptom requires a symptom choice.
@@ -75,10 +74,6 @@ export const BookingRouteGuard = () => {
   // Note: we deliberately do NOT block /book/confirmed when appointmentTime
   // is missing — once a user has booked we want them to land on the page even
   // if the store is partially populated by a slow round-trip.
-
-  // Suppress unused warning: navigate is reserved for future imperative
-  // redirects (e.g. session timeout) — keep the hook so it's stable.
-  void navigate;
 
   return <Outlet />;
 };
