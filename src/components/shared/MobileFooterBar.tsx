@@ -5,7 +5,7 @@ import { Phone, CalendarCheck, MessageSquare } from "lucide-react";
 /** Exact routes where this bar should NOT appear */
 const EXCLUDED_EXACT = ["/", "/wl", "/ed"];
 /** Route prefixes (entire funnels) where this bar should NOT appear */
-const EXCLUDED_PREFIXES = ["/book", "/bookv2", "/intake", "/lp/"];
+const EXCLUDED_PREFIXES = ["/book", "/bookv2", "/intake", "/lp/", "/quiz"];
 
 export const MobileFooterBar = () => {
   const { pathname } = useLocation();
