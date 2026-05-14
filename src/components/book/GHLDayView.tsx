@@ -402,11 +402,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              className="md:grid md:grid-cols-7 flex md:gap-2 gap-2 overflow-x-auto md:overflow-visible"
+              className="flex gap-2 overflow-x-auto"
               style={{
                 scrollSnapType: "x mandatory",
                 WebkitOverflowScrolling: "touch",
                 paddingBottom: 4,
+                scrollbarWidth: "none",
               }}
             >
               {days.map((d) => {
