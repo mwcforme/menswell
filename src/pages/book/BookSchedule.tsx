@@ -2,40 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import GHLDayView from "@/components/book/GHLDayView";
-import { useBookingSync, updateBookingState, toQueryString, type UrgencyTier } from "@/lib/bookingState";
+import { useBookingSync, updateBookingState, toQueryString } from "@/lib/bookingState";
 import { CENTER_CALENDARS, type LocationKey } from "@/lib/ghlCalendars";
-
-const SERVICE_LABEL: Record<string, string> = {
-  energy: "TRT consult",
-  sexual: "men's sexual health consult",
-  weight: "medical weight loss consult",
-  other: "consultation",
-};
-
-const SYMPTOM_CHIP: Record<string, string> = {
-  energy: "⚡ Energy & focus",
-  sexual: "💪 Sexual health",
-  weight: "⚖ Weight & body comp",
-  other: "🩺 General wellness",
-};
 
 const LOCATION_LABEL: Record<string, string> = {
   richmond: "Richmond clinic",
   "virginia-beach": "Virginia Beach clinic",
   "newport-news": "Newport News clinic",
-};
-
-const LOCATION_CHIP: Record<string, string> = {
-  richmond: "📍 Richmond",
-  "virginia-beach": "📍 Virginia Beach",
-  "newport-news": "📍 Newport News",
-};
-
-const URGENCY_SUB: Record<UrgencyTier, string> = {
-  early: "60-minute in-person visit at our Virginia clinic.",
-  building: "60-minute in-person visit at our Virginia clinic.",
-  overdue: "60-minute in-person visit at our Virginia clinic.",
-  long_overdue: "60-minute in-person visit at our Virginia clinic.",
 };
 
 // First name only, URL-decoded. React text-node escaping handles XSS.
@@ -53,24 +26,13 @@ const BookSchedule = () => {
   const navigate = useNavigate();
   const state = useBookingSync();
 
-  const serviceLabel = SERVICE_LABEL[state.symptom || "other"] || SERVICE_LABEL.other;
-  const subhead = state.urgencyTier
-    ? URGENCY_SUB[state.urgencyTier]
-    : "60-minute in-person visit at our Virginia clinic.";
-
   const [firstName = "", ...lastParts] = (state.name || "").trim().split(/\s+/);
   const lastName = lastParts.join(" ");
   const personalFirstName = firstNameOnly(state.name);
 
   const heading = personalFirstName
-    ? `${personalFirstName}, pick a time that works.`
-    : `Pick a time that works.`;
-
-  const contextChips = [
-    state.location ? LOCATION_CHIP[state.location] : null,
-    state.symptom ? SYMPTOM_CHIP[state.symptom] : null,
-    "🕒 60 min · $0 today",
-  ].filter(Boolean) as string[];
+    ? `${personalFirstName}, pick a time.`
+    : `Pick a time.`;
 
   const goBack = () => {
     const qs = toQueryString(state);
