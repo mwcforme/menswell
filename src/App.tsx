@@ -24,6 +24,11 @@ import TcpaDisclosure from "./pages/legal/TcpaDisclosure";
 import PrescribingPolicy from "./pages/legal/PrescribingPolicy";
 import { MobileFooterBar } from "./components/shared/MobileFooterBar";
 import { SentryTestTrigger } from "./components/SentryTestTrigger";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminLeads from "./pages/admin/AdminLeads";
+import AdminEvents from "./pages/admin/AdminEvents";
+import { RequireAdmin } from "./components/admin/RequireAdmin";
 
 const queryClient = new QueryClient();
 
@@ -100,6 +105,11 @@ const App = () => (
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/tcpa" element={<TcpaDisclosure />} />
               <Route path="/prescribing-policy" element={<PrescribingPolicy />} />
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route path="/admin/login" element={<Navigate to="/admin" replace />} />
+              <Route path="/admin/overview" element={<RequireAdmin><AdminOverview /></RequireAdmin>} />
+              <Route path="/admin/leads" element={<RequireAdmin><AdminLeads /></RequireAdmin>} />
+              <Route path="/admin/events" element={<RequireAdmin><AdminEvents /></RequireAdmin>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <MobileFooterBar />
