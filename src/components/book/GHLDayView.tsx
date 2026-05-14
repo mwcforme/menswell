@@ -410,7 +410,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         )}
 
         {/* WEEK NAV */}
-        <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
+        <div className="px-4 md:px-7 pt-3 md:pt-5 flex items-center justify-between gap-3">
           <button
             type="button"
             disabled={prevDisabled}
