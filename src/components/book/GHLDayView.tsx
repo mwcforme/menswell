@@ -362,6 +362,60 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         </div>
 
 
+        {/* RECOMMENDED EARLIEST SLOTS (urgency-driven) */}
+        {showRecommended && recommendedSlots.length > 0 && (
+          <div className="px-5 md:px-7 pt-5">
+            <div
+              style={{
+                background: ORANGE_SOFT,
+                borderLeft: `4px solid ${ORANGE}`,
+                borderRadius: 12,
+                padding: "14px 16px",
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.06em", color: ORANGE_DEEP, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                ⚡ Earliest available for you
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {recommendedSlots.map(({ iso, day }) => {
+                  const { time, ampm } = fmtTimeParts(iso);
+                  const dayLabel = isTodayET(day)
+                    ? "Today"
+                    : isTomorrowET(day)
+                      ? "Tomorrow"
+                      : day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE });
+                  return (
+                    <button
+                      key={iso}
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => confirmDirectly(iso)}
+                      style={{
+                        background: SURFACE,
+                        border: `1.5px solid ${ORANGE}`,
+                        borderRadius: 10,
+                        padding: "12px 14px",
+                        textAlign: "left",
+                        cursor: submitting ? "wait" : "pointer",
+                        color: INK,
+                      }}
+                    >
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: ORANGE_DEEP, textTransform: "uppercase" }}>
+                        {dayLabel}
+                      </div>
+                      <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, marginTop: 2 }}>
+                        {time} <span style={{ fontSize: 13, color: MUTED }}>{ampm}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ fontSize: 12, color: MUTED, marginTop: 10 }}>
+                Or pick another time below ↓
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* WEEK NAV */}
         <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
