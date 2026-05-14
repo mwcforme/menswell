@@ -491,8 +491,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                   : isSunday || !available
                     ? MUTED
                     : scarce
-                      ? ORANGE
-                      : INK_SOFT;
+                      ? "#FFB37A" // warm amber that reads on the dark navy card
+                      : "rgba(255,255,255,0.85)"; // light on dark navy — was INK_SOFT (invisible)
                 return (
                   <button
                     key={key}
