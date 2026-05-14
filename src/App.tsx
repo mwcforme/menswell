@@ -14,6 +14,7 @@ import TRTQuizApproved from "./pages/TRTQuizApproved";
 import BookSymptom from "./pages/book/BookSymptom";
 import BookDuration from "./pages/book/BookDuration";
 import BookSchedule from "./pages/book/BookSchedule";
+import BookSchedule2 from "./pages/book/BookSchedule2";
 import BookConfirmed from "./pages/book/BookConfirmed";
 import BookLetsTalk from "./pages/book/BookLetsTalk";
 import LpDirectory from "./pages/internal/LpDirectory";
@@ -91,6 +92,7 @@ const App = () => (
               <Route path="/book/symptom" element={<BookSymptom />} />
               <Route path="/book/duration" element={<BookDuration />} />
               <Route path="/book/schedule" element={<BookSchedule />} />
+              <Route path="/book/schedule2" element={<BookSchedule2 />} />
               <Route path="/book/confirmed" element={<BookConfirmed />} />
               <Route path="/book/lets-talk" element={<BookLetsTalk />} />
               <Route path="/lp" element={<LpDirectory />} />
