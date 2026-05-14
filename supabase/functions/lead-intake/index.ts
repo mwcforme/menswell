@@ -36,8 +36,36 @@ function rateLimit(ip: string): boolean {
 
 // ---- GHL config (mirrors ghl-proxy) ----
 const GHL_API_BASE = "https://services.leadconnectorhq.com";
-const GHL_LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
 const GHL_API_VERSION = "2021-07-28";
+const PROD_LOCATION_ID = "Ghstz8eIsHWLeXek47dk";
+
+type AppEnv = "prod" | "stage";
+const PROD_HOSTS = new Set<string>([
+  "book.menswellnesscenters.com",
+  "menswellnesscenters.com",
+  "www.menswellnesscenters.com",
+]);
+function detectEnv(req: Request, hint?: unknown): AppEnv {
+  if (hint === "prod" || hint === "stage") return hint;
+  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
+  try {
+    const host = new URL(origin).hostname.toLowerCase();
+    if (PROD_HOSTS.has(host)) return "prod";
+  } catch { /* ignore */ }
+  return "stage";
+}
+function envCreds(env: AppEnv) {
+  if (env === "stage") {
+    return {
+      apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
+      locationId: Deno.env.get("GHL_LOCATION_ID_STAGE") ?? "",
+    };
+  }
+  return {
+    apiKey: Deno.env.get("GHL_API_KEY"),
+    locationId: Deno.env.get("GHL_LOCATION_ID") ?? PROD_LOCATION_ID,
+  };
+}
 
 async function parseBody(req: Request): Promise<Record<string, unknown>> {
   const ct = (req.headers.get("content-type") ?? "").toLowerCase();
@@ -83,7 +111,7 @@ function validate(c: CanonicalLead): { ok: true } | { ok: false; error: string }
   return { ok: true };
 }
 
-async function forwardToGhl(c: CanonicalLead, accessToken: string): Promise<{ contactId: string }> {
+async function forwardToGhl(c: CanonicalLead, accessToken: string, locationId: string): Promise<{ contactId: string }> {
   const { firstName, lastName } = splitName(c.fullName);
   const tags = ["external-intake"];
   if (c.form_source_label) tags.push(`form:${c.form_source_label}`);
@@ -95,7 +123,7 @@ async function forwardToGhl(c: CanonicalLead, accessToken: string): Promise<{ co
     ...(lastName ? { lastName } : {}),
     ...(c.email ? { email: c.email } : {}),
     ...(c.phone ? { phone: c.phone } : {}),
-    locationId: GHL_LOCATION_ID,
+    locationId,
     source: c.form_source_label ?? "wordpress-intake",
     tags,
   };
@@ -111,6 +139,11 @@ async function forwardToGhl(c: CanonicalLead, accessToken: string): Promise<{ co
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`GHL ${res.status}: ${text.slice(0, 500)}`);
+  const data = JSON.parse(text);
+  const contactId = data?.contact?.id ?? data?.id;
+  if (!contactId) throw new Error("GHL response missing contact id");
+  return { contactId };
+}
   const data = JSON.parse(text);
   const contactId = data?.contact?.id ?? data?.id;
   if (!contactId) throw new Error("GHL response missing contact id");
@@ -197,18 +230,19 @@ Deno.serve(async (req) => {
   }
   const captureId = inserted.id as string;
 
-  // ---- Forward to GHL ----
-  const ghlToken = Deno.env.get("GHL_API_KEY");
-  if (!ghlToken) {
+  // ---- Forward to GHL (env-aware) ----
+  const appEnv = detectEnv(req, (raw as Record<string, unknown>).__env);
+  const { apiKey: ghlToken, locationId: ghlLocationId } = envCreds(appEnv);
+  if (!ghlToken || !ghlLocationId) {
     await supabase
       .from("lead_captures")
-      .update({ crm_status: "failed", crm_error: "GHL_API_KEY not configured" })
+      .update({ crm_status: "failed", crm_error: `GHL ${appEnv} credentials not configured` })
       .eq("id", captureId);
     return json(502, { ok: false, capture_id: captureId, error: "CRM not configured" });
   }
 
   try {
-    const { contactId } = await forwardToGhl(canonical, ghlToken);
+    const { contactId } = await forwardToGhl(canonical, ghlToken, ghlLocationId);
     await supabase
       .from("lead_captures")
       .update({ crm_status: "synced", crm_contact_id: contactId })
