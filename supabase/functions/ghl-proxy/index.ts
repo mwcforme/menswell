@@ -1,4 +1,4 @@
-// ghl-proxy v4 — env-aware (prod vs stage) + route allowlist + manual CORS
+// ghl-proxy v5 — env-aware (prod vs stage) + route allowlist + manual CORS
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
