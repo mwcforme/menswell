@@ -1,4 +1,4 @@
-import { CheckCircle2, MapPin, Phone, Play, FlaskConical, ExternalLink } from "lucide-react";
+import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingSync } from "@/lib/bookingState";
 
@@ -38,21 +38,40 @@ const CENTERS: Record<string, CenterInfo> = {
 
 const DEFAULT_CENTER = CENTERS["newport-news"];
 
+const formatAppointment = (raw?: string): string => {
+  if (!raw) return "Time to be confirmed";
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return "Time to be confirmed";
+  const datePart = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: "America/New_York",
+  }).format(d);
+  const timePart = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "America/New_York",
+  }).format(d);
+  return `${datePart}  ·  ${timePart} ET`;
+};
+
 const BookConfirmed = () => {
   const state = useBookingSync();
-  const apptTime = state.appointmentTime || "Tuesday, May 12 at 10:30 AM";
+  const apptTime = formatAppointment(state.appointmentTime);
   const center = (state.location && CENTERS[state.location]) || DEFAULT_CENTER;
   const fullAddress = `${center.centerName}, ${center.street}, ${center.cityStateZip}`;
   const mapsQuery = encodeURIComponent(fullAddress);
   const PHONE_DISPLAY = center.phoneDisplay;
   const PHONE_TEL = center.phoneTel;
-  const firstName = state.name ? state.name.split(" ")[0] : "";
+  const fullName = state.name || "";
 
 
   return (
-    <BookLayout page="confirmed" title="You're booked | Men's Wellness Centers">
+    <BookLayout page="confirmed" variant="confirmation" title="You're booked | Men's Wellness Centers">
       <div
-        className="px-4 md:px-8 py-6 md:py-10 pb-28 md:pb-12"
+        className="px-4 md:px-8 py-6 md:py-10 pb-12"
         style={{ background: "#000814" }}
       >
         <div className="mx-auto flex flex-col gap-8 md:gap-10" style={{ maxWidth: 1100, fontFamily: "Inter, sans-serif" }}>
@@ -86,20 +105,25 @@ const BookConfirmed = () => {
             >
               Appointment Confirmed
             </h1>
-            <div
-              className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-base md:text-lg"
-              style={{ color: "rgba(255,255,255,0.55)" }}
-            >
-              {firstName && (
-                <>
-                  <span style={{ color: "#FFFFFF", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.02em" }}>
-                    {firstName}
-                  </span>
-                  <span style={{ opacity: 0.3 }}>|</span>
-                </>
+            <div className="flex flex-col items-center gap-1.5">
+              {fullName && (
+                <span
+                  className="text-base md:text-lg"
+                  style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif", fontWeight: 600 }}
+                >
+                  {fullName}
+                </span>
               )}
-              <span>
-                <span style={{ color: "#FFFFFF", fontWeight: 600 }}>{apptTime}</span>
+              <span
+                className="text-lg md:text-xl"
+                style={{
+                  fontFamily: "Oswald, sans-serif",
+                  fontWeight: 500,
+                  letterSpacing: "0.02em",
+                  color: "rgba(255,255,255,0.85)",
+                }}
+              >
+                {apptTime}
               </span>
             </div>
           </div>
@@ -300,27 +324,6 @@ const BookConfirmed = () => {
         </div>
       </div>
 
-      {/* Sticky mobile tap-to-call */}
-      <a
-        href={PHONE_TEL}
-        aria-label={`Call ${PHONE_DISPLAY}`}
-        className="md:hidden fixed inset-x-0 bottom-0 flex items-center justify-center gap-3 z-50"
-        style={{
-          background: "#E8670A",
-          color: "#FFFFFF",
-          fontFamily: "Inter, sans-serif",
-          fontWeight: 700,
-          fontSize: 22,
-          textDecoration: "none",
-          minHeight: 72,
-          padding: "16px 20px",
-          paddingBottom: "max(16px, env(safe-area-inset-bottom))",
-          boxShadow: "0 -4px 12px rgba(0,0,0,0.25)",
-        }}
-      >
-        <Phone size={24} strokeWidth={2.5} />
-        <span>CALL {PHONE_DISPLAY}</span>
-      </a>
     </BookLayout>
   );
 };
