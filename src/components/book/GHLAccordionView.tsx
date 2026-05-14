@@ -247,7 +247,11 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
                       <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.9 }}>
                         {badgeText}
                       </span>
-                      {!disabled && (expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />)}
+                      {!disabled && (
+                        <span style={{ display: "inline-flex", transition: "transform 280ms ease", transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+                          <ChevronDown size={18} />
+                        </span>
+                      )}
                     </div>
                   </button>
 
