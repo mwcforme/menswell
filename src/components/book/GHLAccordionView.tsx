@@ -38,8 +38,10 @@ interface Props {
   lastName?: string;
   email?: string;
   phone?: string;
+  /** @deprecated PHI: do not pass — clinical context flows via `customFields`. */
   notes?: string;
   source?: string;
+  customFields?: import("@/services/contracts/ILeadSubmitter").MwcCustomFields;
   onBooked?: (slotIso: string) => void;
 }
 
