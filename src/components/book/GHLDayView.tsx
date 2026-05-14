@@ -84,7 +84,7 @@ const fmtDayShort = (d: Date) =>
 const fmtMonthDay = (d: Date) =>
   d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
 const fmtWeekRange = (start: Date) => {
-  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const end = new Date(start); end.setDate(end.getDate() + 3);
   const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE });
   const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: TIMEZONE });
   return `${s} – ${e}`;
@@ -220,9 +220,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
   const cal = CENTER_CALENDARS[location];
 
-  // Visible week: 7 days from weekStart.
+  // Visible window: 4 days from weekStart.
   const days = useMemo(() => {
-    return Array.from({ length: 7 })
+    return Array.from({ length: 4 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
@@ -234,7 +234,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 4); end.setHours(0, 0, 0, 0);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -414,7 +414,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 4); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -434,7 +434,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 4); setWeekStart(w); }}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
