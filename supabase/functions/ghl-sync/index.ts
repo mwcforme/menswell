@@ -139,13 +139,19 @@ async function runSync(supabase: any, runId: string) {
         }
         envCount += rows.length;
       }
-      summary[env.name] = envCount;
+      envDetail.total = envCount;
+      summary[env.name] = envDetail;
       total += envCount;
     }
 
     await supabase
       .from("ghl_sync_runs")
-      .update({ status: "ok", slot_count: total, finished_at: new Date().toISOString() })
+      .update({
+        status: firstError ? "error" : "ok",
+        slot_count: total,
+        error: firstError ?? JSON.stringify(summary),
+        finished_at: new Date().toISOString(),
+      })
       .eq("id", runId);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
