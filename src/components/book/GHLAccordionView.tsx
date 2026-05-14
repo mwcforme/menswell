@@ -212,7 +212,7 @@ const AccordionDay = memo(function AccordionDay({
               {ribbon}
             </span>
           )}
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", opacity: 0.85 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em" }}>
             {fmtDayShort(day)}
           </span>
           <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "0.02em" }}>
