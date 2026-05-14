@@ -155,7 +155,6 @@ export function useConfirmAppointment(opts?: {
           startTime: input.slotIso,
           notes: GENERIC_APPT_NOTES,
         });
-
   const [redirect, setRedirect] = useState<RedirectState | null>(null);
   const tickRef = useRef<number | null>(null);
   const navTimerRef = useRef<number | null>(null);
