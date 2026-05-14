@@ -106,37 +106,13 @@ const fmtTimeParts = (iso: string) => {
 const fmtFullDay = (d: Date) =>
   d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
 
-// Returns the UTC offset (in minutes) of America/New_York for the given UTC instant.
-// e.g. -240 during EDT, -300 during EST. Browser-independent (uses numeric parts only).
-const etOffsetMinutes = (instant: Date): number => {
-  const get = (parts: Intl.DateTimeFormatPart[], type: string) =>
-    parseInt(parts.find((p) => p.type === type)!.value, 10);
-  const fmt = (tz: string) =>
-    new Intl.DateTimeFormat("en-US", {
-      timeZone: tz,
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hour12: false,
-    }).formatToParts(instant);
-  const u = fmt("UTC");
-  const e = fmt(TIMEZONE);
-  const utcMs = Date.UTC(
-    get(u, "year"), get(u, "month") - 1, get(u, "day"),
-    get(u, "hour") % 24, get(u, "minute"),
-  );
-  const etMs = Date.UTC(
-    get(e, "year"), get(e, "month") - 1, get(e, "day"),
-    get(e, "hour") % 24, get(e, "minute"),
-  );
-  return Math.round((etMs - utcMs) / 60000);
-};
-
 // Build a Date for the given ET wall-clock time (YYYY-MM-DD + hour, minute=0).
 // Uses ET's offset on that calendar date so display is always 8 AM..5 PM ET.
 const etWallToDate = (ymdStr: string, hour: number): Date => {
   const [y, m, d] = ymdStr.split("-").map((n) => parseInt(n, 10));
   // Probe at noon UTC on that date to get a stable ET offset (avoids DST edge ambiguity).
   const probe = new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
-  const offsetMin = etOffsetMinutes(probe); // e.g. -240
+  const offsetMin = timeZoneOffsetMinutes(probe, TIMEZONE); // e.g. -240
   // ET wall hour H corresponds to UTC = H - offsetMin (in minutes).
   const utcMs = Date.UTC(y, m - 1, d, hour, 0, 0) - offsetMin * 60_000;
   return new Date(utcMs);
@@ -167,13 +143,7 @@ const isTomorrowET = (day: Date): boolean => {
   return tom === ymd(day);
 };
 
-// Build a JS Date for ET midnight of the given YYYY-MM-DD string.
-const dateFromEtYmd = (s: string): Date => {
-  const [y, m, d] = s.split("-").map((n) => parseInt(n, 10));
-  const local = new Date(y, m - 1, d);
-  local.setHours(0, 0, 0, 0);
-  return local;
-};
+const dateFromEtYmd = (s: string): Date => dateFromYmdInTimeZone(s, TIMEZONE);
 
 // banned-wording-allow-next-line — GHL API endpoint name
 // Parse the GHL free-slots payload into a per-day map of ISO start times.
