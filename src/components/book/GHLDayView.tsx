@@ -234,7 +234,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 5); end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -275,13 +275,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
 
     load(refreshNonce > 0 ? "manual" : "initial");
-    // Auto-refresh every 30 min. On tab focus, only refresh if data is >5 min old.
-    const interval = window.setInterval(() => load("timer"), 30 * 60 * 1000);
+    // Auto-refresh every 30 sec so the live-availability badge reflects real demand.
+    // On tab focus, force-refresh if data is >30s old.
+    const interval = window.setInterval(() => load("timer"), 30 * 1000);
     const onFocus = () => {
       // Read freshest lastUpdated from closure-safe ref via state setter pattern
       // (acceptable here: at worst we refresh once when not strictly needed)
       const last = lastUpdatedRef.current;
-      if (!last || Date.now() - last.getTime() > 5 * 60 * 1000) load("focus");
+      if (!last || Date.now() - last.getTime() > 30 * 1000) load("focus");
     };
     window.addEventListener("focus", onFocus);
 
@@ -344,7 +345,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 5); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -362,7 +363,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           </div>
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 5); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
