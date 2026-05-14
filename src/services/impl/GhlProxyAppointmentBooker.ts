@@ -71,12 +71,14 @@ export class GhlProxyAppointmentBooker implements IAppointmentBooker {
     });
     try {
       const res = await bookAppointment(input);
+      const upstreamBody = (res as unknown as { upstreamBody?: string }).upstreamBody;
       void logBookingEvent({
         event_type: res.ok ? "success" : "error",
         location: input.location,
         slot_iso: input.startTime,
         contact_id: input.contactId,
-        error: res.ok ? undefined : `HTTP ${res.status}`,
+        error: res.ok ? undefined : `HTTP ${res.status}: ${upstreamBody ?? ""}`.slice(0, 1000),
+        meta: res.ok ? undefined : { upstreamBody, status: res.status },
       });
       return { ok: res.ok, status: res.status };
     } catch (err) {
