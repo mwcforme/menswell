@@ -242,7 +242,9 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const days = useMemo(() => {
     return Array.from({ length: 7 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
-      .filter((d) => d >= today);
+      .filter((d) => d >= today)
+      // Hide closed days (Sunday) from the day strip; only show operating days.
+      .filter((d) => d.getDay() !== 0);
   }, [weekStart, today]);
 
   const [refreshNonce, setRefreshNonce] = useState(0);
