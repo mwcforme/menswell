@@ -1,6 +1,6 @@
 import { Phone, MessageSquareText } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
-import { useBookingSync } from "@/lib/bookingState";
+
 
 const PHONE_DISPLAY = "(866) 344-4955";
 const PHONE_TEL = "tel:8663444955";
@@ -21,9 +21,6 @@ const SMS_HREF = "sms:8663444955";
  *   - Two contact methods so the user picks whichever they're comfortable with
  */
 const BookLetsTalk = () => {
-  // Hydrate state so we can log/track the symptom value they picked (still
-  // "other" but URL params persist forward for GHL).
-  useBookingSync();
 
   const trackCallClick = () => {
     const dl = (window as unknown as { dataLayer?: unknown[] }).dataLayer;
