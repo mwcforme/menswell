@@ -503,17 +503,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                       minWidth: 0,
                       scrollSnapAlign: "start",
                       background: selected ? SURFACE : isSunday || !available ? "#F1F2F6" : INK,
-                      border: selected ? `2px solid ${ORANGE}` : `1.5px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
+                      border: `2px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
                       borderRadius: 12,
                       padding: "8px 4px 10px",
                       color: selected ? INK : isSunday || !available ? MUTED : "#FFFFFF",
                       cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
-                      transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
+                      transition: "background 120ms ease, border-color 120ms ease",
                       position: "relative",
-                      boxShadow: selected
-                        ? `0 0 0 2px ${ORANGE}33, 0 8px 18px -10px rgba(232,103,10,0.45)`
-                        : "0 1px 0 rgba(11,16,41,0.03)",
                       opacity: !available && !selected ? 0.55 : 1,
                     }}
                   >
