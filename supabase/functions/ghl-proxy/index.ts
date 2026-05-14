@@ -89,6 +89,29 @@ function validateBody(method: string, path: string, body: unknown): { ok: true; 
         .slice(0, 30);
       if (filtered.length) tags = filtered;
     }
+    // Allowlisted PHI-safe structured fields. Anything else is silently dropped
+    // so the proxy can never be used to write arbitrary contact properties.
+    const ALLOWED_CF = new Set([
+      "mwc_symptom",
+      "mwc_symptom_duration",
+      "mwc_urgency_tier",
+      "mwc_clinical_note",
+      "mwc_funnel_service",
+      "mwc_lp_slug",
+    ]);
+    let customFields: Record<string, string> | undefined;
+    if (b.customFields !== undefined) {
+      if (!b.customFields || typeof b.customFields !== "object" || Array.isArray(b.customFields)) {
+        return { ok: false, error: "customFields must be object" };
+      }
+      const cf: Record<string, string> = {};
+      for (const [k, v] of Object.entries(b.customFields as Record<string, unknown>)) {
+        if (!ALLOWED_CF.has(k)) continue;
+        if (typeof v !== "string" || v.length === 0 || v.length > 500) continue;
+        cf[k] = v;
+      }
+      if (Object.keys(cf).length) customFields = cf;
+    }
     return {
       ok: true,
       body: {
@@ -98,6 +121,7 @@ function validateBody(method: string, path: string, body: unknown): { ok: true; 
         ...(b.phone ? { phone: b.phone } : {}),
         ...(b.source ? { source: b.source } : {}),
         ...(tags ? { tags } : {}),
+        ...(customFields ? { customFields } : {}),
       },
     };
   }

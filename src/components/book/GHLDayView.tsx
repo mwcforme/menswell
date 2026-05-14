@@ -50,10 +50,11 @@ interface Props {
   lastName?: string;
   email?: string;
   phone?: string;
+  /** @deprecated PHI: do not pass — clinical context flows via `customFields`. */
   notes?: string;
   source?: string;
-  /** From URL: drives the "Earliest available for you" recommended-slot card. */
   urgencyTier?: "early" | "urgent" | "building" | "overdue" | "long_overdue" | "flexible" | string;
+  customFields?: import("@/services/contracts/ILeadSubmitter").MwcCustomFields;
   onBooked?: (slotIso: string) => void;
 }
 
@@ -169,7 +170,7 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
 };
 
 
-const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, urgencyTier, onBooked }: Props) => {
+const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgencyTier, customFields, onBooked }: Props) => {
   // Anchor "today" to ET, not the visitor's local midnight, so the picker is
   // correct for PT/MT/CT visitors near midnight ET.
   const today = useMemo(() => dateFromEtYmd(todayET()), []);
@@ -312,7 +313,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     setSelectedSlot(iso);
     void confirmCtl.confirm({
       slotIso: iso,
-      location, firstName, lastName, email, phone, notes, source,
+      location, firstName, lastName, email, phone, source, customFields,
     });
   };
 
@@ -325,8 +326,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
       lastName,
       email,
       phone,
-      notes,
       source,
+      customFields,
     });
     if (ok) setModalOpen(false);
   };

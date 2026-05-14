@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServices } from "@/app/providers/ServicesProvider";
-import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
-import { confirmLeadSchema, type ConfirmLeadInput } from "@/domain/leads/leadFormSchema";
 import type { LocationKey } from "@/lib/ghlCalendars";
+import type { MwcCustomFields } from "@/services/contracts/ILeadSubmitter";
 import { trackConversion } from "@/lib/capi";
+
+/**
+ * Generic notes string written to GHL appointments. Real clinical context
+ * (symptom / duration / urgency / freeform note) is routed via structured
+ * contact custom fields so it never appears in URLs, GA4, or appointment
+ * subjects. See PHI refactor in `BookingRouteGuard`.
+ */
+const GENERIC_APPT_NOTES =
+  "Booked via mwc booking funnel. See contact custom fields for clinical context.";
 
 export interface ConfirmInput {
   slotIso: string;
@@ -12,18 +20,16 @@ export interface ConfirmInput {
   lastName?: string;
   email?: string;
   phone?: string;
-  notes?: string;
   source?: string;
+  /** Structured PHI-safe context — written to GHL contact custom fields only. */
+  customFields?: MwcCustomFields;
 }
 
 export type ConfirmStatus = "idle" | "submitting" | "success" | "error";
 
 export interface RedirectState {
-  /** Where the user is being sent. */
   url: string;
-  /** Total countdown duration in ms. */
   totalMs: number;
-  /** Remaining ms (ticks every ~100ms). */
   remainingMs: number;
 }
 
@@ -31,37 +37,20 @@ export interface ConfirmAppointmentController {
   status: ConfirmStatus;
   error: string | null;
   isSubmitting: boolean;
-  /** Non-null when an automatic redirect is pending after an unrecoverable error. */
   redirect: RedirectState | null;
   confirm: (input: ConfirmInput) => Promise<boolean>;
-  /** Cancel a pending redirect (e.g. when the user dismisses the modal). */
   cancelRedirect: () => void;
   reset: () => void;
 }
 
 const FAILED_INTENT_KEY = "mwc_booking_failed_intent_v1";
 
-/**
- * Composes lead submission + appointment booking for the booking modal.
- * Mirrors the existing GHLDayView `handleFinalConfirm` behavior:
- *  - upsert contact via `useLeadSubmitController` (no toast, inline error)
- *  - book appointment via `useServices().booking`
- *  - on slot-taken: persist failed-intent and redirect to /book/lets-talk
- */
 export function useConfirmAppointment(opts?: {
   onBooked?: (slotIso: string) => void;
 }): ConfirmAppointmentController {
   const { booking } = useServices();
   const [status, setStatus] = useState<ConfirmStatus>("idle");
   const [error, setError] = useState<string | null>(null);
-
-  const lead = useLeadSubmitController<ConfirmLeadInput>({
-    schema: confirmLeadSchema,
-    toLeadInput: (v) => ({ firstName: v.name || "Guest", email: v.email, phone: v.phone }),
-    toastOnError: false,
-    persistToBookingState: false,
-  });
-
   const [redirect, setRedirect] = useState<RedirectState | null>(null);
   const tickRef = useRef<number | null>(null);
   const navTimerRef = useRef<number | null>(null);
@@ -82,7 +71,6 @@ export function useConfirmAppointment(opts?: {
     setRedirect(null);
   }, [clearTimers]);
 
-  // Cleanup on unmount.
   useEffect(() => () => clearTimers(), [clearTimers]);
 
   const scheduleRedirect = useCallback(
@@ -111,8 +99,7 @@ export function useConfirmAppointment(opts?: {
     setRedirect(null);
     setStatus("idle");
     setError(null);
-    lead.reset();
-  }, [clearTimers, lead]);
+  }, [clearTimers]);
 
   const confirm = useCallback(
     async (input: ConfirmInput): Promise<boolean> => {
@@ -121,45 +108,36 @@ export function useConfirmAppointment(opts?: {
       setStatus("submitting");
       setError(null);
 
-      // Step 1: upsert contact.
-      const result = await lead.submit({
-        ...(input.firstName ? { name: input.firstName } : {}),
-        ...(input.email ? { email: input.email } : {}),
-        ...(input.phone ? { phone: input.phone } : {}),
-      } satisfies ConfirmLeadInput);
-
-      // The controller may have skipped submission (validation only); fall back
-      // to a direct call when no validated payload was produced but the caller
-      // gave us at least a name to upsert under.
-      let contactId = result?.contactId ?? null;
-      if (!contactId) {
+      // Step 1: upsert contact (with structured PHI-safe customFields).
+      let contactId: string;
+      try {
         const { GhlProxyLeadSubmitter } = await import(
           "@/services/impl/GhlProxyLeadSubmitter"
         );
-        try {
-          const r = await new GhlProxyLeadSubmitter().submitLead({
-            firstName: input.firstName || "Guest",
-            lastName: input.lastName || undefined,
-            email: input.email || undefined,
-            phone: input.phone || undefined,
-            source: input.source || "mwc-book-funnel",
-          });
-          contactId = r.contactId;
-        } catch (e) {
-          const msg = (e as Error).message || "Booking failed. Please try another time.";
-          setError(msg);
-          setStatus("error");
-          return false;
-        }
+        const r = await new GhlProxyLeadSubmitter().submitLead({
+          firstName: input.firstName || "Guest",
+          lastName: input.lastName || undefined,
+          email: input.email || undefined,
+          phone: input.phone || undefined,
+          source: input.source || "mwc-book-funnel",
+          customFields: input.customFields,
+        });
+        contactId = r.contactId;
+      } catch (e) {
+        const msg = (e as Error).message || "Booking failed. Please try another time.";
+        setError(msg);
+        setStatus("error");
+        return false;
       }
 
-      // Step 2: book the appointment.
+      // Step 2: book the appointment with generic notes only — clinical
+      // detail lives on the contact's custom fields.
       try {
         await booking.bookAppointment({
           location: input.location,
           contactId,
           startTime: input.slotIso,
-          notes: input.notes,
+          notes: GENERIC_APPT_NOTES,
         });
         setStatus("success");
         void trackConversion("Schedule", {
@@ -179,7 +157,6 @@ export function useConfirmAppointment(opts?: {
         opts?.onBooked?.(input.slotIso);
         return true;
       } catch (bookErr) {
-        // Slot likely taken between render and confirm. Persist intent and bounce.
         try {
           sessionStorage.setItem(
             FAILED_INTENT_KEY,
@@ -206,7 +183,7 @@ export function useConfirmAppointment(opts?: {
         return false;
       }
     },
-    [booking, cancelRedirect, lead, opts, scheduleRedirect, status],
+    [booking, cancelRedirect, opts, scheduleRedirect, status],
   );
 
   return {
@@ -219,4 +196,3 @@ export function useConfirmAppointment(opts?: {
     reset,
   };
 }
-

@@ -38,8 +38,10 @@ interface Props {
   lastName?: string;
   email?: string;
   phone?: string;
+  /** @deprecated PHI: do not pass — clinical context flows via `customFields`. */
   notes?: string;
   source?: string;
+  customFields?: import("@/services/contracts/ILeadSubmitter").MwcCustomFields;
   onBooked?: (slotIso: string) => void;
 }
 
@@ -257,7 +259,7 @@ const AccordionDay = memo(function AccordionDay({
   );
 });
 
-const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
+const GHLAccordionView = ({ location, firstName, lastName, email, phone, source, customFields, onBooked }: Props) => {
   const today = useMemo(() => dateFromEtYmd(todayET()), []);
   const days = useMemo(() => {
     return Array.from({ length: 7 }).map((_, i) => addDaysInTimeZone(today, i, TIMEZONE));
@@ -334,7 +336,7 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
     if (!selectedSlot) return;
     const ok = await confirmCtl.confirm({
       slotIso: selectedSlot,
-      location, firstName, lastName, email, phone, notes, source,
+      location, firstName, lastName, email, phone, source, customFields,
     });
     if (ok) setModalOpen(false);
   };

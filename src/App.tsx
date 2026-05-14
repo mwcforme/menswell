@@ -31,6 +31,7 @@ import AdminLeads from "./pages/admin/AdminLeads";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminSync from "./pages/admin/AdminSync";
 import { RequireAdmin } from "./components/admin/RequireAdmin";
+import { BookingRouteGuard } from "./domain/booking/bookingRouteGuard";
 
 const queryClient = new QueryClient();
 
@@ -96,12 +97,14 @@ const App = () => (
               <Route path="/quiz" element={<TRTQuiz />} />
               <Route path="/quiz/approved" element={<TRTQuizApproved />} />
               <Route path="/book" element={<Navigate to="/book/schedule" replace />} />
-              <Route path="/book/symptom" element={<BookSymptom />} />
-              <Route path="/book/duration" element={<BookDuration />} />
-              <Route path="/book/schedule" element={<BookSchedule />} />
-              <Route path="/book/schedule2" element={<BookSchedule2 />} />
-              <Route path="/book/confirmed" element={<BookConfirmed />} />
-              <Route path="/book/lets-talk" element={<BookLetsTalk />} />
+              <Route element={<BookingRouteGuard />}>
+                <Route path="/book/symptom" element={<BookSymptom />} />
+                <Route path="/book/duration" element={<BookDuration />} />
+                <Route path="/book/schedule" element={<BookSchedule />} />
+                <Route path="/book/schedule2" element={<BookSchedule2 />} />
+                <Route path="/book/confirmed" element={<BookConfirmed />} />
+                <Route path="/book/lets-talk" element={<BookLetsTalk />} />
+              </Route>
               <Route path="/lp" element={<LpDirectory />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
