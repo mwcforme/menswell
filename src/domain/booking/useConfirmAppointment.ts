@@ -63,12 +63,98 @@ export function useConfirmAppointment(opts?: {
   const [status, setStatus] = useState<ConfirmStatus>("idle");
   const [error, setError] = useState<string | null>(null);
 
-  const lead = useLeadSubmitController<ConfirmLeadInput>({
-    schema: confirmLeadSchema,
-    toLeadInput: (v) => ({ firstName: v.name || "Guest", email: v.email, phone: v.phone }),
-    toastOnError: false,
-    persistToBookingState: false,
-  });
+  const [redirect, setRedirect] = useState<RedirectState | null>(null);
+  const tickRef = useRef<number | null>(null);
+  const navTimerRef = useRef<number | null>(null);
+
+  const clearTimers = useCallback(() => {
+    if (tickRef.current !== null) {
+      window.clearInterval(tickRef.current);
+      tickRef.current = null;
+    }
+    if (navTimerRef.current !== null) {
+      window.clearTimeout(navTimerRef.current);
+      navTimerRef.current = null;
+    }
+  }, []);
+
+  const cancelRedirect = useCallback(() => {
+    clearTimers();
+    setRedirect(null);
+  }, [clearTimers]);
+
+  // Cleanup on unmount.
+  useEffect(() => () => clearTimers(), [clearTimers]);
+
+  const scheduleRedirect = useCallback(
+    (url: string, totalMs: number) => {
+      clearTimers();
+      const start = Date.now();
+      setRedirect({ url, totalMs, remainingMs: totalMs });
+      tickRef.current = window.setInterval(() => {
+        const elapsed = Date.now() - start;
+        const remainingMs = Math.max(0, totalMs - elapsed);
+        setRedirect({ url, totalMs, remainingMs });
+        if (remainingMs <= 0 && tickRef.current !== null) {
+          window.clearInterval(tickRef.current);
+          tickRef.current = null;
+        }
+      }, 100);
+      navTimerRef.current = window.setTimeout(() => {
+        window.location.href = url;
+      }, totalMs);
+    },
+    [clearTimers],
+  );
+
+  const reset = useCallback(() => {
+    clearTimers();
+    setRedirect(null);
+    setStatus("idle");
+    setError(null);
+  }, [clearTimers]);
+
+  const confirm = useCallback(
+    async (input: ConfirmInput): Promise<boolean> => {
+      if (status === "submitting") return false;
+      cancelRedirect();
+      setStatus("submitting");
+      setError(null);
+
+      // Step 1: upsert contact via direct submitter so we can pass the
+      // structured PHI-safe customFields. The lead controller path is reserved
+      // for the LP form (which writes its own lead_captures row).
+      let contactId: string;
+      try {
+        const { GhlProxyLeadSubmitter } = await import(
+          "@/services/impl/GhlProxyLeadSubmitter"
+        );
+        const r = await new GhlProxyLeadSubmitter().submitLead({
+          firstName: input.firstName || "Guest",
+          lastName: input.lastName || undefined,
+          email: input.email || undefined,
+          phone: input.phone || undefined,
+          source: input.source || "mwc-book-funnel",
+          customFields: input.customFields,
+        });
+        contactId = r.contactId;
+      } catch (e) {
+        const msg = (e as Error).message || "Booking failed. Please try another time.";
+        setError(msg);
+        setStatus("error");
+        return false;
+      }
+
+      // Step 2: book the appointment. Notes are intentionally generic — real
+      // clinical detail lives on the contact's custom fields, never the
+      // appointment subject/notes.
+      try {
+        await booking.bookAppointment({
+          location: input.location,
+          contactId,
+          startTime: input.slotIso,
+          notes: GENERIC_APPT_NOTES,
+        });
 
   const [redirect, setRedirect] = useState<RedirectState | null>(null);
   const tickRef = useRef<number | null>(null);
