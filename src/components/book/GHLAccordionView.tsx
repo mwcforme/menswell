@@ -251,51 +251,59 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
                     </div>
                   </button>
 
-                  {expanded && (
-                    <div
-                      style={{
-                        background: SURFACE,
-                        borderLeft: `1px solid ${ORANGE}`,
-                        borderRight: `1px solid ${ORANGE}`,
-                        borderBottom: `1px solid ${ORANGE}`,
-                        borderBottomLeftRadius: 12,
-                        borderBottomRightRadius: 12,
-                        padding: 14,
-                      }}
-                    >
-                      <div className="grid grid-cols-2 gap-3">
-                        {slots.map((iso) => {
-                          const active = iso === selectedSlot;
-                          const { time, ampm } = fmtTimeParts(iso);
-                          return (
-                            <button
-                              key={iso}
-                              type="button"
-                              aria-pressed={active}
-                              onClick={() => setSelectedSlot(iso)}
-                              style={{
-                                background: active ? ORANGE : SURFACE,
-                                border: active ? "1px solid transparent" : `1px solid ${BORDER}`,
-                                borderRadius: 10, padding: "16px 14px",
-                                display: "flex", alignItems: "center", justifyContent: "center",
-                                color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
-                                transition: "background-color 120ms ease",
-                              }}
-                            >
-                              <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                                <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
-                                  {time}
-                                </span>
-                                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
-                                  {ampm}
-                                </span>
-                              </div>
-                            </button>
-                          );
-                        })}
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateRows: expanded ? "1fr" : "0fr",
+                      transition: "grid-template-rows 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+                    }}
+                  >
+                    <div style={{ overflow: "hidden" }}>
+                      <div
+                        style={{
+                          background: SURFACE,
+                          borderLeft: `1px solid ${ORANGE}`,
+                          borderRight: `1px solid ${ORANGE}`,
+                          borderBottom: `1px solid ${ORANGE}`,
+                          borderBottomLeftRadius: 12,
+                          borderBottomRightRadius: 12,
+                          padding: 14,
+                        }}
+                      >
+                        <div className="grid grid-cols-2 gap-3">
+                          {slots.map((iso) => {
+                            const active = iso === selectedSlot;
+                            const { time, ampm } = fmtTimeParts(iso);
+                            return (
+                              <button
+                                key={iso}
+                                type="button"
+                                aria-pressed={active}
+                                onClick={() => setSelectedSlot(iso)}
+                                style={{
+                                  background: active ? ORANGE : SURFACE,
+                                  border: active ? "1px solid transparent" : `1px solid ${BORDER}`,
+                                  borderRadius: 10, padding: "16px 14px",
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
+                                  transition: "background-color 120ms ease",
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                                  <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
+                                    {time}
+                                  </span>
+                                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
+                                    {ampm}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
