@@ -1,5 +1,6 @@
 // ghl-sync — fetches free slots for all centers (prod + stage) and upserts into the cache.
-// Triggered hourly by pg_cron, or manually via POST.
+// Triggered hourly by pg_cron, or manually via POST. Manual triggers return 202 immediately
+// and run the actual sync as a background task so the admin UI never times out.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -80,24 +81,8 @@ function flatten(resp: FreeSlotsResponse): string[] {
   return out;
 }
 
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!supabaseUrl || !serviceKey) {
-    return json(500, { error: "Missing Supabase environment" });
-  }
-
-  const supabase = createClient(supabaseUrl, serviceKey);
-
-  const { data: run, error: runErr } = await supabase
-    .from("ghl_sync_runs")
-    .insert({ status: "running" })
-    .select("id")
-    .single();
-  if (runErr || !run) return json(500, { error: `run insert: ${runErr?.message}` });
-
+// deno-lint-ignore no-explicit-any
+async function runSync(supabase: any, runId: string) {
   const envs = loadEnvs();
   const summary: Record<string, number | string> = {};
   let total = 0;
@@ -150,15 +135,45 @@ Deno.serve(async (req) => {
     await supabase
       .from("ghl_sync_runs")
       .update({ status: "ok", slot_count: total, finished_at: new Date().toISOString() })
-      .eq("id", run.id);
-
-    return json(200, { ok: true, slot_count: total, by_env: summary });
+      .eq("id", runId);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     await supabase
       .from("ghl_sync_runs")
       .update({ status: "error", error: msg, finished_at: new Date().toISOString() })
-      .eq("id", run.id);
-    return json(500, { error: msg, by_env: summary });
+      .eq("id", runId);
   }
+}
+
+// EdgeRuntime is provided by Supabase Edge Runtime for background tasks.
+// deno-lint-ignore no-explicit-any
+const edgeRuntime: { waitUntil?: (p: Promise<unknown>) => void } | undefined = (globalThis as any).EdgeRuntime;
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!supabaseUrl || !serviceKey) {
+    return json(500, { error: "Missing Supabase environment" });
+  }
+
+  const supabase = createClient(supabaseUrl, serviceKey);
+
+  const { data: run, error: runErr } = await supabase
+    .from("ghl_sync_runs")
+    .insert({ status: "running" })
+    .select("id")
+    .single();
+  if (runErr || !run) return json(500, { error: `run insert: ${runErr?.message}` });
+
+  const task = runSync(supabase, run.id);
+  if (edgeRuntime?.waitUntil) {
+    edgeRuntime.waitUntil(task);
+  } else {
+    // Fallback: fire and forget (cron path also tolerates this).
+    task.catch(() => {});
+  }
+
+  return json(202, { ok: true, run_id: run.id, status: "running" });
 });
