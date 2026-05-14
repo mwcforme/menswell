@@ -11,24 +11,26 @@ export interface CenterCalendar {
 
 // Production calendars (live GHL location Ghstz8eIsHWLeXek47dk).
 const PROD_CALENDARS: Record<LocationKey, CenterCalendar> = {
-  richmond:        { key: "richmond",        label: "Richmond",        calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
-  "virginia-beach":{ key: "virginia-beach",  label: "Virginia Beach",  calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
-  "newport-news":  { key: "newport-news",    label: "Newport News",    calendarId: "lBaRbjUpEmesxEloFBME" },
+  richmond: { key: "richmond", label: "Richmond", calendarId: "1Cfy5JnO2A4ggiZlMVvX" },
+  "virginia-beach": { key: "virginia-beach", label: "Virginia Beach", calendarId: "4xmnBGMWJ6TVUKcAPpPb" },
+  "newport-news": { key: "newport-news", label: "Newport News", calendarId: "lBaRbjUpEmesxEloFBME" },
 };
 
 // Stage calendars (sandbox GHL location CKDRQ73SXifxYOqPLLq0).
 const STAGE_CALENDARS: Record<LocationKey, CenterCalendar> = {
-  richmond:        { key: "richmond",        label: "Richmond",        calendarId: "CpcOAez2bv3tQTvTdRkO" },
-  "virginia-beach":{ key: "virginia-beach",  label: "Virginia Beach",  calendarId: "r1IBpjVKT05qyfH2hcwv" },
-  "newport-news":  { key: "newport-news",    label: "Newport News",    calendarId: "6cSOOYintvb8y0B42uTc" },
+  richmond: { key: "richmond", label: "Richmond", calendarId: "CpcOAez2bv3tQTvTdRkO" },
+  "virginia-beach": { key: "virginia-beach", label: "Virginia Beach", calendarId: "r1IBpjVKT05qyfH2hcwv" },
+  "newport-news": { key: "newport-news", label: "Newport News", calendarId: "6cSOOYintvb8y0B42uTc" },
 };
 
-export const CENTER_CALENDARS: Record<LocationKey, CenterCalendar> =
-  IS_PROD ? PROD_CALENDARS : STAGE_CALENDARS;
+export const CENTER_CALENDARS: Record<LocationKey, CenterCalendar> = IS_PROD ? PROD_CALENDARS : STAGE_CALENDARS;
 
 export const TIMEZONE = "America/New_York";
 
-export interface FreeSlot { startTime: string; endTime: string; }
+export interface FreeSlot {
+  startTime: string;
+  endTime: string;
+}
 
 interface FreeSlotsResponse {
   // GHL returns either { _dates_: { 'YYYY-MM-DD': { slots: string[] } } } or a flat array depending on version
@@ -55,9 +57,9 @@ export async function getFreeSlots(location: LocationKey, startDate: Date, endDa
 
 export interface BookAppointmentInput {
   location: LocationKey;
-  contactId: string;          // GHL contact id (create or upsert first)
-  startTime: string;          // ISO string
-  endTime?: string;           // optional, GHL infers from calendar duration
+  contactId: string; // GHL contact id (create or upsert first)
+  startTime: string; // ISO string
+  endTime?: string; // optional, GHL infers from calendar duration
   title?: string;
   notes?: string;
 }
