@@ -427,11 +427,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           >
             <ChevronLeft size={16} /> Prev
           </button>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
-              {fmtWeekRange(weekStart)}
-            </div>
-          </div>
+          <div style={{ flex: 1 }} />
           <button
             type="button"
             onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 4); setWeekStart(w); }}
