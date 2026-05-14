@@ -32,7 +32,7 @@ function loadEnvs(): Env[] {
     },
     {
       name: "stage",
-      apiKey: Deno.env.get("GHL_API_KEY_STAGE"),
+      apiKey: Deno.env.get("GHL_API_KEY_STAGE_1") ?? Deno.env.get("GHL_API_KEY_STAGE"),
       centers: [
         { key: "richmond",        calendarId: "CpcOAez2bv3tQTvTdRkO" },
         { key: "virginia-beach",  calendarId: "r1IBpjVKT05qyfH2hcwv" },
