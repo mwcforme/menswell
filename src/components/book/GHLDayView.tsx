@@ -190,13 +190,12 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
 };
 
 
-const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
-  const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
-  // Rolling 7-day window starting today (not week-aligned) so we always show
-  // a full week of upcoming availability instead of just the remainder.
-  const [weekStart, setWeekStart] = useState<Date>(() => {
-    const t = new Date(); t.setHours(0, 0, 0, 0); return t;
-  });
+const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, urgencyTier, onBooked }: Props) => {
+  // Anchor "today" to ET, not the visitor's local midnight, so the picker is
+  // correct for PT/MT/CT visitors near midnight ET.
+  const today = useMemo(() => dateFromEtYmd(todayET()), []);
+  // Rolling 7-day window starting today (Sun-Sat naturally included).
+  const [weekStart, setWeekStart] = useState<Date>(() => dateFromEtYmd(todayET()));
   const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -211,17 +210,17 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
-  // Tick every 15s so the "X seconds ago" label stays fresh
+  // Tick every 5s so the "X seconds ago" label stays fresh
   useEffect(() => {
-    const t = window.setInterval(() => setNowTick(Date.now()), 15_000);
+    const t = window.setInterval(() => setNowTick(Date.now()), 5_000);
     return () => window.clearInterval(t);
   }, []);
 
   const cal = CENTER_CALENDARS[location];
 
-  // Only future days (today + later) within the visible week
+  // Visible week: 7 days from weekStart.
   const days = useMemo(() => {
-    return Array.from({ length: 5 })
+    return Array.from({ length: 7 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
