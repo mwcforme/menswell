@@ -29,7 +29,7 @@ const PROD_CALENDARS: Record<string, string> = {
 
 const STAGE_CALENDARS: Record<string, string> = {
   richmond: "CpcOAez2bv3tQTvTdRkO",
-  "virginia-beach": "r1IBpjVKT05qyfH2hcwv",
+  "virginia-beach": "HbuYjmaupXDpYoiYzvUk",
   "newport-news": "6cSOOYintvb8y0B42uTc",
 };
 
