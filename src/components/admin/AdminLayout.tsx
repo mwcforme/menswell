@@ -8,6 +8,7 @@ import {
   RefreshCw,
   LogOut,
 } from "lucide-react";
+import { EnvSwitcher } from "./EnvSwitcher";
 
 const NAV = [
   { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
@@ -88,7 +89,10 @@ export function AdminLayout({ title, children }: Props) {
             <h1 className="text-lg font-semibold tracking-wide" style={{ fontFamily: "Oswald, Inter, sans-serif" }}>
               {title}
             </h1>
-            <div className="text-xs text-white/60">{email}</div>
+            <div className="flex items-center gap-4">
+              <EnvSwitcher />
+              <div className="text-xs text-white/60">{email}</div>
+            </div>
           </header>
           <main className="flex-1 overflow-auto p-5 md:p-7">{children}</main>
         </div>

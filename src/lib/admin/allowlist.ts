@@ -11,7 +11,8 @@
  *   2. Edit `public.is_admin_email` via a new migration.
  */
 export const ADMIN_EMAILS: readonly string[] = [
-  "chris@menswellnesscenters.com",
+  "eobrien@mwcforme.com",
+  "hammad@mwcforme.com",
 ];
 
 export const isAdminEmail = (email: string | null | undefined): boolean =>
