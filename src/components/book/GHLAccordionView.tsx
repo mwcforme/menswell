@@ -162,7 +162,7 @@ const AccordionDay = memo(function AccordionDay({
   const ribbon = isToday ? "TODAY" : isTomorrow ? "TMRW" : null;
 
   const headerBg = isExpanded ? ORANGE : INK;
-  const headerColor = "#FFFFFF";
+  const headerColor = isExpanded ? INK : "#FFFFFF";
   const disabled = !available;
   const badgeText = isSunday ? "Closed" : !available ? "Full" : `${count} slots`;
 
