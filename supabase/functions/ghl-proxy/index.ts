@@ -186,9 +186,11 @@ Deno.serve(async (req) => {
     const text = await upstream.text();
     const data = text ? safeJson(text) : null;
     if (!upstream.ok) {
-      console.error(`[ghl-proxy] ${env} ${method} ${cleanPath} -> ${upstream.status}: ${text.slice(0, 500)}`);
+      console.error(`[ghl-proxy] ${env} ${method} ${cleanPath} -> ${upstream.status} locId=${locationId}: ${text.slice(0, 800)}`);
     }
-    return json(upstream.status, { ok: upstream.ok, status: upstream.status, data });
+    // Always return 200 so the supabase-js client surfaces the body to callers.
+    // Real upstream status lives in the JSON payload.
+    return json(200, { ok: upstream.ok, status: upstream.status, data, upstreamBody: upstream.ok ? undefined : text.slice(0, 800) });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return json(502, { error: `GHL request failed: ${message}` });
