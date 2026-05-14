@@ -435,8 +435,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           >
             <ChevronLeft size={16} /> Prev
           </button>
-          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
-            {fmtWeekRange(weekStart)}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
+              {fmtWeekRange(weekStart)}
+            </div>
+            <div style={{ fontSize: 10, color: MUTED, marginTop: 2, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+              Eastern Time · Virginia clinics
+            </div>
           </div>
           <button
             type="button"
