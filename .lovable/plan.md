@@ -1,40 +1,46 @@
-# Required GHL scopes for the stage API key
+# Virginia Beach (stage) calendar — file map and likely cause
 
-The `ghl-proxy` edge function only calls three GHL endpoints. For each, here is the exact scope GHL requires on a Private Integration Token (Settings → Private Integrations → New).
+## Backend (sync + proxy)
 
-## Mandatory scopes (check these)
+- `supabase/functions/ghl-sync/index.ts`
+  Hardcodes the 6-calendar list (prod + stage). Stage Virginia Beach = `HbuYjmaupXDpYoiYzvUk` (line 38). Pulls `/calendars/<id>/free-slots` from GHL with the stage API key and writes rows to `ghl_free_slots` (`calendar_id`, `location`, `slot_start`, `slot_end`).
+- `supabase/functions/ghl-sync-validate/index.ts`
+  Hourly audit; same calendar id constants. Logs drift to `booking_event_log`.
+- `supabase/functions/ghl-proxy/index.ts`
+  Env-aware passthrough used for live GHL reads (and bookings). `Origin` decides prod vs stage credentials. Not used by DayView for slot reads — DayView reads the cache table directly.
+- DB table `ghl_free_slots` (public read RLS).
+  Currently holds **469 stage Virginia Beach rows under `HbuYjmaupXDpYoiYzvUk`** (verified just now), so the cache is healthy.
 
-| Purpose | Endpoint | Scope (View) | Scope (Edit) |
-|---|---|---|---|
-| Load free slots on /book/schedule | `GET /calendars/{calendarId}/free-slots` | `calendars/events.readonly` | — |
-| Upsert the lead as a GHL contact | `POST /contacts/upsert` | `contacts.readonly` | `contacts.write` |
-| Create the confirmed appointment | `POST /calendars/events/appointments` | `calendars/events.readonly` | `calendars/events.write` |
-| (Implicit) resolve the location the calendars belong to | n/a | `locations.readonly` | — |
+## Frontend (calendar selection + render)
 
-So in the PIT scope picker, tick:
+- `src/lib/env.ts`
+  Decides `IS_PROD`. Anything not on `book.menswellnesscenters.com` (or sister hosts) → `stage`. Override via `?env=prod|stage|auto` (persisted in localStorage as `mwc_env_override`).
+- `src/lib/ghlCalendars.ts`
+  `CENTER_CALENDARS` switches on `IS_PROD`. Stage Virginia Beach → `HbuYjmaupXDpYoiYzvUk`. Prod Virginia Beach → `4xmnBGMWJ6TVUKcAPpPb`.
+- `src/lib/etDate.ts`
+  ET-safe date helpers used by DayView/AccordionView for keying slots.
+- `src/components/book/GHLDayView.tsx`
+  Reads `CENTER_CALENDARS[location].calendarId` and queries `ghl_free_slots` directly via `supabase.from('ghl_free_slots')`. Renders the per-day badge ("Closed" for Sunday, "Full" when `slotsByDay[key]` is empty, else `N slots` / `Only N left`).
+- `src/components/book/GHLAccordionView.tsx`
+  Same data path, alternate UI.
+- `src/pages/book/BookSchedule.tsx` / `BookSchedule2.tsx`
+  Pages that mount the views and pass `location="virginia-beach"`.
 
-- `View Calendars`  → `calendars.readonly`
-- `View Calendar Events` → `calendars/events.readonly`
-- `Edit Calendar Events` → `calendars/events.write`
-- `View Contacts` → `contacts.readonly`
-- `Edit Contacts` → `contacts.write`
-- `View Locations` → `locations.readonly`
+## Why stage is showing Full / Closed even though slots exist
 
-That is the full set the current proxy code exercises. Nothing else is needed.
+There is no missing/incorrect slot data — the cache has 469 rows for `HbuYjmaupXDpYoiYzvUk`. The most plausible reasons the UI still shows Full/Closed:
 
-## Critical: token must be issued from the right subaccount
+1. **The user is hitting prod calendar id by mistake.** If the browser has `mwc_env_override=prod` saved in localStorage (e.g. you ever opened `?env=prod`), `IS_PROD` becomes `true` and DayView queries `4xmnBGMWJ6TVUKcAPpPb`, which has only 78 rows and runs out of future days quickly. Visit `?env=auto` (or `?env=stage`) once to reset.
+2. **Published vs preview.** The timezone fix in `etDate.ts` and the stage calendar id swap are only on the preview build until you click Publish. The public `menswell.lovable.app` URL still serves the older bundle that hashes against `r1IBpjVKT05qyfH2hcwv` (54 rows, ends 2026-05-22) — which would also explain why later weeks read as Full and earlier ones look thin.
+3. **Past-time dropping in `dropPastSlots`.** DayView filters out any slot earlier than "now" in ET. Slots earlier today that already passed correctly render the day as Full once everything is in the past.
 
-The PIT must be created **inside the same subaccount that owns the three calendars** (`CpcOAez2bv3tQTvTdRkO`, `r1IBpjVKT05qyfH2hcwv`, `6cSOOYintvb8y0B42uTc`). A token from any other subaccount will keep returning `"Calendar does not belong to this location"` — which is exactly the error our diagnostic test surfaced, regardless of scopes.
+## Proposed verification (no edits in plan mode)
 
-While you are in that subaccount, also copy its Location ID (Settings → Business Profile → Location ID) and confirm it matches `GHL_LOCATION_ID_STAGE_1`.
+- Confirm `IS_PROD` in the live session: open devtools console on the failing page and run `window.localStorage.getItem('mwc_env_override')` and `location.hostname`.
+- Confirm the bundle is reading the right calendar id: in devtools network panel, find the `ghl_free_slots?...calendar_id=eq.<id>` request — it should be `HbuYjmaupXDpYoiYzvUk` on stage.
+- If both look right, query `ghl_free_slots` for `calendar_id=HbuYjmaupXDpYoiYzvUk` filtered to the visible week to make sure rows fall inside the week the UI is asking for.
 
-## After you generate the new key
+## Most likely fix path
 
-1. Update the secret `GHL_API_KEY_STAGE` with the new PIT.
-2. Confirm `GHL_LOCATION_ID_STAGE_1` is the Location ID of that same subaccount.
-3. Tell me when done and I will:
-   - Re-run the diagnostic POST against `/calendars/events/appointments` and the GET against `/free-slots` for all three stage calendars.
-   - Confirm we get `200` / `201` responses.
-   - Report back with the verdict (and clean up the temporary `upstreamBody` debug field on the proxy if everything is green).
-
-No code changes are required for this step — only the secret and PIT scopes.
+- Publish the project so `menswell.lovable.app` serves the current `ghlCalendars.ts` (`HbuYjmaupXDpYoiYzvUk`) and the ET date helpers.
+- Have the user clear the `mwc_env_override` key (or visit `?env=auto`) to make sure they aren't pinned to prod on the stage host.
