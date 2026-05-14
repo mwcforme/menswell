@@ -230,18 +230,19 @@ Deno.serve(async (req) => {
   }
   const captureId = inserted.id as string;
 
-  // ---- Forward to GHL ----
-  const ghlToken = Deno.env.get("GHL_API_KEY");
-  if (!ghlToken) {
+  // ---- Forward to GHL (env-aware) ----
+  const appEnv = detectEnv(req, (raw as Record<string, unknown>).__env);
+  const { apiKey: ghlToken, locationId: ghlLocationId } = envCreds(appEnv);
+  if (!ghlToken || !ghlLocationId) {
     await supabase
       .from("lead_captures")
-      .update({ crm_status: "failed", crm_error: "GHL_API_KEY not configured" })
+      .update({ crm_status: "failed", crm_error: `GHL ${appEnv} credentials not configured` })
       .eq("id", captureId);
     return json(502, { ok: false, capture_id: captureId, error: "CRM not configured" });
   }
 
   try {
-    const { contactId } = await forwardToGhl(canonical, ghlToken);
+    const { contactId } = await forwardToGhl(canonical, ghlToken, ghlLocationId);
     await supabase
       .from("lead_captures")
       .update({ crm_status: "synced", crm_contact_id: contactId })
