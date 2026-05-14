@@ -126,7 +126,7 @@ const SlotButton = memo(function SlotButton({ iso, selected, onSelect }: SlotBut
         <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
           {time}
         </span>
-        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: selected ? "rgba(255,255,255,0.9)" : MUTED }}>
+        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: selected ? INK : MUTED }}>
           {ampm}
         </span>
       </div>
