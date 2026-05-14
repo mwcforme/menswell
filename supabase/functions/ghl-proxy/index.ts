@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
     }
     // Always return 200 so the supabase-js client surfaces the body to callers.
     // Real upstream status lives in the JSON payload.
-    return json(200, { ok: upstream.ok, status: upstream.status, data, upstreamBody: upstream.ok ? undefined : text.slice(0, 800) });
+    return json(200, { ok: upstream.ok, status: upstream.status, data });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     return json(502, { error: `GHL request failed: ${message}` });
