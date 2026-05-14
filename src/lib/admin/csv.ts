@@ -12,7 +12,7 @@ const escapeCell = (v: unknown): string => {
   return s;
 };
 
-export function downloadCsv<T extends Record<string, unknown>>(
+export function downloadCsv<T>(
   filename: string,
   rows: T[],
   columns: { key: keyof T; header: string }[],
