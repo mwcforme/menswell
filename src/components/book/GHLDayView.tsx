@@ -212,6 +212,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const lastUpdatedRef = useRef<Date | null>(null);
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
   const [nowTick, setNowTick] = useState<number>(Date.now());
+  const confirmBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  // Move focus to the confirm button when a slot is picked (a11y + CRO).
+  useEffect(() => {
+    if (selectedSlot && confirmBtnRef.current) {
+      confirmBtnRef.current.focus({ preventScroll: false });
+    }
+  }, [selectedSlot]);
 
   // Tick every 5s so the "X seconds ago" label stays fresh
   useEffect(() => {
