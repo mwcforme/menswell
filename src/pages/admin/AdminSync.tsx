@@ -48,10 +48,13 @@ export default function AdminSync() {
 
   const runSync = async () => {
     setBusy("sync"); setError(null);
+    // ghl-sync returns 202 immediately and runs the work in the background.
+    // The auto-poll picks up the running row and flips it to ok/error.
     const { error } = await supabase.functions.invoke("ghl-sync");
-    setBusy(null);
     if (error) setError(error.message);
     await load();
+    // Brief debounce so the button doesn't get hammered.
+    setTimeout(() => setBusy(null), 1500);
   };
 
   const runValidate = async () => {
