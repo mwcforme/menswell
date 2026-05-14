@@ -568,6 +568,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           style={{ borderTop: `1px solid ${LINE}`, background: SURFACE }}
         >
           <button
+            ref={confirmBtnRef}
             type="button"
             onClick={() => canConfirm && setModalOpen(true)}
             disabled={!canConfirm}
