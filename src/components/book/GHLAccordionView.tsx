@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, memo, useCallback } from "react";
 import { Loader2, ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CENTER_CALENDARS, TIMEZONE, type LocationKey } from "@/lib/ghlCalendars";
+import { addDaysInTimeZone, dateFromYmdInTimeZone, isSundayInTimeZone, ymdInTimeZone } from "@/lib/etDate";
 import { supabase } from "@/integrations/supabase/client";
 import { useConfirmAppointment } from "@/domain/booking/useConfirmAppointment";
 
@@ -49,8 +50,7 @@ const BORDER = "#8B92A0";
 const SURFACE = "#FFFFFF";
 const ORANGE = "#E8670A";
 
-const ymd = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const ymd = (d: Date) => ymdInTimeZone(d, TIMEZONE);
 
 const fmtDayShort = (d: Date) =>
   d.toLocaleDateString("en-US", { weekday: "short", timeZone: TIMEZONE }).toUpperCase();
@@ -81,12 +81,7 @@ const isTomorrowET = (day: Date): boolean => {
   return tom === ymd(day);
 };
 
-const dateFromEtYmd = (s: string): Date => {
-  const [y, m, d] = s.split("-").map((n) => parseInt(n, 10));
-  const local = new Date(y, m - 1, d);
-  local.setHours(0, 0, 0, 0);
-  return local;
-};
+const dateFromEtYmd = (s: string): Date => dateFromYmdInTimeZone(s, TIMEZONE);
 
 const dropPastSlots = (day: Date, slots: string[]): string[] => {
   if (!isTodayET(day)) return slots;
