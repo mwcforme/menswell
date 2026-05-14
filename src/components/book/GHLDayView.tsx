@@ -142,12 +142,28 @@ const etHourNow = (): number => {
   return n === 24 ? 0 : n;
 };
 
-// Is the local-midnight day "today" in ET?
-const isTodayET = (day: Date): boolean => {
-  const today = new Intl.DateTimeFormat("en-CA", {
+// Today (and tomorrow) in ET as "YYYY-MM-DD".
+const todayET = (): string =>
+  new Intl.DateTimeFormat("en-CA", {
     timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(new Date()); // "YYYY-MM-DD"
-  return today === ymd(day);
+  }).format(new Date());
+
+const isTodayET = (day: Date): boolean => todayET() === ymd(day);
+const isTomorrowET = (day: Date): boolean => {
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  const tom = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(t);
+  return tom === ymd(day);
+};
+
+// Build a JS Date for ET midnight of the given YYYY-MM-DD string.
+const dateFromEtYmd = (s: string): Date => {
+  const [y, m, d] = s.split("-").map((n) => parseInt(n, 10));
+  const local = new Date(y, m - 1, d);
+  local.setHours(0, 0, 0, 0);
+  return local;
 };
 
 // banned-wording-allow-next-line — GHL API endpoint name
