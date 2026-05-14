@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { trackCro } from "@/hooks/useAnalytics";
 import { COPY } from "@/data/copy";
 
-export const TRTHeader = () => {
+export const TRTHeader = ({ minimal = false }: { minimal?: boolean } = {}) => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -39,6 +39,7 @@ export const TRTHeader = () => {
         </Link>
 
         {/* Desktop right */}
+        {!minimal && (
         <div className="hidden md:flex items-center gap-4">
           <a
             href="tel:+18663444955"
@@ -65,8 +66,10 @@ export const TRTHeader = () => {
             {COPY.cta.bookConsult}
           </button>
         </div>
+        )}
 
         {/* Mobile: phone icon only */}
+        {!minimal && (
         <div className="md:hidden flex items-center">
           <a
             href="tel:+18663444955"
@@ -89,6 +92,7 @@ export const TRTHeader = () => {
             <Phone size={20} className="relative" strokeWidth={2.5} />
           </a>
         </div>
+        )}
       </div>
     </header>
   );
