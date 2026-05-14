@@ -70,7 +70,7 @@ export default function AdminOverview() {
             sub={stats.lastSync?.finished_at ? new Date(stats.lastSync.finished_at).toLocaleString() : "—"}
             tone={stats.lastSync?.status === "ok" ? "ok" : stats.lastSync ? "bad" : "warn"}
           />
-          <Stat label="Cached free slots" value={stats.freeSlotCount} />
+          <Stat label="Cached open slots" value={stats.freeSlotCount} />
           <Stat
             label="Freshest slot fetched"
             value={stats.freshestSlotFetched ? new Date(stats.freshestSlotFetched).toLocaleString() : "—"}
