@@ -1,0 +1,403 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CENTER_CALENDARS, TIMEZONE, type LocationKey } from "@/lib/ghlCalendars";
+import { supabase } from "@/integrations/supabase/client";
+import { useConfirmAppointment } from "@/domain/booking/useConfirmAppointment";
+
+// banned-wording-allow-next-line — GHL API table/endpoint name
+const fetchCachedSlots = async (
+  calendarId: string,
+  start: Date,
+  end: Date,
+): Promise<Record<string, string[]>> => {
+  const { data, error } = await supabase
+    .from("ghl_free_slots")
+    .select("slot_start")
+    .eq("calendar_id", calendarId)
+    .gte("slot_start", start.toISOString())
+    .lt("slot_start", end.toISOString())
+    .order("slot_start", { ascending: true })
+    .limit(1000);
+  if (error) throw new Error(error.message);
+  const out: Record<string, string[]> = {};
+  for (const row of data || []) {
+    const iso = row.slot_start as string;
+    const key = new Intl.DateTimeFormat("en-CA", {
+      timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date(iso));
+    (out[key] ||= []).push(iso);
+  }
+  return out;
+};
+
+interface Props {
+  location: LocationKey;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  notes?: string;
+  source?: string;
+  onBooked?: (slotIso: string) => void;
+}
+
+const INK = "#0B1029";
+const MUTED = "#4B5563";
+const LINE = "#E5E7EB";
+const BORDER = "#8B92A0";
+const SURFACE = "#FFFFFF";
+const ORANGE = "#E8670A";
+
+const ymd = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+const fmtDayShort = (d: Date) =>
+  d.toLocaleDateString("en-US", { weekday: "short", timeZone: TIMEZONE }).toUpperCase();
+const fmtMonthDay = (d: Date) =>
+  d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
+const fmtTimeParts = (iso: string) => {
+  const s = new Date(iso).toLocaleTimeString("en-US", {
+    hour: "numeric", minute: "2-digit", hour12: true, timeZone: TIMEZONE,
+  });
+  const [time, ampm] = s.split(" ");
+  return { time, ampm };
+};
+const fmtFullDay = (d: Date) =>
+  d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: TIMEZONE });
+
+const todayET = (): string =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(new Date());
+
+const isTodayET = (day: Date): boolean => todayET() === ymd(day);
+const isTomorrowET = (day: Date): boolean => {
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  const tom = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(t);
+  return tom === ymd(day);
+};
+
+const dateFromEtYmd = (s: string): Date => {
+  const [y, m, d] = s.split("-").map((n) => parseInt(n, 10));
+  const local = new Date(y, m - 1, d);
+  local.setHours(0, 0, 0, 0);
+  return local;
+};
+
+const dropPastSlots = (day: Date, slots: string[]): string[] => {
+  if (!isTodayET(day)) return slots;
+  const cutoffMs = Date.now();
+  return slots.filter((iso) => new Date(iso).getTime() > cutoffMs);
+};
+
+const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
+  const today = useMemo(() => dateFromEtYmd(todayET()), []);
+  const days = useMemo(() => {
+    return Array.from({ length: 7 }).map((_, i) => {
+      const d = new Date(today); d.setDate(today.getDate() + i); return d;
+    });
+  }, [today]);
+
+  const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [expandedDay, setExpandedDay] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const confirmCtl = useConfirmAppointment({ onBooked: (slot) => onBooked?.(slot) });
+  const submitting = confirmCtl.isSubmitting;
+  const submitError = confirmCtl.error;
+  const initialised = useRef(false);
+
+  const cal = CENTER_CALENDARS[location];
+
+  useEffect(() => {
+    let cancelled = false;
+    const start = new Date(today);
+    const end = new Date(today); end.setDate(end.getDate() + 7);
+    setLoading(true); setLoadError(null);
+    fetchCachedSlots(cal.calendarId, start, end)
+      .then((parsed) => {
+        if (cancelled) return;
+        const out: Record<string, string[]> = {};
+        days.forEach((d) => {
+          const key = ymd(d);
+          const slots = dropPastSlots(d, parsed[key] || []);
+          if (slots.length > 0) out[key] = slots;
+        });
+        setSlotsByDay(out);
+        if (!initialised.current) {
+          const firstWith = days.find((d) => d.getDay() !== 0 && out[ymd(d)]?.length);
+          if (firstWith) setExpandedDay(ymd(firstWith));
+          initialised.current = true;
+        }
+      })
+      .catch((e: Error) => { if (!cancelled) setLoadError(e.message || "Could not load times."); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location]);
+
+  const canConfirm = Boolean(selectedSlot);
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+  const handleFinalConfirm = async () => {
+    if (!selectedSlot) return;
+    const ok = await confirmCtl.confirm({
+      slotIso: selectedSlot,
+      location, firstName, lastName, email, phone, notes, source,
+    });
+    if (ok) setModalOpen(false);
+  };
+
+  return (
+    <>
+      <div
+        style={{
+          background: SURFACE,
+          border: `1px solid ${LINE}`,
+          borderRadius: 16,
+          overflow: "hidden",
+          color: INK,
+          fontFamily: "Inter, system-ui, sans-serif",
+          boxShadow: "0 1px 2px rgba(11,16,41,0.04), 0 24px 48px -24px rgba(11,16,41,0.18)",
+        }}
+      >
+        <div style={{ padding: 16, position: "relative" }}>
+          {loading && (
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.7)", zIndex: 1 }}>
+              <Loader2 size={22} className="animate-spin" color={INK} />
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {days.map((d) => {
+              const key = ymd(d);
+              const isSunday = d.getDay() === 0;
+              const slots = slotsByDay[key] || [];
+              const count = slots.length;
+              const available = count > 0 && !isSunday;
+              const expanded = expandedDay === key && available;
+              const isToday = isTodayET(d);
+              const isTomorrow = isTomorrowET(d);
+              const ribbon = isToday ? "TODAY" : isTomorrow ? "TMRW" : null;
+
+              const headerBg = expanded ? ORANGE : INK;
+              const headerColor = "#FFFFFF";
+              const disabled = !available;
+              const badgeText = isSunday ? "Closed" : !available ? "Full" : `${count} slots`;
+
+              return (
+                <div key={key} style={{ borderRadius: 12, overflow: "hidden", border: expanded ? "none" : `1px solid ${LINE}` }}>
+                  <button
+                    type="button"
+                    disabled={disabled}
+                    aria-expanded={expanded}
+                    aria-label={`${fmtFullDay(d)} — ${badgeText}`}
+                    onClick={() => {
+                      if (disabled) return;
+                      setExpandedDay(expanded ? null : key);
+                      setSelectedSlot(null);
+                    }}
+                    style={{
+                      width: "100%",
+                      background: disabled ? "#F1F2F6" : headerBg,
+                      color: disabled ? MUTED : headerColor,
+                      border: 0,
+                      padding: "14px 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      cursor: disabled ? "not-allowed" : "pointer",
+                      textAlign: "left",
+                      opacity: disabled ? 0.7 : 1,
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {ribbon && (
+                        <span
+                          style={{
+                            display: "inline-block",
+                            alignSelf: "flex-start",
+                            background: expanded ? "rgba(255,255,255,0.2)" : ORANGE,
+                            color: "#FFFFFF",
+                            fontSize: 10,
+                            fontWeight: 800,
+                            letterSpacing: "0.06em",
+                            padding: "2px 6px",
+                            borderRadius: 4,
+                            marginBottom: 2,
+                          }}
+                        >
+                          {ribbon}
+                        </span>
+                      )}
+                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", opacity: 0.85 }}>
+                        {fmtDayShort(d)}
+                      </span>
+                      <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "0.02em" }}>
+                        {fmtMonthDay(d)}
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.9 }}>
+                        {badgeText}
+                      </span>
+                      {!disabled && (expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />)}
+                    </div>
+                  </button>
+
+                  {expanded && (
+                    <div
+                      style={{
+                        background: SURFACE,
+                        borderLeft: `1px solid ${ORANGE}`,
+                        borderRight: `1px solid ${ORANGE}`,
+                        borderBottom: `1px solid ${ORANGE}`,
+                        borderBottomLeftRadius: 12,
+                        borderBottomRightRadius: 12,
+                        padding: 14,
+                      }}
+                    >
+                      <div className="grid grid-cols-2 gap-3">
+                        {slots.map((iso) => {
+                          const active = iso === selectedSlot;
+                          const { time, ampm } = fmtTimeParts(iso);
+                          return (
+                            <button
+                              key={iso}
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => setSelectedSlot(iso)}
+                              style={{
+                                background: active ? ORANGE : SURFACE,
+                                border: active ? "1px solid transparent" : `1px solid ${BORDER}`,
+                                borderRadius: 10, padding: "16px 14px",
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
+                                transition: "background-color 120ms ease",
+                              }}
+                            >
+                              <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+                                <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
+                                  {time}
+                                </span>
+                                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
+                                  {ampm}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {loadError && (
+            <div style={{ marginTop: 10, fontSize: 13, color: "#B91C1C" }}>{loadError}</div>
+          )}
+        </div>
+
+        <div style={{ borderTop: `1px solid ${LINE}`, background: SURFACE, padding: 16 }}>
+          <button
+            type="button"
+            onClick={() => canConfirm && setModalOpen(true)}
+            disabled={!canConfirm}
+            style={{
+              width: "100%", minHeight: 56,
+              background: canConfirm ? ORANGE : "#E5E7EB",
+              color: canConfirm ? "#FFFFFF" : "#5B6271",
+              border: 0, borderRadius: 12, fontSize: 15, fontWeight: 700,
+              letterSpacing: "0.06em", textTransform: "uppercase",
+              cursor: canConfirm ? "pointer" : "not-allowed",
+              fontFamily: "Oswald, Inter, sans-serif",
+              boxShadow: canConfirm ? "0 10px 24px -10px rgba(232,103,10,0.55)" : "none",
+            }}
+          >
+            {canConfirm && selectedSlot
+              ? (() => {
+                  const dayLabel = new Date(selectedSlot).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
+                  const { time, ampm } = fmtTimeParts(selectedSlot);
+                  return `Confirm ${dayLabel} · ${time} ${ampm} →`;
+                })()
+              : "Tap a time above to continue"}
+          </button>
+        </div>
+      </div>
+
+      <Dialog open={modalOpen} onOpenChange={(o) => !submitting && setModalOpen(o)}>
+        <DialogContent className="sm:max-w-md" style={{ background: SURFACE, color: INK, border: `1px solid ${LINE}`, fontFamily: "Inter, sans-serif" }}>
+          <DialogHeader>
+            <DialogTitle style={{ color: INK, fontFamily: "Oswald, Inter, sans-serif", letterSpacing: "0.02em" }}>
+              Confirm your appointment
+            </DialogTitle>
+          </DialogHeader>
+          <div style={{ background: "#F7F8FB", border: `1px solid ${LINE}`, borderRadius: 12, padding: 16, marginTop: 4 }}>
+            <div style={{ fontSize: 12, color: MUTED, textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 700, marginBottom: 8 }}>
+              You're booking
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>
+              New Patient Consultation (60 min)
+            </div>
+            {selectedSlot && (
+              <div style={{ fontSize: 15, color: INK, marginBottom: 4 }}>
+                {fmtFullDay(new Date(selectedSlot))} · {fmtTimeParts(selectedSlot).time} {fmtTimeParts(selectedSlot).ampm} ET
+              </div>
+            )}
+            <div style={{ fontSize: 14, color: MUTED }}>{cal.label}, In-person</div>
+            {fullName && (
+              <div style={{ fontSize: 14, color: MUTED, marginTop: 8 }}>
+                Under: <strong style={{ color: INK }}>{fullName}</strong>
+              </div>
+            )}
+          </div>
+
+          {submitError && (
+            <div role="alert" style={{ marginTop: 12, padding: "12px 14px", background: "#FEF2F2", border: "1px solid #EF4444", borderRadius: 8, color: "#B91C1C", fontSize: 13 }}>
+              {submitError}
+            </div>
+          )}
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+            <button
+              type="button"
+              onClick={handleFinalConfirm}
+              disabled={submitting || !!confirmCtl.redirect}
+              style={{
+                width: "100%", minHeight: 52,
+                background: ORANGE, color: "#FFFFFF",
+                border: 0, borderRadius: 12, fontSize: 15, fontWeight: 700,
+                letterSpacing: "0.06em", textTransform: "uppercase",
+                cursor: submitting ? "wait" : "pointer",
+                opacity: submitting ? 0.6 : 1,
+                fontFamily: "Oswald, Inter, sans-serif",
+                display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
+                boxShadow: "0 10px 24px -10px rgba(232,103,10,0.55)",
+              }}
+            >
+              {submitting && <Loader2 size={16} className="animate-spin" />}
+              {submitting ? "Booking..." : "Confirm booking"}
+            </button>
+            <button
+              type="button"
+              onClick={() => { if (!submitting) { confirmCtl.cancelRedirect(); setModalOpen(false); } }}
+              style={{ width: "100%", minHeight: 44, background: "transparent", color: MUTED, border: 0, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+            >
+              ← Change time
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+export default GHLAccordionView;
