@@ -45,6 +45,8 @@ interface Props {
   phone?: string;
   notes?: string;
   source?: string;
+  /** From URL: drives the "Earliest available for you" recommended-slot card. */
+  urgencyTier?: "early" | "urgent" | "building" | "overdue" | "long_overdue" | "flexible" | string;
   onBooked?: (slotIso: string) => void;
 }
 
@@ -82,9 +84,9 @@ const fmtDayShort = (d: Date) =>
 const fmtMonthDay = (d: Date) =>
   d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
 const fmtWeekRange = (start: Date) => {
-  const end = new Date(start); end.setDate(end.getDate() + 4);
-  const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE });
+  const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: TIMEZONE });
   return `${s} – ${e}`;
 };
 const fmtTimeParts = (iso: string) => {
@@ -142,12 +144,28 @@ const etHourNow = (): number => {
   return n === 24 ? 0 : n;
 };
 
-// Is the local-midnight day "today" in ET?
-const isTodayET = (day: Date): boolean => {
-  const today = new Intl.DateTimeFormat("en-CA", {
+// Today (and tomorrow) in ET as "YYYY-MM-DD".
+const todayET = (): string =>
+  new Intl.DateTimeFormat("en-CA", {
     timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
-  }).format(new Date()); // "YYYY-MM-DD"
-  return today === ymd(day);
+  }).format(new Date());
+
+const isTodayET = (day: Date): boolean => todayET() === ymd(day);
+const isTomorrowET = (day: Date): boolean => {
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  const tom = new Intl.DateTimeFormat("en-CA", {
+    timeZone: TIMEZONE, year: "numeric", month: "2-digit", day: "2-digit",
+  }).format(t);
+  return tom === ymd(day);
+};
+
+// Build a JS Date for ET midnight of the given YYYY-MM-DD string.
+const dateFromEtYmd = (s: string): Date => {
+  const [y, m, d] = s.split("-").map((n) => parseInt(n, 10));
+  const local = new Date(y, m - 1, d);
+  local.setHours(0, 0, 0, 0);
+  return local;
 };
 
 // banned-wording-allow-next-line — GHL API endpoint name
@@ -174,13 +192,12 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
 };
 
 
-const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
-  const today = useMemo(() => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; }, []);
-  // Rolling 7-day window starting today (not week-aligned) so we always show
-  // a full week of upcoming availability instead of just the remainder.
-  const [weekStart, setWeekStart] = useState<Date>(() => {
-    const t = new Date(); t.setHours(0, 0, 0, 0); return t;
-  });
+const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source, urgencyTier, onBooked }: Props) => {
+  // Anchor "today" to ET, not the visitor's local midnight, so the picker is
+  // correct for PT/MT/CT visitors near midnight ET.
+  const today = useMemo(() => dateFromEtYmd(todayET()), []);
+  // Rolling 7-day window starting today (Sun-Sat naturally included).
+  const [weekStart, setWeekStart] = useState<Date>(() => dateFromEtYmd(todayET()));
   const [slotsByDay, setSlotsByDay] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -195,17 +212,17 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
   const [nowTick, setNowTick] = useState<number>(Date.now());
 
-  // Tick every 15s so the "X seconds ago" label stays fresh
+  // Tick every 5s so the "X seconds ago" label stays fresh
   useEffect(() => {
-    const t = window.setInterval(() => setNowTick(Date.now()), 15_000);
+    const t = window.setInterval(() => setNowTick(Date.now()), 5_000);
     return () => window.clearInterval(t);
   }, []);
 
   const cal = CENTER_CALENDARS[location];
 
-  // Only future days (today + later) within the visible week
+  // Visible week: 7 days from weekStart.
   const days = useMemo(() => {
-    return Array.from({ length: 5 })
+    return Array.from({ length: 7 })
       .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
       .filter((d) => d >= today);
   }, [weekStart, today]);
@@ -217,7 +234,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 5); end.setHours(0, 0, 0, 0);
+    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -258,13 +275,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
 
 
     load(refreshNonce > 0 ? "manual" : "initial");
-    // Auto-refresh every 30 min. On tab focus, only refresh if data is >5 min old.
-    const interval = window.setInterval(() => load("timer"), 30 * 60 * 1000);
+    // Auto-refresh every 30 sec so the live-availability badge reflects real demand.
+    // On tab focus, force-refresh if data is >30s old.
+    const interval = window.setInterval(() => load("timer"), 30 * 1000);
     const onFocus = () => {
       // Read freshest lastUpdated from closure-safe ref via state setter pattern
       // (acceptable here: at worst we refresh once when not strictly needed)
       const last = lastUpdatedRef.current;
-      if (!last || Date.now() - last.getTime() > 5 * 60 * 1000) load("focus");
+      if (!last || Date.now() - last.getTime() > 30 * 1000) load("focus");
     };
     window.addEventListener("focus", onFocus);
 
@@ -279,6 +297,29 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const times = selectedDay ? slotsByDay[selectedDay] || [] : [];
   const canConfirm = Boolean(selectedSlot);
   const prevDisabled = weekStart <= today;
+
+  // Earliest 2 actually-available slots across the visible window — drives §2 hero card.
+  const recommendedSlots = useMemo(() => {
+    const all: { iso: string; day: Date }[] = [];
+    days.forEach((d) => {
+      const key = ymd(d);
+      (slotsByDay[key] || []).forEach((iso) => all.push({ iso, day: d }));
+    });
+    all.sort((a, b) => new Date(a.iso).getTime() - new Date(b.iso).getTime());
+    return all.slice(0, 2);
+  }, [days, slotsByDay]);
+
+  const showRecommended =
+    urgencyTier === "early" || urgencyTier === "urgent" || urgencyTier === "long_overdue" || urgencyTier === "overdue";
+
+  // One-tap confirm for the recommended-slot card.
+  const confirmDirectly = (iso: string) => {
+    setSelectedSlot(iso);
+    void confirmCtl.confirm({
+      slotIso: iso,
+      location, firstName, lastName, email, phone, notes, source,
+    });
+  };
 
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
@@ -321,13 +362,67 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         </div>
 
 
+        {/* RECOMMENDED EARLIEST SLOTS (urgency-driven) */}
+        {showRecommended && recommendedSlots.length > 0 && (
+          <div className="px-5 md:px-7 pt-5">
+            <div
+              style={{
+                background: ORANGE_SOFT,
+                borderLeft: `4px solid ${ORANGE}`,
+                borderRadius: 12,
+                padding: "14px 16px",
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.06em", color: ORANGE_DEEP, textTransform: "uppercase", marginBottom: 10, display: "flex", alignItems: "center", gap: 6 }}>
+                ⚡ Earliest available for you
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {recommendedSlots.map(({ iso, day }) => {
+                  const { time, ampm } = fmtTimeParts(iso);
+                  const dayLabel = isTodayET(day)
+                    ? "Today"
+                    : isTomorrowET(day)
+                      ? "Tomorrow"
+                      : day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE });
+                  return (
+                    <button
+                      key={iso}
+                      type="button"
+                      disabled={submitting}
+                      onClick={() => confirmDirectly(iso)}
+                      style={{
+                        background: SURFACE,
+                        border: `1.5px solid ${ORANGE}`,
+                        borderRadius: 10,
+                        padding: "12px 14px",
+                        textAlign: "left",
+                        cursor: submitting ? "wait" : "pointer",
+                        color: INK,
+                      }}
+                    >
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: ORANGE_DEEP, textTransform: "uppercase" }}>
+                        {dayLabel}
+                      </div>
+                      <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, marginTop: 2 }}>
+                        {time} <span style={{ fontSize: 13, color: MUTED }}>{ampm}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              <div style={{ fontSize: 12, color: MUTED, marginTop: 10 }}>
+                Or pick another time below ↓
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* WEEK NAV */}
         <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 5); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -340,12 +435,17 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           >
             <ChevronLeft size={16} /> Prev
           </button>
-          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
-            {fmtWeekRange(weekStart)}
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.04em", color: INK_SOFT }}>
+              {fmtWeekRange(weekStart)}
+            </div>
+            <div style={{ fontSize: 10, color: MUTED, marginTop: 2, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+              Eastern Time · Virginia clinics
+            </div>
           </div>
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 5); setWeekStart(w); }}
+            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -371,8 +471,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              className="grid grid-cols-5"
-              style={{ gap: 8 }}
+              className="md:grid md:grid-cols-7 flex md:gap-2 gap-2 overflow-x-auto md:overflow-visible"
+              style={{
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+                paddingBottom: 4,
+              }}
             >
               {days.map((d) => {
                 const key = ymd(d);
@@ -381,14 +485,25 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 const isSunday = d.getDay() === 0;
                 const available = actualCount > 0 && !isSunday;
                 const selected = selectedDay === key;
-                const isToday = ymd(today) === key;
+                const isToday = isTodayET(d);
+                const isTomorrow = isTomorrowET(d);
+                const scarce = available && count > 0 && count <= 3;
                 const badgeText = !loading
                   ? isSunday
-                    ? "CLOSED"
-                    : available
-                      ? `${count} OPEN`
-                      : "FULL"
+                    ? "Closed"
+                    : !available
+                      ? "Full"
+                      : scarce
+                        ? `Only ${count} left`
+                        : `${count} slots`
                   : "···";
+                const badgeColor = selected
+                  ? INK
+                  : isSunday || !available
+                    ? MUTED
+                    : scarce
+                      ? ORANGE
+                      : INK_SOFT;
                 return (
                   <button
                     key={key}
@@ -398,48 +513,66 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
-                      background: selected ? INK : SURFACE,
-                      border: `1.5px solid ${selected ? INK : BORDER}`,
-                      borderRadius: 12, padding: "12px 6px",
-                      color: selected ? "#FFFFFF" : INK,
-                      cursor: isSunday || !available ? "default" : "pointer",
+                      flex: "0 0 22%",
+                      minWidth: 88,
+                      scrollSnapAlign: "start",
+                      background: selected ? SURFACE : isSunday || !available ? "#F1F2F6" : INK,
+                      border: selected ? `2px solid ${ORANGE}` : `1.5px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
+                      borderRadius: 12,
+                      padding: "10px 6px 12px",
+                      color: selected ? INK : isSunday || !available ? MUTED : "#FFFFFF",
+                      cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
                       transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                       position: "relative",
                       boxShadow: selected
-                        ? "0 8px 18px -10px rgba(11,16,41,0.45)"
-                        : available
-                          ? "0 1px 0 rgba(11,16,41,0.03)"
-                          : "inset 0 0 0 9999px rgba(11,16,41,0.015)",
-                      opacity: available || selected ? 1 : 0.85,
+                        ? `0 0 0 2px ${ORANGE}33, 0 8px 18px -10px rgba(232,103,10,0.45)`
+                        : "0 1px 0 rgba(11,16,41,0.03)",
+                      opacity: !available && !selected ? 0.55 : 1,
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : available ? INK_SOFT : MUTED, marginBottom: 4, opacity: available || selected ? 1 : 0.6 }}>
-                      {isToday ? "TODAY" : fmtDayShort(d)}
+                    {/* Selected dot */}
+                    {selected && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)",
+                          width: 6, height: 6, borderRadius: 999, background: ORANGE,
+                        }}
+                      />
+                    )}
+                    {/* TODAY / TOMORROW pill */}
+                    {(isToday || isTomorrow) && (
+                      <div
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 800,
+                          letterSpacing: "0.08em",
+                          padding: "2px 6px",
+                          borderRadius: 999,
+                          display: "inline-block",
+                          marginBottom: 4,
+                          background: isToday ? ORANGE : "transparent",
+                          color: isToday ? "#FFFFFF" : selected ? ORANGE : "#FFFFFF",
+                          border: isTomorrow ? `1px solid ${selected ? ORANGE : "rgba(255,255,255,0.7)"}` : "none",
+                        }}
+                      >
+                        {isToday ? "TODAY" : "TOMORROW"}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? INK_SOFT : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
+                      {fmtDayShort(d)}
                     </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", opacity: available || selected ? 1 : 0.45 }}>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
                       {fmtMonthDay(d)}
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: 700,
-                        color: selected
-                          ? "#FFFFFF"
-                          : available
-                            ? INK_SOFT
-                            : MUTED,
-                        background: selected
-                          ? "rgba(255,255,255,0.18)"
-                          : available
-                            ? "#EEF1F6"
-                            : "transparent",
+                        color: badgeColor,
                         marginTop: 6,
-                        letterSpacing: "0.06em",
-                        padding: "3px 7px",
-                        borderRadius: 999,
-                        display: "inline-block",
-                        opacity: available || selected ? 1 : 0.7,
+                        letterSpacing: "0.04em",
                       }}
                     >
                       {badgeText}
@@ -571,8 +704,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             }}
           >
             {canConfirm && selectedSlot
-              ? `Confirm ${fmtTimeParts(selectedSlot).time} ${fmtTimeParts(selectedSlot).ampm}`
-              : "Select a time to continue"}
+              ? (() => {
+                  const day = new Date(selectedSlot);
+                  const dayLabel = day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
+                  const { time, ampm } = fmtTimeParts(selectedSlot);
+                  return `Confirm ${dayLabel} · ${time} ${ampm} →`;
+                })()
+              : "Tap a time above to continue"}
           </button>
         </div>
       </div>
