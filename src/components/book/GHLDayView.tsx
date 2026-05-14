@@ -84,9 +84,9 @@ const fmtDayShort = (d: Date) =>
 const fmtMonthDay = (d: Date) =>
   d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
 const fmtWeekRange = (start: Date) => {
-  const end = new Date(start); end.setDate(end.getDate() + 4);
-  const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-  const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const end = new Date(start); end.setDate(end.getDate() + 6);
+  const s = start.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: TIMEZONE });
+  const e = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: TIMEZONE });
   return `${s} – ${e}`;
 };
 const fmtTimeParts = (iso: string) => {
