@@ -298,6 +298,29 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const canConfirm = Boolean(selectedSlot);
   const prevDisabled = weekStart <= today;
 
+  // Earliest 2 actually-available slots across the visible window — drives §2 hero card.
+  const recommendedSlots = useMemo(() => {
+    const all: { iso: string; day: Date }[] = [];
+    days.forEach((d) => {
+      const key = ymd(d);
+      (slotsByDay[key] || []).forEach((iso) => all.push({ iso, day: d }));
+    });
+    all.sort((a, b) => new Date(a.iso).getTime() - new Date(b.iso).getTime());
+    return all.slice(0, 2);
+  }, [days, slotsByDay]);
+
+  const showRecommended =
+    urgencyTier === "early" || urgencyTier === "urgent" || urgencyTier === "long_overdue" || urgencyTier === "overdue";
+
+  // One-tap confirm for the recommended-slot card.
+  const confirmDirectly = (iso: string) => {
+    setSelectedSlot(iso);
+    void confirmCtl.confirm({
+      slotIso: iso,
+      location, firstName, lastName, email, phone, notes, source,
+    });
+  };
+
   const handleFinalConfirm = async () => {
     if (!selectedSlot) return;
     const ok = await confirmCtl.confirm({
