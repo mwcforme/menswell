@@ -389,8 +389,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
             </div>
           ) : (
             <div
-              className="grid grid-cols-5"
-              style={{ gap: 8 }}
+              className="md:grid md:grid-cols-7 flex md:gap-2 gap-2 overflow-x-auto md:overflow-visible"
+              style={{
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+                paddingBottom: 4,
+              }}
             >
               {days.map((d) => {
                 const key = ymd(d);
@@ -399,14 +403,25 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 const isSunday = d.getDay() === 0;
                 const available = actualCount > 0 && !isSunday;
                 const selected = selectedDay === key;
-                const isToday = ymd(today) === key;
+                const isToday = isTodayET(d);
+                const isTomorrow = isTomorrowET(d);
+                const scarce = available && count > 0 && count <= 3;
                 const badgeText = !loading
                   ? isSunday
-                    ? "CLOSED"
-                    : available
-                      ? `${count} OPEN`
-                      : "FULL"
+                    ? "Closed"
+                    : !available
+                      ? "Full"
+                      : scarce
+                        ? `Only ${count} left`
+                        : `${count} slots`
                   : "···";
+                const badgeColor = selected
+                  ? INK
+                  : isSunday || !available
+                    ? MUTED
+                    : scarce
+                      ? ORANGE
+                      : INK_SOFT;
                 return (
                   <button
                     key={key}
@@ -416,48 +431,66 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
-                      background: selected ? INK : SURFACE,
-                      border: `1.5px solid ${selected ? INK : BORDER}`,
-                      borderRadius: 12, padding: "12px 6px",
-                      color: selected ? "#FFFFFF" : INK,
-                      cursor: isSunday || !available ? "default" : "pointer",
+                      flex: "0 0 22%",
+                      minWidth: 88,
+                      scrollSnapAlign: "start",
+                      background: selected ? SURFACE : isSunday || !available ? "#F1F2F6" : INK,
+                      border: selected ? `2px solid ${ORANGE}` : `1.5px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
+                      borderRadius: 12,
+                      padding: "10px 6px 12px",
+                      color: selected ? INK : isSunday || !available ? MUTED : "#FFFFFF",
+                      cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
                       transition: "background 120ms ease, transform 120ms ease, box-shadow 120ms ease",
                       position: "relative",
                       boxShadow: selected
-                        ? "0 8px 18px -10px rgba(11,16,41,0.45)"
-                        : available
-                          ? "0 1px 0 rgba(11,16,41,0.03)"
-                          : "inset 0 0 0 9999px rgba(11,16,41,0.015)",
-                      opacity: available || selected ? 1 : 0.85,
+                        ? `0 0 0 2px ${ORANGE}33, 0 8px 18px -10px rgba(232,103,10,0.45)`
+                        : "0 1px 0 rgba(11,16,41,0.03)",
+                      opacity: !available && !selected ? 0.55 : 1,
                     }}
                   >
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : available ? INK_SOFT : MUTED, marginBottom: 4, opacity: available || selected ? 1 : 0.6 }}>
-                      {isToday ? "TODAY" : fmtDayShort(d)}
+                    {/* Selected dot */}
+                    {selected && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute", top: 6, left: "50%", transform: "translateX(-50%)",
+                          width: 6, height: 6, borderRadius: 999, background: ORANGE,
+                        }}
+                      />
+                    )}
+                    {/* TODAY / TOMORROW pill */}
+                    {(isToday || isTomorrow) && (
+                      <div
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 800,
+                          letterSpacing: "0.08em",
+                          padding: "2px 6px",
+                          borderRadius: 999,
+                          display: "inline-block",
+                          marginBottom: 4,
+                          background: isToday ? ORANGE : "transparent",
+                          color: isToday ? "#FFFFFF" : selected ? ORANGE : "#FFFFFF",
+                          border: isTomorrow ? `1px solid ${selected ? ORANGE : "rgba(255,255,255,0.7)"}` : "none",
+                        }}
+                      >
+                        {isToday ? "TODAY" : "TOMORROW"}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? INK_SOFT : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
+                      {fmtDayShort(d)}
                     </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 17, letterSpacing: "0.02em", opacity: available || selected ? 1 : 0.45 }}>
+                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
                       {fmtMonthDay(d)}
                     </div>
                     <div
                       style={{
-                        fontSize: 11,
+                        fontSize: 10,
                         fontWeight: 700,
-                        color: selected
-                          ? "#FFFFFF"
-                          : available
-                            ? INK_SOFT
-                            : MUTED,
-                        background: selected
-                          ? "rgba(255,255,255,0.18)"
-                          : available
-                            ? "#EEF1F6"
-                            : "transparent",
+                        color: badgeColor,
                         marginTop: 6,
-                        letterSpacing: "0.06em",
-                        padding: "3px 7px",
-                        borderRadius: 999,
-                        display: "inline-block",
-                        opacity: available || selected ? 1 : 0.7,
+                        letterSpacing: "0.04em",
                       }}
                     >
                       {badgeText}
