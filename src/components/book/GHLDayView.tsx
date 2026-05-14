@@ -582,21 +582,22 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                   <button
                     key={iso}
                     type="button"
+                    aria-pressed={active}
                     onClick={() => setSelectedSlot(iso)}
                     style={{
-                      background: SURFACE,
-                      border: `2px solid ${active ? ORANGE : BORDER}`,
+                      background: active ? ORANGE : SURFACE,
+                      border: active ? "1px solid transparent" : `1px solid ${BORDER}`,
                       borderRadius: 12, padding: "16px 18px",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      color: INK, cursor: "pointer", textAlign: "center",
-                      transition: "border-color 120ms ease",
+                      color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
+                      transition: "background-color 120ms ease",
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
                       <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
                         {time}
                       </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: MUTED }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
                         {ampm}
                       </span>
                     </div>
