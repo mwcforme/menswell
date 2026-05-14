@@ -43,12 +43,19 @@ function readOverride(): "prod" | "stage" | null {
 }
 
 function detect(): "prod" | "stage" {
-  if (typeof window === "undefined") return "prod";
+  if (typeof window === "undefined") return "stage";
   const override = readOverride();
   if (override) return override;
-  // Default everywhere to prod so the preview shows real GHL availability.
-  // Append `?env=stage` to any URL to flip back to the sandbox location.
-  return "prod";
+  // Only the live custom domain hits production GHL. Everything else
+  // (preview, lovable.app, localhost) routes to the stage sandbox.
+  // Append `?env=prod` to any URL to force prod from a non-prod host.
+  try {
+    const host = window.location.hostname.toLowerCase();
+    if (PROD_HOSTS.has(host)) return "prod";
+  } catch {
+    /* ignore */
+  }
+  return "stage";
 }
 
 export const APP_ENV: "prod" | "stage" = detect();
