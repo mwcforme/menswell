@@ -217,10 +217,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   // Visible window: 7 days from weekStart.
   const days = useMemo(() => {
     return Array.from({ length: 7 })
-      .map((_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; })
+      .map((_, i) => addDaysInTimeZone(weekStart, i, TIMEZONE))
       .filter((d) => d >= today)
       // Hide closed days (Sunday) from the day strip; only show operating days.
-      .filter((d) => d.getDay() !== 0);
+      .filter((d) => !isSundayInTimeZone(d, TIMEZONE));
   }, [weekStart, today]);
 
   const [refreshNonce, setRefreshNonce] = useState(0);
@@ -229,8 +229,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
     let cancelled = false;
     const start = new Date(weekStart);
     if (start < today) start.setTime(today.getTime());
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 7); end.setHours(0, 0, 0, 0);
+    const end = addDaysInTimeZone(weekStart, 7, TIMEZONE);
 
     const load = (reason: "initial" | "timer" | "focus" | "manual") => {
       const isInitial = reason === "initial";
@@ -355,7 +354,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <button
             type="button"
             disabled={prevDisabled}
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() - 7); setWeekStart(w); }}
+            onClick={() => setWeekStart(addDaysInTimeZone(weekStart, -7, TIMEZONE))}
             aria-label="Previous week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
@@ -371,7 +370,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           <div style={{ flex: 1 }} />
           <button
             type="button"
-            onClick={() => { const w = new Date(weekStart); w.setDate(w.getDate() + 7); setWeekStart(w); }}
+            onClick={() => setWeekStart(addDaysInTimeZone(weekStart, 7, TIMEZONE))}
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
