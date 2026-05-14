@@ -300,7 +300,7 @@ export function useConfirmAppointment(opts?: {
         return false;
       }
     },
-    [booking, cancelRedirect, lead, opts, scheduleRedirect, status],
+    [booking, cancelRedirect, opts, scheduleRedirect, status],
   );
 
   return {
