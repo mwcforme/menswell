@@ -111,7 +111,7 @@ function validate(c: CanonicalLead): { ok: true } | { ok: false; error: string }
   return { ok: true };
 }
 
-async function forwardToGhl(c: CanonicalLead, accessToken: string): Promise<{ contactId: string }> {
+async function forwardToGhl(c: CanonicalLead, accessToken: string, locationId: string): Promise<{ contactId: string }> {
   const { firstName, lastName } = splitName(c.fullName);
   const tags = ["external-intake"];
   if (c.form_source_label) tags.push(`form:${c.form_source_label}`);
@@ -123,7 +123,7 @@ async function forwardToGhl(c: CanonicalLead, accessToken: string): Promise<{ co
     ...(lastName ? { lastName } : {}),
     ...(c.email ? { email: c.email } : {}),
     ...(c.phone ? { phone: c.phone } : {}),
-    locationId: GHL_LOCATION_ID,
+    locationId,
     source: c.form_source_label ?? "wordpress-intake",
     tags,
   };
@@ -139,6 +139,11 @@ async function forwardToGhl(c: CanonicalLead, accessToken: string): Promise<{ co
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`GHL ${res.status}: ${text.slice(0, 500)}`);
+  const data = JSON.parse(text);
+  const contactId = data?.contact?.id ?? data?.id;
+  if (!contactId) throw new Error("GHL response missing contact id");
+  return { contactId };
+}
   const data = JSON.parse(text);
   const contactId = data?.contact?.id ?? data?.id;
   if (!contactId) throw new Error("GHL response missing contact id");
