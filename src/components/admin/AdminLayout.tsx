@@ -11,7 +11,7 @@ import {
 import { EnvSwitcher } from "./EnvSwitcher";
 
 const NAV = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
+  { to: "/admin/overview", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/admin/leads", label: "Leads", icon: Users },
   { to: "/admin/events", label: "Events", icon: Activity },
   { to: "/admin/sync", label: "Sync", icon: RefreshCw },

@@ -15,7 +15,7 @@ export default function AdminLogin() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session && isAdminEmail(session.user.email)) {
-        nav("/admin", { replace: true });
+        nav("/admin/overview", { replace: true });
       }
     });
   }, [nav]);
@@ -31,7 +31,7 @@ export default function AdminLogin() {
     setBusy(true);
     setError(null);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/admin`,
+      redirect_uri: `${window.location.origin}/admin/overview`,
     });
     if (result.error) {
       setBusy(false);
