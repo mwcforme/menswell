@@ -351,20 +351,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
           boxShadow: "0 1px 2px rgba(11,16,41,0.04), 0 24px 48px -24px rgba(11,16,41,0.18)",
         }}
       >
-        {/* HEADER */}
-        <div
-          className="px-5 md:px-7 pt-6 md:pt-8 pb-5"
-          style={{ borderBottom: `1px solid ${LINE}`, background: SURFACE }}
-        >
-          <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, letterSpacing: "0.01em", fontSize: "clamp(22px, 3vw, 30px)", lineHeight: 1.1, color: INK }}>
-            {cal.label} clinic
-          </div>
-        </div>
-
+        {/* Clinic name removed from card header — surfaced in the page meta
+            line above (e.g. "Richmond clinic · 60-min · No charge today"). */}
 
         {/* RECOMMENDED EARLIEST SLOTS (urgency-driven) */}
         {showRecommended && recommendedSlots.length > 0 && (
-          <div className="px-5 md:px-7 pt-5">
+          <div className="hidden md:block px-5 md:px-7 pt-5">
             <div
               style={{
                 background: ORANGE_SOFT,
@@ -418,7 +410,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
         )}
 
         {/* WEEK NAV */}
-        <div className="px-5 md:px-7 pt-5 flex items-center justify-between gap-3">
+        <div className="px-4 md:px-7 pt-3 md:pt-5 flex items-center justify-between gap-3">
           <button
             type="button"
             disabled={prevDisabled}
