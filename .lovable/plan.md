@@ -1,64 +1,66 @@
-## What's heavy on iPhone (390px) right now
-
-Above the calendar card, the page stacks 7 distinct vertical blocks before any time appears:
-
-```
-Back  ←  Step 3 of 3 · PICK YOUR TIME  ←  ▬▬▬ progress bar
-"Pick a time that works."
-"60-minute in-person visit at our Virginia clinic."
-[📍 Richmond] [💪 Sexual health] [🕒 60 min · $0 today]
-[Richmond clinic]   ← duplicate inside the white card
-[< Prev   May 13–19, 2026   Next >]
-```
-
-On a 390x732 screen this consumes the full first viewport. The user has to scroll just to see day pills.
-
 ## Goal
 
-One-screen schedule on iPhone: chrome → day pills → first time slot all visible without scrolling.
+After reverting the last edit, redesign the "selected" state for day pills and time slots on `/book/schedule` to match the visual language of iOS 18 system pickers (Calendar app date picker, Clock app time picker, Reminders date chips).
 
-## Changes
+## How iOS handles "selected" today
 
-### 1. `src/pages/book/BookSchedule.tsx` (collapse the dark header)
+iOS 18 pickers use a **single, decisive cue: a solid filled shape in the system accent color, with high-contrast white text inside it**. There is no border, no glow, no dot, no ring. Unselected items are flat text or a near-invisible chip; the selected item is the only filled element on screen.
 
-Replace the 5-block hero (Back + Step + progress + headline + paragraph + 3 chips) with one compact 2-row strip on mobile:
+Key properties:
+- **Fill, not outline.** Selection = solid accent background. Outlines are reserved for "focus" (keyboard) or "today" markers.
+- **Single shape.** Pill or rounded-rect, no inner badge, no second indicator.
+- **High contrast text.** White on the accent fill. Numerals stay the same weight/size — selection does not resize or rescale.
+- **Today vs Selected are visually distinct.** "Today" is accent-colored *text* on a transparent background. "Selected" is white text on an accent *fill*. If today is also selected, the fill wins and white text reads on accent.
+- **No motion on commit.** A 120ms cross-fade between fill colors. No bounce, no shadow swell.
 
-- **Row 1:** `← Back` (left) · thin 3-segment progress bar (right). Drop the "STEP 3 OF 3 · PICK YOUR TIME" label — the filled progress bar already conveys it.
-- **Row 2:** Single line headline `Pick a time.` (or `{firstName}, pick a time.` when present), font-size 18 mobile / 22 desktop, no subtitle paragraph.
-- **Drop the 3 context chips entirely on mobile.** The selected location is already implicit (calendar shows "Richmond clinic" via the inline meta line below — see step 2). The "60 min · $0 today" fact moves into a single grey meta line below the headline: `60-min consult · No charge today`.
-- Drop the bottom "Need help picking a time? Call (866) 344-4955" footer line — keep only the floating header phone button (already visible top-right) so we don't add another row.
-- Tighten outer padding: `py-4` → `py-2` on mobile, `space-y-4` → `space-y-2` on mobile.
-- Desktop (`md:`) keeps the existing fuller layout intact.
+## Apply to /book/schedule
 
-### 2. `src/components/book/GHLDayView.tsx` (drop duplicate clinic header)
+### Day pills (week strip)
 
-- Remove the `{cal.label} clinic` h2 block (lines ~354–362) and its bottom border. The location is already shown in the new compact meta line in step 1.
-- Remove the `pt-6 md:pt-8` top padding on the card; week-nav row becomes the first row.
-- Tighten week-nav padding `px-5 pt-5` → `px-4 pt-3` on mobile.
+States, after revert + redesign:
 
-### 3. Recommended-slots band — mobile collapse
+| State | Background | Text | Border |
+|---|---|---|---|
+| Default (available, dark navy card) | `INK` (navy) | white | `INK` (invisible) |
+| Disabled (Sunday / Full) | `#F1F2F6` light grey | `MUTED` | `LINE` |
+| **Selected** | `ORANGE` solid fill | `#FFFFFF` | none |
+| Today (not selected) | transparent over navy | `ORANGE` text on the TODAY pill, white numerals | none |
+| Tomorrow (not selected) | transparent | white numerals, hairline white pill around "TMRW" | none |
 
-The orange "⚡ Earliest available for you" band (lines ~365–417) duplicates the time grid on mobile. Hide it under `md:` (desktop only). Mobile users get straight to day pills + grid; desktop keeps the urgency CTA.
+The TODAY/TMRW micro-pill stays, but when the day itself is selected the micro-pill simplifies to white text with no border (it's redundant decoration on top of the orange fill — exactly what iOS avoids).
 
-## Net result on iPhone
+The "X slots" / "Full" / "Closed" badge text color when selected becomes `rgba(255,255,255,0.85)` so it reads on orange.
 
-```
-←Back              ▬▬▬
-Pick a time.
-60-min consult · No charge today
-─────────────────────────
-< Prev   May 13–19   Next >
-[Wed] [Thu•] [Fri] [Sat] →
-─────────────────────────
-8:00 AM    11:00 AM
-12:00 PM   1:00 PM
-```
+No shadow, no ring, no scale change.
 
-Approximate height saved above the day pills: ~260px → ~110px (≈150px reclaimed, roughly two extra time slots visible without scrolling).
+### Time slots (grid below)
 
-## Files touched
+| State | Background | Text | Border |
+|---|---|---|---|
+| Default | `SURFACE` (white card) | `INK` numerals, `MUTED` AM/PM | `1px solid BORDER` |
+| **Selected** | `ORANGE` solid fill | white numerals, `rgba(255,255,255,0.9)` AM/PM | none |
 
-- `src/pages/book/BookSchedule.tsx` — header rewrite, drop chips/footer
-- `src/components/book/GHLDayView.tsx` — drop clinic-name h2, mobile-hide recommended band, tighten padding
+Drop the colored drop-shadow we had previously — iOS does not shadow filled selections in pickers. Border on default cards stays at 1px hairline (not 2px) so the unselected grid stays calm and the orange fill is the only thing that "pops."
 
-No copy added. No business logic, routing, or GHL data flow changes.
+### Why this differs from "orange border only"
+
+The orange-border-only version we just shipped reads as a *focus ring* in iOS grammar, not a selection. iOS users expect the chosen value to be the visually heaviest element. A 2px outline on an otherwise-identical card looks like the cursor landed there, not like a commitment. Filled accent restores that commitment cue with one shape, one color, one weight — still a single visual cue, just the right one.
+
+### Accessibility / contrast
+
+- White on `ORANGE` (`#E8670A`): ~4.7:1 — passes WCAG AA for normal text and AA Large for the 22px Oswald numerals.
+- White on `INK` navy: well above 7:1.
+- `MUTED` on `#F1F2F6`: existing disabled treatment, unchanged.
+- `aria-pressed={selected}` on the day buttons stays; add `aria-pressed` to time slot buttons too (currently missing) so screen readers announce selection independent of color.
+
+## Files
+
+- `src/components/book/GHLDayView.tsx` — day pill style block (~lines 486–555) and time slot style block (~lines 578–608).
+
+No changes to `BookSchedule.tsx`, no token changes, no new assets.
+
+## Out of scope
+
+- Progress bar, back button, header layout (already settled in earlier turns).
+- Confirm bar styling.
+- Modal styling.
