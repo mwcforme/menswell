@@ -491,8 +491,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                   : isSunday || !available
                     ? MUTED
                     : scarce
-                      ? ORANGE
-                      : INK_SOFT;
+                      ? "#FFB37A" // warm amber that reads on the dark navy card
+                      : "rgba(255,255,255,0.85)"; // light on dark navy — was INK_SOFT (invisible)
                 return (
                   <button
                     key={key}
@@ -502,13 +502,13 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                     aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
                     onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                     style={{
-                      flex: "0 0 22%",
-                      minWidth: 88,
+                      flex: "1 1 0",
+                      minWidth: 0,
                       scrollSnapAlign: "start",
                       background: selected ? SURFACE : isSunday || !available ? "#F1F2F6" : INK,
                       border: selected ? `2px solid ${ORANGE}` : `1.5px solid ${selected ? ORANGE : isSunday || !available ? LINE : INK}`,
                       borderRadius: 12,
-                      padding: "10px 6px 12px",
+                      padding: "8px 4px 10px",
                       color: selected ? INK : isSunday || !available ? MUTED : "#FFFFFF",
                       cursor: isSunday || !available ? "not-allowed" : "pointer",
                       textAlign: "center",
