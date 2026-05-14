@@ -408,7 +408,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
                 const key = ymd(d);
                 const actualCount = slotsByDay[key]?.length || 0;
                 const count = actualCount;
-                const isSunday = d.getDay() === 0;
+                const isSunday = isSundayInTimeZone(d, TIMEZONE);
                 const available = actualCount > 0 && !isSunday;
                 const selected = selectedDay === key;
                 const isToday = isTodayET(d);
