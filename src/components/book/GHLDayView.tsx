@@ -215,9 +215,18 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, notes, source
   const confirmBtnRef = useRef<HTMLButtonElement | null>(null);
 
   // Move focus to the confirm button when a slot is picked (a11y + CRO).
+  // Focus without auto-scroll, then smooth-scroll into view only if needed,
+  // so mobile doesn't snap awkwardly when the button is already on-screen.
   useEffect(() => {
-    if (selectedSlot && confirmBtnRef.current) {
-      confirmBtnRef.current.focus({ preventScroll: false });
+    if (!selectedSlot) return;
+    const btn = confirmBtnRef.current;
+    if (!btn) return;
+    btn.focus({ preventScroll: true });
+    const r = btn.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const fullyVisible = r.top >= 0 && r.bottom <= vh;
+    if (!fullyVisible) {
+      btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
   }, [selectedSlot]);
 

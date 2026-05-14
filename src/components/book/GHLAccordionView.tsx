@@ -283,8 +283,15 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
   const confirmBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
-    if (selectedSlot && confirmBtnRef.current) {
-      confirmBtnRef.current.focus({ preventScroll: false });
+    if (!selectedSlot) return;
+    const btn = confirmBtnRef.current;
+    if (!btn) return;
+    btn.focus({ preventScroll: true });
+    const r = btn.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const fullyVisible = r.top >= 0 && r.bottom <= vh;
+    if (!fullyVisible) {
+      btn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
     }
   }, [selectedSlot]);
 
