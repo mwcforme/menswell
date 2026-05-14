@@ -220,7 +220,7 @@ const AccordionDay = memo(function AccordionDay({
           </span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.9 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em" }}>
             {badgeText}
           </span>
           {!disabled && (
