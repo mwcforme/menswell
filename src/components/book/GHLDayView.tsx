@@ -45,6 +45,8 @@ interface Props {
   phone?: string;
   notes?: string;
   source?: string;
+  /** From URL: drives the "Earliest available for you" recommended-slot card. */
+  urgencyTier?: "early" | "urgent" | "building" | "overdue" | "long_overdue" | "flexible" | string;
   onBooked?: (slotIso: string) => void;
 }
 
