@@ -12,7 +12,7 @@
  *     personalised DOM text or PHI-laden URLs to Sentry.
  */
 import { useEffect } from "react";
-import { Outlet, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { useBookingStore } from "@/domain/booking/bookingStore";
 import { sanitizeAnalyticsForBookingRoute } from "@/lib/analyticsGuard";
@@ -20,12 +20,7 @@ import { sanitizeAnalyticsForBookingRoute } from "@/lib/analyticsGuard";
 // Routes that may be entered without prior identity (entry / fallback pages).
 const PUBLIC_BOOKING_ROUTES = new Set(["/book/lets-talk"]);
 
-interface ServiceRoute {
-  service?: string;
-  fallback: string;
-}
-
-const lpFor = ({ service }: ServiceRoute): string => {
+const lpFor = (service?: string): string => {
   switch (service) {
     case "wl":
       return "/wl";
@@ -39,7 +34,6 @@ const lpFor = ({ service }: ServiceRoute): string => {
 
 export const BookingRouteGuard = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const identity = useBookingStore((s) => s.identity);
   const symptom = useBookingStore((s) => s.symptom);
   const service = useBookingStore((s) => s.service);
@@ -65,7 +59,7 @@ export const BookingRouteGuard = () => {
 
   // No identity → must re-enter through the LP hero form.
   if (!isPublic && !identity) {
-    return <Navigate to={lpFor({ service, fallback: "/" })} replace />;
+    return <Navigate to={lpFor(service)} replace />;
   }
 
   // Step prerequisites: any step past /book/symptom requires a symptom choice.
@@ -80,10 +74,6 @@ export const BookingRouteGuard = () => {
   // Note: we deliberately do NOT block /book/confirmed when appointmentTime
   // is missing — once a user has booked we want them to land on the page even
   // if the store is partially populated by a slow round-trip.
-
-  // Suppress unused warning: navigate is reserved for future imperative
-  // redirects (e.g. session timeout) — keep the hook so it's stable.
-  void navigate;
 
   return <Outlet />;
 };

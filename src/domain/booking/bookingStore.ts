@@ -98,6 +98,3 @@ export const useBookingStore = create<BookingState & BookingActions>()(
     },
   ),
 );
-
-/** Read current state imperatively (e.g. inside event handlers / non-React code). */
-export const getBookingSnapshot = (): BookingState => useBookingStore.getState();
