@@ -12,7 +12,7 @@
  *     personalised DOM text or PHI-laden URLs to Sentry.
  */
 import { useEffect } from "react";
-import { Outlet, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { Outlet, useLocation, Navigate } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { useBookingStore } from "@/domain/booking/bookingStore";
 import { sanitizeAnalyticsForBookingRoute } from "@/lib/analyticsGuard";
@@ -20,12 +20,7 @@ import { sanitizeAnalyticsForBookingRoute } from "@/lib/analyticsGuard";
 // Routes that may be entered without prior identity (entry / fallback pages).
 const PUBLIC_BOOKING_ROUTES = new Set(["/book/lets-talk"]);
 
-interface ServiceRoute {
-  service?: string;
-  fallback: string;
-}
-
-const lpFor = ({ service }: ServiceRoute): string => {
+const lpFor = (service?: string): string => {
   switch (service) {
     case "wl":
       return "/wl";
