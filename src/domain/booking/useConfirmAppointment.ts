@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServices } from "@/app/providers/ServicesProvider";
-import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController";
-import { confirmLeadSchema, type ConfirmLeadInput } from "@/domain/leads/leadFormSchema";
 import type { LocationKey } from "@/lib/ghlCalendars";
+import type { MwcCustomFields } from "@/services/contracts/ILeadSubmitter";
 import { trackConversion } from "@/lib/capi";
+
+/**
+ * Generic notes string written to GHL appointments. Real clinical context
+ * (symptom / duration / urgency / freeform note) is routed via structured
+ * contact custom fields so it never appears in URLs, GA4, or appointment
+ * subjects. See PHI refactor in `BookingRouteGuard`.
+ */
+const GENERIC_APPT_NOTES = "Booked via mwc booking funnel. See contact custom fields for clinical context.";
 
 export interface ConfirmInput {
   slotIso: string;
@@ -12,8 +19,9 @@ export interface ConfirmInput {
   lastName?: string;
   email?: string;
   phone?: string;
-  notes?: string;
   source?: string;
+  /** Structured PHI-safe context — written to GHL contact custom fields only. */
+  customFields?: MwcCustomFields;
 }
 
 export type ConfirmStatus = "idle" | "submitting" | "success" | "error";
