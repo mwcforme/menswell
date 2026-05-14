@@ -280,6 +280,13 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
   const submitting = confirmCtl.isSubmitting;
   const submitError = confirmCtl.error;
   const initialised = useRef(false);
+  const confirmBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (selectedSlot && confirmBtnRef.current) {
+      confirmBtnRef.current.focus({ preventScroll: false });
+    }
+  }, [selectedSlot]);
 
   const cal = CENTER_CALENDARS[location];
 
