@@ -1,59 +1,33 @@
-## Root cause for `/admin/sync` not loading
+## Goal
+Show a small floating "ENV: STAGE" badge on funnels and landing pages whenever the app is not running against prod GHL, and let it open the existing env switcher.
 
-The sidebar in `AdminLayout.tsx` links to `/admin/sync`, but no `AdminSync.tsx` page exists and no matching `<Route>` is registered in `src/App.tsx`. The path falls through to the `NotFound` route.
+## Scope
+Visible on: `/`, `/wl`, `/ed`, `/quiz/*`, `/book/*`, and any `/lp/*`.
+Hidden on: `/admin/*` (admin already has `EnvSwitcher` in the layout), legal pages, 404.
 
-## Admin-section regression — issues found
+## Behavior
+- Render only when `APP_ENV !== "prod"` OR `localStorage.mwc_env_override` is set (so an admin who forced `?env=stage` on the prod domain also sees it).
+- Fixed-position pill, bottom-left on desktop, above the `MobileFooterBar` (56px) on mobile so it never overlaps existing CTAs.
+- Click opens a small popover containing the same three actions as the admin `EnvSwitcher` (Stage / Prod / Auto), reusing its logic. Reload on selection (matches existing behavior).
+- Color: amber/emerald pill for stage, red for prod-on-non-prod-host (manual override). Uses inline styles consistent with funnel chrome (no new tokens).
+- Non-blocking: `pointer-events-auto` on the pill itself, `aria-label="Environment switcher"`.
 
-| # | Area | Issue | Severity |
-|---|---|---|---|
-| 1 | Routing | `/admin/sync` route + page missing (sidebar links to it) | Bug — confirmed broken |
-| 2 | `AdminOverview` "Cached open slots" stat | Counts every row in `ghl_free_slots`, including slots from the inactive env's calendars. Frontend reads filter by env calendar IDs, so the stat overstates what users actually see. | Inconsistency |
-| 3 | `RequireAdmin` | Both `onAuthStateChange` and `getSession` race to call `setState`. Harmless today but can flash the loader after sign-out. | Minor |
-| 4 | `EnvSwitcher` | Reload-on-toggle works, but there is no visual confirmation of which env actually loaded after the reload (it reads `APP_ENV`, fine), and there's no way to clear the override back to "auto". | Polish |
-| 5 | `AdminLeads` | Filter dropdown options are `ok / pending / failed` but the table also shows other statuses (e.g. blank/`null`). Filtering hides rows with no status. | Minor |
+## Files
+- New `src/components/shared/EnvBadge.tsx` — floating pill + popover. Internally calls the same `setEnv` logic (extract to a tiny shared helper).
+- New `src/lib/envOverride.ts` — exports `setEnvOverride(next)` and `hasEnvOverride()` so both `EnvBadge` and `admin/EnvSwitcher` share one source of truth.
+- Edit `src/components/admin/EnvSwitcher.tsx` — use the shared helper (no behavior change).
+- Edit `src/App.tsx` — mount `<EnvBadge />` next to `<MobileFooterBar />`. The badge component itself decides visibility based on route prefix + env, so App.tsx stays clean.
 
-## Fixes
+## Route allowlist (inside EnvBadge)
+```
+const ALLOWED_PREFIXES = ["/", "/wl", "/ed", "/quiz", "/book", "/lp"];
+// match exact "/" or startsWith "<prefix>/" / "<prefix>"
+// explicitly skip "/admin"
+```
 
-### 1. Create `/admin/sync`
-- New `src/pages/admin/AdminSync.tsx`:
-  - Loads last 50 rows from `ghl_sync_runs` ordered by `started_at desc` (id, status, slot_count, started_at, finished_at, error).
-  - Status pill: `ok` green, `running` amber, anything else red.
-  - "Run sync now" button → `supabase.functions.invoke('ghl-sync')`, then refresh.
-  - "Run validation" button → `supabase.functions.invoke('ghl-sync-validate')`, surfaces returned summary (env, expected vs actual calendar IDs, drift count) inline.
-  - Refresh button + 30 s auto-poll while a run is `running`.
-  - Wrapped in `<AdminLayout title="Sync">`.
-- Register route in `src/App.tsx`:
-  ```tsx
-  <Route path="/admin/sync" element={<RequireAdmin><AdminSync /></RequireAdmin>} />
-  ```
-
-### 2. Overview "Cached open slots" accuracy
-- Filter the count query by the active env's calendar IDs (import the same calendar list the booking funnel uses) so the number matches what the frontend actually serves. Add a tiny "(env: stage|prod)" caption under the stat.
-
-### 3. RequireAdmin tightening
-- Drop the redundant `getSession()` block; rely on `onAuthStateChange` (it fires immediately with the current session). Removes the race and simplifies the gate.
-
-### 4. EnvSwitcher polish
-- Add a third `Auto` button that clears `mwc_env_override` from localStorage then reloads, so admins can return to host-based detection.
-- Add a small caption under the toggle: `Active: <APP_ENV>`.
-
-### 5. AdminLeads filter
-- Add `Other` option that filters to rows where `crm_status` is not in (`ok`,`pending`,`failed`), and include null/blank statuses in the default `All` view (already does — verify).
-
-## Files touched
-
-- `src/App.tsx` — add AdminSync route + import
-- `src/pages/admin/AdminSync.tsx` — new
-- `src/pages/admin/AdminOverview.tsx` — env-filtered slot count
-- `src/components/admin/RequireAdmin.tsx` — simplify
-- `src/components/admin/EnvSwitcher.tsx` — Auto button + caption
-- `src/pages/admin/AdminLeads.tsx` — Other status filter
-
-No DB migrations, no edge-function changes (existing `ghl-sync` and `ghl-sync-validate` already deployed and used as-is).
-
-## Verification
-
-- Navigate to `/admin/sync` while logged in as `eobrien@mwcforme.com` → table renders with recent runs; both buttons trigger their edge functions and the table refreshes.
-- Toggle EnvSwitcher between Stage / Prod / Auto; confirm reload + caption update.
-- Sign out from sidebar → bounces to `/admin` login (no loader flicker).
-- `/admin/overview`, `/admin/leads`, `/admin/events` continue to load with no regressions.
+## Acceptance
+- On `menswell.lovable.app/` a small "ENV: STAGE" pill is visible bottom-left.
+- Clicking it opens a popover with Stage / Prod / Auto; choosing one reloads and updates the pill.
+- On `book.menswellnesscenters.com/` (prod, no override) the badge does not render.
+- On `/admin/*` the badge does not render (existing admin switcher remains).
+- No layout shift; pill sits above mobile footer bar.

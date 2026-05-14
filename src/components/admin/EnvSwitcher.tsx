@@ -1,6 +1,5 @@
 import { APP_ENV } from "@/lib/env";
-
-const STORAGE_KEY = "mwc_env_override";
+import { setEnvOverride } from "@/lib/envOverride";
 
 /**
  * Admin-only environment selector. Persists choice to localStorage and
@@ -8,15 +7,7 @@ const STORAGE_KEY = "mwc_env_override";
  * "Auto" clears the override and reverts to host-based detection.
  */
 export function EnvSwitcher() {
-  const setEnv = (next: "prod" | "stage" | "auto") => {
-    try {
-      if (next === "auto") window.localStorage.removeItem(STORAGE_KEY);
-      else window.localStorage.setItem(STORAGE_KEY, next);
-    } catch {
-      /* ignore */
-    }
-    window.location.reload();
-  };
+  const setEnv = setEnvOverride;
 
   const options: Array<{ key: "stage" | "prod" | "auto"; activeClass: string }> = [
     { key: "stage", activeClass: "bg-emerald-500 text-white" },
