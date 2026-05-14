@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, memo, useCallback } from "react";
 import { Loader2, ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CENTER_CALENDARS, TIMEZONE, type LocationKey } from "@/lib/ghlCalendars";
@@ -94,6 +94,174 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
   return slots.filter((iso) => new Date(iso).getTime() > cutoffMs);
 };
 
+/* ───── memoized slot button ───── */
+interface SlotButtonProps {
+  iso: string;
+  selected: boolean;
+  onSelect: (iso: string) => void;
+}
+
+const SlotButton = memo(function SlotButton({ iso, selected, onSelect }: SlotButtonProps) {
+  const { time, ampm } = fmtTimeParts(iso);
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      onClick={() => onSelect(iso)}
+      style={{
+        background: selected ? ORANGE : SURFACE,
+        border: selected ? "1px solid transparent" : `1px solid ${BORDER}`,
+        borderRadius: 10,
+        padding: "16px 14px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: selected ? "#FFFFFF" : INK,
+        cursor: "pointer",
+        textAlign: "center",
+        transition: "background-color 120ms ease",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
+        <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
+          {time}
+        </span>
+        <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: selected ? "rgba(255,255,255,0.9)" : MUTED }}>
+          {ampm}
+        </span>
+      </div>
+    </button>
+  );
+});
+
+/* ───── memoized day row ───── */
+interface AccordionDayProps {
+  day: Date;
+  slots: string[];
+  expanded: boolean;
+  selectedSlot: string | null;
+  onToggle: (key: string, isExpanded: boolean) => void;
+  onSelectSlot: (iso: string) => void;
+}
+
+const AccordionDay = memo(function AccordionDay({
+  day,
+  slots,
+  expanded,
+  selectedSlot,
+  onToggle,
+  onSelectSlot,
+}: AccordionDayProps) {
+  const key = ymd(day);
+  const isSunday = day.getDay() === 0;
+  const count = slots.length;
+  const available = count > 0 && !isSunday;
+  const isExpanded = expanded && available;
+  const isToday = isTodayET(day);
+  const isTomorrow = isTomorrowET(day);
+  const ribbon = isToday ? "TODAY" : isTomorrow ? "TMRW" : null;
+
+  const headerBg = isExpanded ? ORANGE : INK;
+  const headerColor = "#FFFFFF";
+  const disabled = !available;
+  const badgeText = isSunday ? "Closed" : !available ? "Full" : `${count} slots`;
+
+  const handleToggle = () => {
+    if (disabled) return;
+    onToggle(key, isExpanded);
+  };
+
+  return (
+    <div style={{ borderRadius: 12, overflow: "hidden", border: isExpanded ? "none" : `1px solid ${LINE}` }}>
+      <button
+        type="button"
+        disabled={disabled}
+        aria-expanded={isExpanded}
+        aria-label={`${fmtFullDay(day)} — ${badgeText}`}
+        onClick={handleToggle}
+        style={{
+          width: "100%",
+          background: disabled ? "#F1F2F6" : headerBg,
+          color: disabled ? MUTED : headerColor,
+          border: 0,
+          padding: "14px 16px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          cursor: disabled ? "not-allowed" : "pointer",
+          textAlign: "left",
+          opacity: disabled ? 0.7 : 1,
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {ribbon && (
+            <span
+              style={{
+                display: "inline-block",
+                alignSelf: "flex-start",
+                background: isExpanded ? "rgba(255,255,255,0.2)" : ORANGE,
+                color: "#FFFFFF",
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: "0.06em",
+                padding: "2px 6px",
+                borderRadius: 4,
+                marginBottom: 2,
+              }}
+            >
+              {ribbon}
+            </span>
+          )}
+          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", opacity: 0.85 }}>
+            {fmtDayShort(day)}
+          </span>
+          <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "0.02em" }}>
+            {fmtMonthDay(day)}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.9 }}>
+            {badgeText}
+          </span>
+          {!disabled && (
+            <span style={{ display: "inline-flex", transition: "transform 280ms ease", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>
+              <ChevronDown size={18} />
+            </span>
+          )}
+        </div>
+      </button>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: isExpanded ? "1fr" : "0fr",
+          transition: "grid-template-rows 280ms cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        <div style={{ overflow: "hidden" }}>
+          <div
+            style={{
+              background: SURFACE,
+              borderLeft: `1px solid ${ORANGE}`,
+              borderRight: `1px solid ${ORANGE}`,
+              borderBottom: `1px solid ${ORANGE}`,
+              borderBottomLeftRadius: 12,
+              borderBottomRightRadius: 12,
+              padding: 14,
+            }}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              {slots.map((iso) => (
+                <SlotButton key={iso} iso={iso} selected={iso === selectedSlot} onSelect={onSelectSlot} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, source, onBooked }: Props) => {
   const today = useMemo(() => dateFromEtYmd(todayET()), []);
   const days = useMemo(() => {
@@ -114,6 +282,16 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
   const initialised = useRef(false);
 
   const cal = CENTER_CALENDARS[location];
+
+  /* stable callbacks so memoized children don't re-render unnecessarily */
+  const handleToggleDay = useCallback((key: string, isExpanded: boolean) => {
+    setExpandedDay(isExpanded ? null : key);
+    setSelectedSlot(null);
+  }, []);
+
+  const handleSelectSlot = useCallback((iso: string) => {
+    setSelectedSlot(iso);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -175,142 +353,17 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, notes, 
           )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {days.map((d) => {
-              const key = ymd(d);
-              const isSunday = d.getDay() === 0;
-              const slots = slotsByDay[key] || [];
-              const count = slots.length;
-              const available = count > 0 && !isSunday;
-              const expanded = expandedDay === key && available;
-              const isToday = isTodayET(d);
-              const isTomorrow = isTomorrowET(d);
-              const ribbon = isToday ? "TODAY" : isTomorrow ? "TMRW" : null;
-
-              const headerBg = expanded ? ORANGE : INK;
-              const headerColor = "#FFFFFF";
-              const disabled = !available;
-              const badgeText = isSunday ? "Closed" : !available ? "Full" : `${count} slots`;
-
-              return (
-                <div key={key} style={{ borderRadius: 12, overflow: "hidden", border: expanded ? "none" : `1px solid ${LINE}` }}>
-                  <button
-                    type="button"
-                    disabled={disabled}
-                    aria-expanded={expanded}
-                    aria-label={`${fmtFullDay(d)} — ${badgeText}`}
-                    onClick={() => {
-                      if (disabled) return;
-                      setExpandedDay(expanded ? null : key);
-                      setSelectedSlot(null);
-                    }}
-                    style={{
-                      width: "100%",
-                      background: disabled ? "#F1F2F6" : headerBg,
-                      color: disabled ? MUTED : headerColor,
-                      border: 0,
-                      padding: "14px 16px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      cursor: disabled ? "not-allowed" : "pointer",
-                      textAlign: "left",
-                      opacity: disabled ? 0.7 : 1,
-                    }}
-                  >
-                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                      {ribbon && (
-                        <span
-                          style={{
-                            display: "inline-block",
-                            alignSelf: "flex-start",
-                            background: expanded ? "rgba(255,255,255,0.2)" : ORANGE,
-                            color: "#FFFFFF",
-                            fontSize: 10,
-                            fontWeight: 800,
-                            letterSpacing: "0.06em",
-                            padding: "2px 6px",
-                            borderRadius: 4,
-                            marginBottom: 2,
-                          }}
-                        >
-                          {ribbon}
-                        </span>
-                      )}
-                      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", opacity: 0.85 }}>
-                        {fmtDayShort(d)}
-                      </span>
-                      <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "0.02em" }}>
-                        {fmtMonthDay(d)}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.9 }}>
-                        {badgeText}
-                      </span>
-                      {!disabled && (
-                        <span style={{ display: "inline-flex", transition: "transform 280ms ease", transform: expanded ? "rotate(180deg)" : "rotate(0deg)" }}>
-                          <ChevronDown size={18} />
-                        </span>
-                      )}
-                    </div>
-                  </button>
-
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateRows: expanded ? "1fr" : "0fr",
-                      transition: "grid-template-rows 280ms cubic-bezier(0.4, 0, 0.2, 1)",
-                    }}
-                  >
-                    <div style={{ overflow: "hidden" }}>
-                      <div
-                        style={{
-                          background: SURFACE,
-                          borderLeft: `1px solid ${ORANGE}`,
-                          borderRight: `1px solid ${ORANGE}`,
-                          borderBottom: `1px solid ${ORANGE}`,
-                          borderBottomLeftRadius: 12,
-                          borderBottomRightRadius: 12,
-                          padding: 14,
-                        }}
-                      >
-                        <div className="grid grid-cols-2 gap-3">
-                          {slots.map((iso) => {
-                            const active = iso === selectedSlot;
-                            const { time, ampm } = fmtTimeParts(iso);
-                            return (
-                              <button
-                                key={iso}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => setSelectedSlot(iso)}
-                                style={{
-                                  background: active ? ORANGE : SURFACE,
-                                  border: active ? "1px solid transparent" : `1px solid ${BORDER}`,
-                                  borderRadius: 10, padding: "16px 14px",
-                                  display: "flex", alignItems: "center", justifyContent: "center",
-                                  color: active ? "#FFFFFF" : INK, cursor: "pointer", textAlign: "center",
-                                  transition: "background-color 120ms ease",
-                                }}
-                              >
-                                <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                                  <span style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: "0.01em" }}>
-                                    {time}
-                                  </span>
-                                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
-                                    {ampm}
-                                  </span>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+            {days.map((d) => (
+              <AccordionDay
+                key={ymd(d)}
+                day={d}
+                slots={slotsByDay[ymd(d)] || []}
+                expanded={expandedDay === ymd(d)}
+                selectedSlot={selectedSlot}
+                onToggle={handleToggleDay}
+                onSelectSlot={handleSelectSlot}
+              />
+            ))}
           </div>
 
           {loadError && (
