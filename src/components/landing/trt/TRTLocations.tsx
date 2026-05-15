@@ -62,8 +62,8 @@ export const TRTLocations = () => {
                   {l.city}
                 </div>
                 <div className="text-xs mt-1 mb-3" style={{ color: "var(--c-text-on-light-muted)", fontFamily: "Inter, sans-serif" }}>{l.name}</div>
-                <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase" style={{ color: "var(--brand-cta)", fontFamily: "Inter, sans-serif", letterSpacing: "0.06em" }}>
-                  <MapPin className="h-3.5 w-3.5" /> {l.driveTime}
+                <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase" style={{ color: "#000033", fontFamily: "Inter, sans-serif", letterSpacing: "0.06em" }}>
+                  <MapPin className="h-3.5 w-3.5" style={{ color: "var(--brand-cta)" }} /> {l.driveTime}
                 </div>
 
                 {/* Mobile: collapsed by default */}
