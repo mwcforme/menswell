@@ -110,7 +110,9 @@ const BookConfirmed = () => {
           <BookedCelebrationCard
             firstName={firstName}
             apptTime={apptTime}
+            apptIso={effectiveAppt}
             locationCity={center.city}
+            locationAddress={`${center.street}, ${center.cityStateZip}`}
           />
 
           {/* Two-column grid */}
