@@ -182,7 +182,7 @@ export const TRTHero = () => {
               height: 56,
               background: "var(--brand-cta)",
               color: "#FFFFFF",
-              fontSize: 14,
+              fontSize: 19,
               border: "none",
               borderRadius: 8,
               letterSpacing: "0.08em",
