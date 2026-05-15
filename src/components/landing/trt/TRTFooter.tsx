@@ -41,9 +41,7 @@ export const TRTFooter = () => {
               Contact
             </div>
             <ul className="space-y-3 text-sm">
-              <li>Richmond: <a href="tel:8043464636" className="hover:text-white transition-colors">804-346-4636</a></li>
-              <li>Newport News: <a href="tel:7578066263" className="hover:text-white transition-colors">757-806-6263</a></li>
-              <li>Virginia Beach: <a href="tel:7578066263" className="hover:text-white transition-colors">757-806-6263</a></li>
+              <li><a href="tel:8663444955" className="hover:text-white transition-colors">866-344-4955</a></li>
               <li><a href="mailto:info@menswellnesscenters.com" className="hover:text-white transition-colors">info@menswellnesscenters.com</a></li>
             </ul>
           </div>
