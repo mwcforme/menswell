@@ -42,8 +42,8 @@ export const EDManifesto = () => (
 
       <div className="order-1 md:order-2">
         <img
-          src="/images/services/sexual-wellness-couple.png"
-          alt="Couple feeling reconnected after successful in-person ED treatment in Virginia"
+          src="/assets/lp/man-bloodwork-clinic.png"
+          alt="Patient having labs reviewed with a physician at a Men's Wellness Center in Virginia"
           className="rounded-2xl object-cover w-full aspect-[4/3] md:aspect-auto md:h-[460px]"
           loading="lazy"
         />
