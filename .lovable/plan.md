@@ -1,107 +1,77 @@
-# Booking Funnel PHI Refactor — Phases 1 + 2
+## Frontend cleanup pass
 
-Eliminate PHI/PII leakage from URLs, cookies, GA4/GTM, and Sentry on `/book/*` routes. Move clinical data to GHL custom fields. Anonymous flow only — refresh resets.
+A reference audit (`rg` for every `/lovable-uploads`, `/images`, `/logos`, `/videos`, `@/assets`, plus name-grep for every `.tsx` in `landing/`, `quiz/`, `services/`) turned up a fairly large pile of orphaned assets and a couple of dead components left over from the booking refactor. Nothing here changes runtime behavior — it's pure deletion + a small lint tightening.
 
-## 1. New booking state store (Zustand)
+### 1. Delete unused public assets
 
-**Create `src/domain/booking/bookingStore.ts`** — Zustand store backed by `sessionStorage` key `mwc_booking_state_v2`. Shape:
+Confirmed zero references in `src/` or `index.html`:
 
 ```text
-{ symptom, note, duration, urgencyTier, location, appointmentTime, service,
-  identity?: { firstName, lastName?, phone, email, ghlContactId? } }
+public/favicon.ico                       (only favicon.png is linked)
+public/placeholder.svg
+public/lovable-uploads/4dad80ee-…webp
+public/lovable-uploads/9510c713-…png
+public/logos/Primary_Logo_blue.png
+public/logos/Primary_Logo_dark.png
+public/logos/Primary_Logo_white.png
+public/logos/Primary_Logo_white.svg
+public/logos/Symbol_Logo_blue.png
+public/logos/Symbol_Logo_dark.png
+public/logos/Symbol_Logo_white.png
+public/logos/Text_Logo_blue.png
+public/logos/Text_Logo_dark.png
+public/images/hero-still.jpg
+public/images/ghl/footer-logo.png
+public/images/ghl/legitscript-badge.png
+public/images/landing/trt-hero-bg.png
+public/images/locations/richmond-hero.jpg
+public/images/locations/richmond-why.jpg
+public/images/services/anti-aging-bridge.png
+public/images/services/community.jpg
+public/images/services/custom-protocols.jpg
+public/images/services/hair-loss.jpg
+public/images/services/labs-porch.png
+public/images/services/labs.jpg
+public/images/services/peptides.jpg
+public/images/services/sexual-wellness.jpg
+public/images/services/testosterone.jpg
+public/videos/hero-bg-1.mp4
+public/videos/hero-bg-2.mp4
 ```
 
-Exports: `useBookingStore`, `bookingStore.getState/setState`, `reset()`, `setIdentity()`, `setService()`, granular setters per field. Persists every mutation; hydrates on import.
+Kept (still referenced): `favicon.png`, `og-image.png`, `robots.txt`, `llms.txt`, `logos/Text_Logo_white.png`, `images/badges/{clia,hipaa,legitscript}.png`, `images/services/{sexual-wellness-couple.png,weight-loss.jpg}`, `videos/what-to-expect.mp4`, plus all five files in `src/assets/lp/`.
 
-**Create `src/domain/booking/bookingEntry.ts`** — `enterBookingFunnel({...})` resets store, sets identity + service, then `navigate('/book/symptom')` (no query string).
+### 2. Delete dead source components
 
-**Create `src/domain/booking/bookingRouteGuard.tsx`** — wrapper for `/book/*`:
-- On mount: if no `identity`, redirect to `/` (or service-appropriate LP via `service` if known via referrer fallback to `/`).
-- If on a step whose prereqs are missing (e.g. `/book/duration` without `symptom`), redirect to `/book/symptom`.
-- On every route change inside `/book/*`: call `sanitizeAnalyticsForBookingRoute(pathname)`, set Sentry tag `booking_route=true`, stop Replay if running.
+Name-grep across the project shows zero importers:
 
-## 2. Route + page refactor
+- `src/components/landing/trt/TRTMobileCTA.tsx` (superseded by `StickyMobileCTA`)
+- `src/components/landing/trt/TRTTrustBar.tsx` (superseded by `CredibilityBand`)
 
-Modify all `/book/*` pages to read from `useBookingStore()` and navigate without query strings:
-- `src/pages/book/BookSymptom.tsx`
-- `src/pages/book/BookDuration.tsx`
-- `src/pages/book/BookSchedule.tsx`
-- `src/pages/book/BookSchedule2.tsx`
-- `src/pages/book/BookLetsTalk.tsx`
-- `src/pages/book/BookConfirmed.tsx`
-- `src/components/book/GHLDayView.tsx` — props sourced from store; `onBooked` writes `appointmentTime` to store and navigates to `/book/confirmed` with no query.
+### 3. Delete leftover scratch docs
 
-`src/App.tsx` — wrap the `/book/*` route group with `<BookingRouteGuard>`.
+- `.lovable/plan.md` — temporary planning artifact
+- `REFACTOR_NOTES.md` — internal notes from the PHI refactor; superseded by inline JSDoc
 
-Delete `toQueryString`, `fromQueryString`, `useBookingSync` from `src/lib/bookingState.ts` once unreferenced. Keep `labelFor` if still used; otherwise delete the file.
+(`QA.md` and `a11y/contrast-audit.md` kept — they document live policy.)
 
-## 3. Hero-form handoff
+### 4. Tighten ESLint
 
-`src/domain/leads/useLeadSubmitController.ts` — after successful CRM upsert + CAPI `Lead`, call `enterBookingFunnel({ firstName, lastName, phone, email, ghlContactId: result.contactId, service })` instead of building a query-string URL. Drop `nav.go` URL construction.
+`eslint.config.js` currently sets `@typescript-eslint/no-unused-vars: "off"`, which masks exactly the kind of dead-import drift we just cleaned up. Switch to `warn` with the standard ignore patterns:
 
-`src/components/landing/trt/TRTHeroForm.tsx` (and WL/ED equivalents) — remove attribution-based name prefill; users type their name. Keep all other fields/schemas.
+```js
+"@typescript-eslint/no-unused-vars": ["warn", {
+  argsIgnorePattern: "^_",
+  varsIgnorePattern: "^_",
+  caughtErrorsIgnorePattern: "^_",
+}],
+```
 
-## 4. Attribution cookie hardening
+### 5. Out of scope (flagged, not changed)
 
-`src/lib/attribution.ts`:
-- Bump cookie name to `mwc_attr_v2`. Ignore old `mwc_attr` on read.
-- Drop `first_name`/`last_name` from `ATTRIBUTION_KEYS`, from URL/cookie writes, and from `attributionTags()`.
-- Strip `fn`/`ln` URL aliases.
+- `vite.config.ts` still has `org: "REPLACE_WITH_SENTRY_ORG_SLUG"` — needs the real org slug from you before source maps upload works. Leaving the literal in place so the build keeps no-op'ing instead of failing.
+- `App.tsx` `ErrorFallback` uses inline hex colors. That's intentional — it's the boundary that renders if CSS fails to load — so it stays.
 
-## 5. Analytics sanitization
+### Verification
 
-**Create `src/lib/analyticsGuard.ts`** with `sanitizeAnalyticsForBookingRoute(pathname)` — calls `gtag('config', 'G-KHD64CYC2G', { page_location: origin+pathname, page_path: pathname, send_page_view: true })` and pushes a sanitized `dataLayer` event. Wired into `BookingRouteGuard`.
-
-`index.html` — change default `gtag('config', ...)` to `{ send_page_view: false }`. No initial unsanitized page_view.
-
-`src/main.tsx`:
-- Legacy cleanup: clear `mwc_attr` cookie, remove `mwc_booking_state_v1` from sessionStorage.
-- After React mounts (or via a small `RouteAnalytics` component inside `App`), fire a manual `page_view` for non-`/book/*` routes; for `/book/*`, the guard handles it.
-
-## 6. Sentry scoping
-
-`src/lib/sentry.ts`:
-- Global defaults: `sendDefaultPii: false`, replay `maskAllText: true`, `maskAllInputs: true`.
-- Add `beforeSend` and `beforeSendTransaction` that return `null` when `event.request?.url` (or `window.location.pathname`) matches `/book/`.
-- Keep `replaysSessionSampleRate: 0.1` globally.
-- Expose Replay integration so `BookingRouteGuard` can call `Sentry.getReplay()?.stop()` on `/book/*`.
-
-## 7. GHL payload refactor
-
-`src/components/book/GHLDayView.tsx` + `src/domain/booking/useConfirmAppointment.ts`:
-- Drop the `Concern: ... | Duration: ... | Urgency: ... | note` notes string.
-- Set appointment `notes` to `"Booked via web funnel"` (operational, non-clinical).
-- During contact upsert, include structured `customFields` map for the six keys: `mwc_symptom`, `mwc_symptom_duration`, `mwc_urgency_tier`, `mwc_clinical_note` (≤500 chars), `mwc_funnel_service`, `mwc_lp_slug`.
-
-`supabase/functions/ghl-proxy/index.ts` — extend `/contacts/upsert` validator to accept an optional `customFields` object, accepting only the six `mwc_*` keys (string values, ≤500 chars). Forward verbatim. Allowlist otherwise unchanged.
-
-`src/services/contracts/ILeadSubmitter.ts` + `src/lib/ghlCalendars.ts` (`upsertContact`) — extend `LeadInput` with optional `customFields: Record<MwcKey, string>` and forward to proxy.
-
-## 8. Files summary
-
-**Create:** `src/domain/booking/bookingStore.ts`, `bookingRouteGuard.tsx`, `bookingEntry.ts`, `src/lib/analyticsGuard.ts`.
-
-**Modify:** `src/App.tsx`, `src/main.tsx`, `index.html`, `src/lib/sentry.ts`, `src/lib/attribution.ts`, `src/lib/bookingState.ts` (prune), `src/lib/ghlCalendars.ts`, `src/services/contracts/ILeadSubmitter.ts`, `src/domain/leads/useLeadSubmitController.ts`, `src/domain/booking/useConfirmAppointment.ts`, `src/components/book/GHLDayView.tsx`, `src/components/landing/trt/TRTHeroForm.tsx` (+ WL/ED hero forms), all `src/pages/book/*.tsx`, `supabase/functions/ghl-proxy/index.ts`.
-
-## 9. Acceptance verification
-
-After implementation, walk the full funnel and confirm:
-- No PII/PHI in any `/book/*` URL.
-- `mwc_attr` cleared; `mwc_attr_v2` has no name fields.
-- `mwc_booking_state_v1` removed; `mwc_booking_state_v2` resets on refresh via guard redirect.
-- Refresh of `/book/duration` redirects to `/`.
-- Hero `Lead` + final `Schedule` CAPI events still fire.
-- GHL appointment `notes` contains no clinical content; structured fields land on the contact.
-- Sentry events from `/book/*` are dropped.
-- GA4 `page_view` on `/book/*` has clean `page_location`.
-- No remaining imports of `toQueryString`/`fromQueryString`.
-
-## 10. Out of scope (Phase 3 backlog)
-
-`ghl-proxy` origin allowlist + rate limits, `?env=prod` lockdown, `meta-capi` origin gating, Sentry release tagging — separate PR.
-
-## Decisions taken autonomously
-
-- LP-specific redirect target on guard miss: default to `/` (no reliable referrer-derived service signal). If `service` happens to be in the store, route to that LP.
-- Keep `BookSchedule2.tsx` if still routed; otherwise remove on cleanup pass.
-- `customFields` shape uses GHL `customFields: [{ key, field_value }]` array (per LeadConnector v2 API); the proxy validator will accept the six allowed keys and reshape if needed.
+After deletions: build (auto-runs), `node scripts/check-banned-wording.mjs`, and a quick `rg` for any of the deleted filenames to confirm no stragglers.
