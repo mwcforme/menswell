@@ -488,9 +488,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                             : SURFACE,
                         border: selected
                           ? `1px solid ${ORANGE}`
-                          : isSunday || !available
-                            ? `1px solid ${LINE}`
-                            : `1px solid ${LINE}`,
+                          : `1px solid ${BORDER}`,
                         borderRadius: 14,
                         padding: "10px 6px 12px",
                         color: selected
