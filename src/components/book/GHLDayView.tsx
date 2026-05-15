@@ -610,7 +610,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                   const day = new Date(selectedSlot);
                   const dayLabel = day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
                   const { time, ampm } = fmtTimeParts(selectedSlot);
-                  return `Confirm ${dayLabel} · ${time} ${ampm} →`;
+                  return `Confirm ${dayLabel} · ${time} ${ampm} ET →`;
                 })()
               : "Tap a time above to continue"}
           </button>
