@@ -135,8 +135,8 @@ export const TRTHeroFormShort = ({
       }}
     >
       <h2
-        className="font-bold uppercase"
-        style={{ fontFamily: "Oswald, sans-serif", fontSize: 22, color: "#F5F0EB", fontWeight: 700, letterSpacing: "0.05em", lineHeight: 1.15 }}
+        className="font-bold"
+        style={{ fontFamily: "Oswald, sans-serif", fontSize: 22, color: "#F5F0EB", fontWeight: 700, letterSpacing: "0.05em", lineHeight: 1.15, textTransform: "none" }}
       >
         {heading}
       </h2>
@@ -232,6 +232,7 @@ export const TRTHeroFormShort = ({
             marginTop: 8,
             opacity: isSubmitting ? 0.85 : 1,
             cursor: isSubmitting ? "wait" : "pointer",
+            textTransform: "none",
           }}
           onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}

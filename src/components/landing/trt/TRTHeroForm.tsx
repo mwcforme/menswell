@@ -187,7 +187,7 @@ export const TRTHeroForm = ({
       }}
     >
       <h2
-        className="font-bold uppercase"
+        className="font-bold"
         style={{
           fontFamily: "Oswald, sans-serif",
           fontSize: 22,
@@ -195,6 +195,7 @@ export const TRTHeroForm = ({
           fontWeight: 700,
           letterSpacing: "0.05em",
           lineHeight: 1.15,
+          textTransform: "none",
         }}
       >
         {heading}
@@ -332,6 +333,7 @@ export const TRTHeroForm = ({
             opacity: isSubmitting ? 0.85 : 1,
             cursor: isSubmitting ? "wait" : "pointer",
             transition: "background-color 180ms ease, transform 180ms ease",
+            textTransform: "none",
           }}
           onMouseEnter={(e) => { if (!isSubmitting) { e.currentTarget.style.background = "var(--brand-cta-hover)"; e.currentTarget.style.transform = "scale(1.01)"; } }}
           onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; e.currentTarget.style.transform = "scale(1)"; }}
