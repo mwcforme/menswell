@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
+import { MapPin, Play, ExternalLink, Clock } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingStore } from "@/domain/booking/bookingStore";
