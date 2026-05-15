@@ -46,8 +46,24 @@ Brand orange `#E8670A` is non-negotiable. White-on-orange = **3.29:1**, which on
 
 ## Verified ratios — primary CTAs (white on `#E8670A`)
 - White (`#FFFFFF`) on `#E8670A` = **3.29:1**
-- Passes WCAG AA SC 1.4.3 only at "large text" (≥18.66px when bold). All landing-page CTA labels are bold uppercase with letter-spacing ≥0.06em; current sizes range 14–16px. **Action items** for follow-up if strict large-text compliance is required: bump CTA `font-size` to `19px` inline. (Not applied in this pass to avoid CTA layout regressions; tracked here for product review.)
-- Alternative considered: navy `#000033` on `#E8670A` = 6.07:1 (passes AA at any size). Not adopted — would change established CTA appearance. Available as a future option without altering brand orange.
+- All landing-page primary CTA labels bumped to **`fontSize: 19`** (≥14pt) bold uppercase letter-spaced — qualifies as WCAG large text → 3.29:1 passes AA.
+- Components updated: TRTHero (mobile CTA), TRTHeroForm (submit), TRTManifesto, TRTResults, TRTLocations (per-card book), TRTFinalCTA, TRTHowItWorks, StickyMobileCTA. TRTHeader phone CTA is icon-only (UI element, 3:1 bar, passes).
 
-## Out of scope
-`/wl`, `/ed`, `/quiz`, `/book/*`, `/admin/*`, legal pages. Tokens are global and ready for opt-in adoption.
+## Full-page sweep — verified passing pairs (no change needed)
+- TRTManifesto eyebrow `#E8670A` 13px/700 on `#000033` = **6.1:1** ✓
+- TRTManifesto body `rgba(255,255,255,0.85)` on navy ≈ **14:1** ✓
+- TRTManifesto quote attribution `rgba(255,255,255,0.65)` on navy ≈ **8.6:1** ✓
+- TRTPillars body `rgba(255,255,255,0.65)` on navy ≈ **8.6:1** ✓; hover border `#8C92B0` on navy = **6.7:1** ✓
+- TRTHero subhead `rgba(245,240,235,0.85)` on navy-deep ≈ **14:1** ✓; trust line `0.75` ≈ **9.9:1` ✓; checklist `0.55` ≈ **6.3:1** ✓; medical-review caption 12px `0.60` ≈ **6.1:1** ✓
+- TRTHero orange Check icons on navy-deep = **6.0:1** ✓ (UI ≥3)
+- TRTHeroForm input text `#F5F0EB` on `rgba(11,16,41,0.6)` ≈ **17:1** ✓; placeholder `0.50` ≈ **5.4:1** ✓; TCPA 12px `0.65` ≈ **7.5:1** ✓; native `<option>` `#0B1029` on white = **19:1** ✓
+- TRTResults stars `#E8670A` on white = 3.29:1 ✓ (decorative icon, ≥3)
+- TRTResults testimonial italic `#1a1a2e` on white = **17:1** ✓
+- TRTFooter `rgba(255,255,255,0.78)` on `#000033` ≈ **12:1** ✓; legal `0.55` ≈ **6.3:1** ✓
+- CredibilityBand white on `#0A1628` ≈ **17:1** ✓; sublabel `0.65` ≈ **8.4:1** ✓
+- StickyMobileCTA call-side cream on `rgba(11,16,41,0.96)` ≈ **15:1** ✓; phone-number 11px @ opacity 0.80 ≈ **12:1** ✓
+
+## Non-contrast cleanup noted (not blocking AA)
+- `TRTHero.tsx` `COLORS.navy` (`#1B2B4B`) is declared but unused — safe to remove in a future cleanup pass.
+- Google "G" SVG path fills (`#FFC107` / `#FF3D00` / `#4CAF50` / `#1976D2`) in TRTHero are brand-mark fills (logo exemption — WCAG 1.4.3 specifically excludes logos).
+
