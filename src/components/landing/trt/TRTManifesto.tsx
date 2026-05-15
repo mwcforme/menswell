@@ -71,7 +71,8 @@ export const TRTManifesto = () => {
           <img
             src={imgManifesto}
             alt="Phlebotomist drawing labs for a Virginia man at a Men's Wellness Center"
-            className="rounded-2xl object-cover w-full aspect-[4/3] md:aspect-auto md:h-[460px]"
+            className="rounded-2xl w-full aspect-[4/3] md:aspect-auto md:h-[460px]"
+            style={{ objectFit: "cover", objectPosition: "center 35%" }}
             loading="lazy"
           />
         </div>
