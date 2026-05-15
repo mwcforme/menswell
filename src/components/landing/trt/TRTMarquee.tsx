@@ -8,17 +8,18 @@ const MarqueeContent = () => (
     {items.map((item, i) => (
       <span key={i} className="flex items-center gap-6 flex-shrink-0">
         <span
-          className="font-bold text-lg uppercase"
+          className="font-bold uppercase"
           style={{
             fontFamily: "Oswald, sans-serif",
             color: "#FFFFFF",
             letterSpacing: "0.08em",
             fontWeight: 700,
+            fontSize: 19,
           }}
         >
           {item}
         </span>
-        <span style={{ color: "rgba(255,255,255,0.65)" }}>◆</span>
+        <span aria-hidden="true" style={{ color: "rgba(255,255,255,0.85)" }}>◆</span>
       </span>
     ))}
   </>
