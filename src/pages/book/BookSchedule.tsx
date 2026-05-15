@@ -139,7 +139,7 @@ const BookSchedule = () => {
               customFields={customFields}
               onBooked={(slotIso) => {
                 setAppointmentTime(slotIso);
-                navigate("/book/confirmed");
+                navigate("/book/confirmed", { state: { appointmentTime: slotIso } });
               }}
             />
           ) : (
