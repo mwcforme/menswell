@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
+import { MapPin, Play, ExternalLink, Clock } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingStore } from "@/domain/booking/bookingStore";
@@ -191,23 +191,6 @@ const BookConfirmed = () => {
                   <span style={{ color: "#0B1029", fontSize: 16, fontWeight: 500 }}>
                     {center.hours}
                   </span>
-                </div>
-                <div
-                  className="inline-flex items-center gap-1.5 self-start mt-1"
-                  style={{
-                    background: "rgba(34,197,94,0.10)",
-                    border: "1px solid rgba(34,197,94,0.35)",
-                    color: "#0F7A3A",
-                    padding: "4px 10px",
-                    borderRadius: 999,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  <FlaskConical size={12} strokeWidth={2.5} />
-                  Same-Day Labs On Site
                 </div>
               </div>
 
