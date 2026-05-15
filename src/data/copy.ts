@@ -14,9 +14,9 @@
 export const COPY = {
   cta: {
     /** Primary booking CTA. Header, hero submit, locations, sticky bar, final CTA. */
-    bookConsult: "Book My No-Cost Consult",
+    bookConsult: "Book My Consultation",
     /** Results section CTA. */
-    startConsult: "Book My No-Cost Consult",
+    startConsult: "Book My Consultation",
     /** Inline link variant inside FAQ answers. */
     bookConsultInline: "Book a no-cost consult",
     /** ED service final-CTA + ED form card title. */
