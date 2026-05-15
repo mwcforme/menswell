@@ -1,53 +1,61 @@
-# Restore Brand Orange, Re-Achieve WCAG AA Without Changing Orange
 
-## Constraint
-Brand orange `#E8670A` (and `--accent-orange` / `--brand-accent`) is a hard brand rule. The previous pass replaced CTA fills with `#C2410C` / `#A6360A` — that violates brand. Revert orange, then meet AA through other levers.
+## Fix 11 — `/book/confirmed` Name Bug + "You're Booked" Celebration Card
 
-## Strategy: legal AA paths that keep #E8670A
-WCAG AA passes for "large text" at **3:1**. Large = ≥18px regular OR ≥14px bold. White on `#E8670A` = **3.29:1**, which already passes as large text. So the fix is not the color — it's the text spec on orange surfaces. For non-text UI (borders, icons), the bar is 3:1, so orange-on-white at 3.29:1 also passes; only small orange labels on white need a different treatment.
+### Part A — Name bug
 
-## Fix matrix (revised, brand-safe)
+Current code in `src/pages/book/BookConfirmed.tsx`:
+```ts
+const fullName = [identity?.firstName, identity?.lastName].filter(Boolean).join(" ");
+```
+There's no slice — so the truncation ("er") is almost certainly stale/garbage data persisted in the Zustand booking store from an earlier test session (the store partializes `identity` to localStorage). The form's hand-off (`TRTHeroForm` → `enterBookingFunnel`) passes the raw input, but a previously-poisoned localStorage entry will survive across reloads.
 
-| # | Surface | Old fix (revert) | New brand-safe fix |
-|---|---|---|---|
-| 1 | Primary CTAs (Header, Hero, HeroForm, Manifesto, Results, Locations, FinalCTA, StickyMobile, HowItWorks) | bg `#C2410C` | bg `#E8670A`; ensure label is **white, ≥16px, font-weight ≥700, letter-spacing ≥0.04em** → qualifies as large text → 3.29:1 passes AA. Audit each button for size/weight, bump where needed. |
-| 2 | TRTMarquee scrolling text on orange | darker bg | Keep `#E8670A` bg; set text to **15px / 700** (already large) → passes. Verify weight in component. |
-| 3 | TRTMarquee `◆` separators on orange | n/a | Non-text decorative → exempt from contrast. Add `aria-hidden`. (Keep `rgba(255,255,255,0.40)`.) |
-| 4 | HowItWorks step pill: orange text on tinted-orange chip | n/a | Replace tinted-orange chip bg with **navy `#000033` chip + white text** OR keep orange text but on **white** chip (4.83:1, passes for any size). Choose white chip for minimal visual change. |
-| 5 | HowItWorks final-step circle digit (white on orange) | darker bg | Digit is 16px bold → already large text → 3.29:1 passes. Confirm `font-weight:700`. |
-| 6 | TRTLocations "Open today" / hours small orange-on-white | darker orange | Switch these **small labels** to navy `#000033` (17:1) and reserve orange for icons only (icons are non-text, 3:1 → passes at 3.29:1). |
-| 7 | TRTFAQ chevron caret label small orange-on-white | darker orange | Same as #6 — use navy for the text glyph; keep orange only on the chevron icon stroke. |
-| 8 | TRTFinalCTA placeholder `#999` on white | `#5A6072` | Keep `--placeholder-light: #5A6072` (6.04:1) — does not touch orange. |
-| 9 | TRTFinalCTA input borders `#C8C6C1` | `#949494` | Keep `--border-on-light: #949494` (3.07:1). |
-| 10 | TRTHeroForm input borders on navy | `#6B7299` | Keep `--border-on-dark: #6B7299` (3.10:1). |
-| 11 | TRTPillars card borders | brighter | Keep `--border-on-dark`. |
-| 12 | StickyMobileCTA divider | brighter | Keep `--border-on-dark`. |
-| 13 | TRTFooter dividers | brighter | Keep `--border-on-dark`. |
-| 14 | White-card borders | `#949494` | Keep `--border-on-light`. |
-| 15 | Header "soon" pill (white on 50%-orange = `#F4B385`) | n/a | Set pill bg to **solid `#E8670A`** (drop the 0.5 opacity), label 12px bold uppercase ≥14px? If <14px bold, switch label to navy `#000033` text on orange (8.0:1, passes any size). |
-| 16 | TRTFinalCTA error helper `#CC4444` (4.16:1) | n/a | Use `--error-on-light: #A7211C` (7.4:1). Non-orange. |
-| 17 | TRTHeroForm error helper on navy | already passes | Keep. |
-| 18 | Focus ring | already passes | Keep dual-tone. |
+Fix:
+1. Defensive normalization in `BookConfirmed.tsx`:
+   ```ts
+   const rawFirst = (identity?.firstName ?? "").trim();
+   const rawLast  = (identity?.lastName  ?? "").trim();
+   const firstName = rawFirst.split(/\s+/)[0] || "";
+   const fullName  = [rawFirst, rawLast].filter(Boolean).join(" ").trim();
+   ```
+2. Render `firstName` in the new personalized line ("You're all set, {FirstName}.") and `fullName` only if needed elsewhere.
+3. One-time clear of any stale persisted identity that has no `phone` AND no `email` (treat as corrupt) — guards against any short fragment like "er" surviving.
+4. Add a unit-style guard: if `firstName.length < 2`, fall back to "You're all set." (no name) instead of rendering a fragment.
 
-## Token changes in `src/index.css`
-- **Delete** `--brand-cta` and `--brand-cta-hover` (or alias both to `#E8670A` and a brand-approved hover such as `#D45E08` darkening only ~5%, used **only** on hover state which is allowed). Confirm with user if any hover darkening is permitted; default plan keeps hover identical and uses opacity/transform for affordance.
-- **Keep** `--placeholder-light`, `--border-on-light`, `--border-on-dark`, `--error-on-light`, `--success-on-dark`, dual-tone focus ring.
-- Re-affirm `--accent-orange: #E8670A` and `--brand-accent: #E8670A` as the only orange.
+### Part B — "You're Booked" celebration card
 
-## Component edits
-1. Global find/replace `var(--brand-cta)` → `var(--accent-orange)` and `var(--brand-cta-hover)` → `var(--accent-orange)` (or hover variant if approved) across the 15 TRT components.
-2. Per-component label audits:
-   - **TRTHeader / TRTHero / TRTHeroForm / TRTManifesto / TRTResults / TRTLocations / TRTFinalCTA / StickyMobileCTA / TRTHowItWorks**: ensure CTA `<span>` label is `font-weight:700`, `font-size:≥16px`, `letter-spacing:≥0.04em`. Add where missing.
-   - **TRTMarquee**: confirm text is 15px/700; add `aria-hidden` to `◆`.
-   - **TRTHowItWorks**: change step pill bg from `rgba(232,103,10,0.12)` to `#FFFFFF` with `border:1px solid #E8670A`; keep orange text.
-   - **TRTLocations / TRTFAQ**: small orange labels → navy `#000033`; orange remains on the icon only.
-   - **TRTHeader "soon" pill**: bg solid `#E8670A`, text navy `#000033` 11px/700 uppercase.
-   - **TRTFinalCTA**: error text uses `var(--error-on-light)`.
+Add a new top card **above** the existing 2-column grid. Remove the existing standalone status header (lines ~98–148 of `BookConfirmed.tsx`) since the new card replaces it.
 
-## Out of scope
-`/wl`, `/ed`, `/quiz`, `/book/*`, `/admin/*`, legal pages. Tokens stay globally available so other routes can opt in later without code changes here.
+**Card content (top to bottom):**
+1. Animated green check (existing `CheckCircle2`) inside the existing green ring — add SVG stroke-draw (~600ms) + single radial glow pulse decaying over 1.5s.
+2. `<h1>` "APPOINTMENT CONFIRMED" — Oswald 600, uppercase, white, clamp(28px, 4.4vw, 40px).
+3. Personalized line: `You're all set, {firstName}.` — Inter 500, 18px, white 90%.
+4. Appointment line: formatted via existing `formatAppointment(effectiveAppt)` but rebuilt as `{Weekday}, {Month} {Day} · {Time} ET` — Oswald 600, clamp(20px, 2.6vw, 28px), white.
+5. Location line: `{center.city} clinic, in person` — Inter 500, 16px, white 75%.
+6. Two trust pills (horizontal, centered, wrap on mobile):
+   - `✓ Confirmation sent to your phone`
+   - `✓ No-cost, no obligation`
+   Pills: rounded-full, `rgba(255,255,255,0.06)` bg, `rgba(255,255,255,0.16)` border, white 85% text, 12px Inter 600 uppercase letter-spacing 0.08em, Lucide `Check` icon `#22C55E` 14px.
 
-## Deliverable
-1. Reverted brand orange across all CTAs and accents.
-2. AA achieved through text-size/weight rules and swapping small orange-on-white labels to navy where they can't qualify as large text.
-3. Updated `a11y/landing-contrast-audit.md` showing every pair, the brand-safe remediation, and the new ratio (≥3:1 for large/UI, ≥4.5:1 for normal text).
+**Card style:** elevated dark surface to feel like the "win" state — `background: linear-gradient(180deg, #0B1330 0%, #060B22 100%)`, `border: 1px solid rgba(255,255,255,0.08)`, `borderRadius: 16`, `padding: 40px 28px (mobile) → 56px 48px (md)`, `boxShadow: 0 24px 60px rgba(0,0,0,0.45)`. Centered content. No stock imagery, no emojis in headers (✓ in pills only — Lucide icon, not unicode).
+
+**WCAG:** all text on the dark gradient ≥ 4.5:1 (white 75% on #060B22 ≈ 13:1 ✓). Pill border + text ≥ 3:1.
+
+**Animations (one-time per session):**
+- Confetti: `canvas-confetti` (~10kb, no peer deps) — single burst from top center, ~100 particles, colors `["#E8670A", "#F97316", "#FFFFFF", "#FCD9B4"]`, gravity 1.1, decay 0.92, duration ~1.8s. Auto-cleans canvas after.
+- Card: fade + translateY(12px → 0) over 400ms ease-out on mount.
+- Check: SVG `stroke-dasharray` draw 600ms, then box-shadow glow pulse once (1500ms ease-out).
+- **Gating:** `sessionStorage.getItem('mwc_booking_celebrated')` — if present, skip confetti + check-draw + glow (card still fade-slides in). Set the flag immediately after firing.
+- **Reduced motion:** `window.matchMedia('(prefers-reduced-motion: reduce)').matches` → render final state, no confetti, no draw, no glow, no slide. Card appears instantly.
+
+**New file:** `src/components/book/BookedCelebrationCard.tsx` — encapsulates the card, animations, confetti, sessionStorage gating, reduced-motion guard. Receives `firstName`, `apptTime` (already-formatted string or raw ISO), `locationCity` as props.
+
+**Dependency:** add `canvas-confetti` + `@types/canvas-confetti` via `bun add`. (Lovable supports adding deps; CSS-only fallback not needed.)
+
+**Files touched:**
+- `src/pages/book/BookConfirmed.tsx` — remove old status header (lines 98–148), normalize name, render `<BookedCelebrationCard>` at top of inner container, keep location card / map / video / footer untouched below.
+- `src/components/book/BookedCelebrationCard.tsx` — new.
+- `package.json` — add `canvas-confetti`.
+
+### Out of scope
+- No changes to location card, map embed, "What to Expect" video, or reschedule footer line.
+- No backend/store schema changes; the corrupt-identity guard is a one-time client cleanup only.
