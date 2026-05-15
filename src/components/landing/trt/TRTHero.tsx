@@ -180,7 +180,7 @@ export const TRTHero = () => {
             className="lg:hidden mt-7 w-full uppercase font-bold cursor-pointer"
             style={{
               height: 56,
-              background: COLORS.orange,
+              background: "var(--brand-cta)",
               color: "#FFFFFF",
               fontSize: 14,
               border: "none",

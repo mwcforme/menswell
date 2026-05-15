@@ -55,13 +55,13 @@ export const TRTHeader = ({ minimal = false }: { minimal?: boolean } = {}) => {
             onClick={() => { trackCro("header_book_click"); scrollTo("hero-form"); }}
             className="rounded-full px-5 py-2.5 text-xs font-bold uppercase cursor-pointer transition-colors duration-200"
             style={{
-              background: "#E8670A",
+              background: "var(--brand-cta)",
               color: "#FFFFFF",
               letterSpacing: "0.08em",
               fontFamily: "Inter, sans-serif",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#CF5B09"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
           >
             {COPY.cta.bookConsult}
           </button>
@@ -80,14 +80,14 @@ export const TRTHeader = ({ minimal = false }: { minimal?: boolean } = {}) => {
             style={{
               width: 44,
               height: 44,
-              background: "#E8670A",
+              background: "var(--brand-cta)",
               color: "#FFFFFF",
             }}
           >
             <span
               aria-hidden="true"
               className="absolute inset-0 rounded-full animate-ping"
-              style={{ background: "#E8670A", opacity: 0.5 }}
+              style={{ background: "var(--brand-cta)", opacity: 0.5 }}
             />
             <Phone size={20} className="relative" strokeWidth={2.5} />
           </a>

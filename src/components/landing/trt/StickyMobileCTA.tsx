@@ -80,7 +80,7 @@ export const StickyMobileCTA = () => {
         background: "rgba(11,16,41,0.96)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        borderTop: "1px solid rgba(245,240,235,0.12)",
+        borderTop: "1px solid var(--c-border-on-dark)",
         paddingBottom: "env(safe-area-inset-bottom)",
         boxShadow: "0 -8px 24px rgba(0,0,0,0.35)",
       }}
@@ -98,7 +98,7 @@ export const StickyMobileCTA = () => {
           textDecoration: "none",
           fontFamily: "Inter, sans-serif",
           letterSpacing: "0.08em",
-          borderRight: "1px solid rgba(245,240,235,0.12)",
+          borderRight: "1px solid var(--c-border-on-dark)",
         }}
       >
         <span className="inline-flex items-center gap-1.5">
@@ -113,7 +113,7 @@ export const StickyMobileCTA = () => {
         className="flex-1 flex items-center justify-center text-[13px] font-bold uppercase cursor-pointer border-none"
         style={{
           height: 64,
-          background: "#E8670A",
+          background: "var(--brand-cta)",
           color: "#FFFFFF",
           fontFamily: "Inter, sans-serif",
           letterSpacing: "0.08em",

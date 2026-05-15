@@ -49,15 +49,15 @@ export const TRTPillars = () => (
             className="rounded-xl overflow-hidden text-center transition-all duration-300"
             style={{
               background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.10)",
+              border: "1px solid var(--c-border-on-dark)",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = "rgba(255,255,255,0.09)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+              e.currentTarget.style.borderColor = "#8C92B0";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.background = "rgba(255,255,255,0.06)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.10)";
+              e.currentTarget.style.borderColor = "var(--c-border-on-dark)";
             }}
           >
             <div className="flex justify-center mt-6">
@@ -65,7 +65,7 @@ export const TRTPillars = () => (
                 src={p.image}
                 alt={p.title}
                 className="w-[140px] h-[140px] rounded-full object-cover"
-                style={{ border: "3px solid rgba(255,255,255,0.15)" }}
+                style={{ border: "3px solid var(--c-border-on-dark)" }}
                 loading="lazy"
               />
             </div>

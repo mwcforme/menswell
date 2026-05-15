@@ -39,7 +39,7 @@ export const TRTFinalCTA = () => {
     width: "100%",
     height: 52,
     background: "#F5F0EB",
-    border: "2px solid #C8C6C1",
+    border: "2px solid var(--c-border-on-light)",
     borderRadius: 8,
     padding: "0 16px",
     fontSize: 16,
@@ -50,12 +50,12 @@ export const TRTFinalCTA = () => {
   };
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "#E8670A";
+    e.currentTarget.style.borderColor = "var(--brand-cta)";
     e.currentTarget.style.boxShadow = "0 0 0 3px rgba(232,103,10,0.15)";
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "#C8C6C1";
+    e.currentTarget.style.borderColor = "var(--c-border-on-light)";
     e.currentTarget.style.boxShadow = "none";
   };
 
@@ -167,10 +167,10 @@ export const TRTFinalCTA = () => {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 style={inputStyle}
-                className="placeholder:text-[#999999]"
+                className="placeholder:text-[#5A6072]"
                 autoComplete="name"
               />
-              {errors.name && <p className="text-xs mt-1 text-left" style={{ color: "#CC4444" }}>{errors.name}</p>}
+              {errors.name && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.name}</p>}
             </div>
 
             <div>
@@ -186,10 +186,10 @@ export const TRTFinalCTA = () => {
                   else setErrors((p) => { const { phone: _, ...rest } = p; return rest; });
                 }}
                 style={inputStyle}
-                className="placeholder:text-[#999999]"
+                className="placeholder:text-[#5A6072]"
                 autoComplete="tel"
               />
-              {errors.phone && <p className="text-xs mt-1 text-left" style={{ color: "#CC4444" }}>{errors.phone}</p>}
+              {errors.phone && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.phone}</p>}
             </div>
 
             <div>
@@ -201,10 +201,10 @@ export const TRTFinalCTA = () => {
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 style={inputStyle}
-                className="placeholder:text-[#999999]"
+                className="placeholder:text-[#5A6072]"
                 autoComplete="email"
               />
-              {errors.email && <p className="text-xs mt-1 text-left" style={{ color: "#CC4444" }}>{errors.email}</p>}
+              {errors.email && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.email}</p>}
             </div>
 
             <div>
@@ -215,9 +215,9 @@ export const TRTFinalCTA = () => {
                 onBlur={handleBlur as any}
                 style={{
                   ...inputStyle,
-                  color: location ? "#000033" : "#999999",
+                  color: location ? "#000033" : "var(--c-placeholder-light)",
                   appearance: "none",
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23999999' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A6072' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
                   backgroundRepeat: "no-repeat",
                   backgroundPosition: "right 12px center",
                   paddingRight: 40,
@@ -228,7 +228,7 @@ export const TRTFinalCTA = () => {
                 <option value="newport-news">Newport News</option>
                 <option value="virginia-beach">Virginia Beach</option>
               </select>
-              {errors.location && <p className="text-xs mt-1 text-left" style={{ color: "#CC4444" }}>{errors.location}</p>}
+              {errors.location && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.location}</p>}
             </div>
 
             <button
@@ -236,7 +236,7 @@ export const TRTFinalCTA = () => {
               className="w-full rounded-full uppercase font-bold cursor-pointer transition-colors duration-200"
               style={{
                 height: 52,
-                background: "#E8670A",
+                background: "var(--brand-cta)",
                 color: "#FFFFFF",
                 fontSize: 14,
                 border: "none",
@@ -244,14 +244,14 @@ export const TRTFinalCTA = () => {
                 fontFamily: "Inter, sans-serif",
                 marginTop: 8,
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#CF5B09"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
             >
               {COPY.cta.bookConsult}
             </button>
           </form>
 
-          <p className="text-center text-xs mt-4" style={{ color: "#999999", fontFamily: "Inter, sans-serif" }}>
+          <p className="text-center text-xs mt-4" style={{ color: "var(--c-text-on-light-muted)", fontFamily: "Inter, sans-serif" }}>
             HIPAA Compliant · No Spam · Book entirely online
           </p>
 

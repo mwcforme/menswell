@@ -58,7 +58,7 @@ export const TRTResults = () => {
             <div
               key={t.name}
               className="rounded-2xl p-6 flex flex-col"
-              style={{ background: "#FFFFFF", border: "1px solid #E5E5EA" }}
+              style={{ background: "#FFFFFF", border: "1px solid var(--c-border-on-light)" }}
             >
               <div className="flex items-center gap-0.5 mb-3">
                 {[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4" fill="#E8670A" stroke="#E8670A" />)}
@@ -66,9 +66,9 @@ export const TRTResults = () => {
               <p className="text-sm italic leading-relaxed flex-1" style={{ color: "#1a1a2e", fontFamily: "Inter, sans-serif" }}>
                 "{t.quote}"
               </p>
-              <div className="mt-4 pt-4 border-t" style={{ borderColor: "#E5E5EA" }}>
+              <div className="mt-4 pt-4 border-t" style={{ borderColor: "var(--c-border-on-light)" }}>
                 <div className="text-sm font-semibold" style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}>{t.name}</div>
-                <div className="text-xs" style={{ color: "#7a7a8e", fontFamily: "Inter, sans-serif" }}>{t.city}</div>
+                <div className="text-xs" style={{ color: "var(--c-text-on-light-muted)", fontFamily: "Inter, sans-serif" }}>{t.city}</div>
               </div>
             </div>
           ))}
@@ -81,7 +81,7 @@ export const TRTResults = () => {
           <button
             onClick={scrollToForm}
             className="inline-flex items-center justify-center rounded-full px-8 font-bold uppercase cursor-pointer border-none"
-            style={{ height: 56, minHeight: 56, background: "#E8670A", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
+            style={{ height: 56, minHeight: 56, background: "var(--brand-cta)", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
           >
             {COPY.cta.startConsult}
           </button>

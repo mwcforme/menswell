@@ -30,7 +30,7 @@ export const TRTManifesto = () => {
 
           <figure
             className="mt-7 rounded-xl p-6 relative"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.10)" }}
+            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid var(--c-border-on-dark)" }}
           >
             <Quote
               className="h-10 w-10 absolute"
@@ -47,7 +47,7 @@ export const TRTManifesto = () => {
               <span>— Mark B., 52, Richmond</span>
               <span
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full"
-                style={{ background: "rgba(46,204,113,0.12)", color: "#5DD68A", fontSize: 11, fontWeight: 600 }}
+                style={{ background: "rgba(46,204,113,0.12)", color: "var(--c-success-on-dark)", fontSize: 11, fontWeight: 600 }}
               >
                 ✓ Verified
               </span>
@@ -57,7 +57,7 @@ export const TRTManifesto = () => {
           <button
             onClick={() => document.getElementById("final-cta")?.scrollIntoView({ behavior: "smooth" })}
             className="mt-7 inline-flex items-center justify-center rounded-full px-8 font-bold uppercase cursor-pointer border-none"
-            style={{ height: 56, minHeight: 56, background: "#E8670A", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
+            style={{ height: 56, minHeight: 56, background: "var(--brand-cta)", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
           >
             {COPY.cta.seeIfYouQualify}
           </button>
