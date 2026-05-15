@@ -430,7 +430,7 @@ const GHLAccordionView = ({ location, firstName, lastName, email, phone, source,
             <div style={{ fontSize: 14, color: MUTED }}>{cal.label}, In-person</div>
             {fullName && (
               <div style={{ fontSize: 14, color: MUTED, marginTop: 8 }}>
-                Under: <strong style={{ color: INK }}>{fullName}</strong>
+                For: <strong style={{ color: INK }}>{fullName}</strong>
               </div>
             )}
           </div>
