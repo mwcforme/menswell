@@ -5,6 +5,8 @@ import { componentTagger } from "lovable-tagger";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 // @ts-expect-error - .mjs file, no declaration needed
 import { vitePluginCheckBannedWording } from "./scripts/check-banned-wording.mjs";
+// @ts-expect-error - .mjs file, no declaration needed
+import { vitePluginCheckHardcodedColors } from "./scripts/check-hardcoded-colors.mjs";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -14,6 +16,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     vitePluginCheckBannedWording(),
+    vitePluginCheckHardcodedColors(),
     react(),
     mode === "development" && componentTagger(),
     process.env.SENTRY_AUTH_TOKEN
