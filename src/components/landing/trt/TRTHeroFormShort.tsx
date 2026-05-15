@@ -219,7 +219,7 @@ export const TRTHeroFormShort = ({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full uppercase font-bold cursor-pointer inline-flex items-center justify-center gap-2"
+          className="w-full font-bold cursor-pointer inline-flex items-center justify-center gap-2"
           style={{
             height: 56,
             background: "var(--brand-cta)",
