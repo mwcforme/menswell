@@ -169,13 +169,11 @@ const BookSchedule = () => {
               <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "clamp(20px, 2.6vw, 28px)", lineHeight: 1.15, letterSpacing: "-0.01em", marginBottom: 6, color: "#FFFFFF" }}>
                 {heading}
               </h1>
-              <div className="flex items-center justify-center gap-2 flex-wrap" style={{ fontFamily: "Inter, sans-serif", fontSize: 13 }}>
-                <span style={{ color: "rgba(255,255,255,0.45)" }}>{locationLine || "Select a location"}</span>
-                <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-                <span style={{ color: "#E8670A", letterSpacing: 0.5 }}>★★★★★ 4.9</span>
-                <span style={{ color: "rgba(255,255,255,0.20)" }}>·</span>
-                <span style={{ color: "#2ECC71", fontWeight: 600 }}>No charge today</span>
-              </div>
+              {locationLine && (
+                <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "rgba(255,255,255,0.50)", margin: 0 }}>
+                  {locationLine} &middot; 60-min consult
+                </p>
+              )}
             </section>
 
             {/* Next available slot banner */}
