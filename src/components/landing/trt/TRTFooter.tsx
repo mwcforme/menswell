@@ -82,7 +82,7 @@ export const TRTFooter = () => {
               <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600, marginBottom: 2 }}>Newport News</div>
               <div>827 Diligence Drive, Suite 206</div>
               <div>Newport News, VA 23606</div>
-              <a href="tel:7578736500" style={{ color: "rgba(255,255,255,0.60)", textDecoration: "none" }}>(757) 873-6500</a>
+              <a href="tel:7578066263" style={{ color: "rgba(255,255,255,0.60)", textDecoration: "none" }}>(757) 806-6263</a>
             </div>
             <div>
               <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600, marginBottom: 2 }}>Virginia Beach</div>
