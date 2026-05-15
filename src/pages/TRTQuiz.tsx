@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 import { useQuizState, computeScores, type Tier } from "@/lib/quizState";
@@ -69,10 +69,19 @@ export default function TRTQuiz() {
   const navigate = useNavigate();
   const { state, setSymptom, setSafetyConditions, setContact, setStep, markCompleted } = useQuizState();
 
+  // Scroll to top on every step change.
+  const advanceStep = useCallback(
+    (step: Parameters<typeof setStep>[0]) => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+      setStep(step);
+    },
+    [setStep],
+  );
+
   // Reset to step 1 if state is in a transition phase from a stale session.
   useEffect(() => {
-    if (state.currentStep === "approved" && !state.completed) setStep(1);
-  }, [state.currentStep, state.completed, setStep]);
+    if (state.currentStep === "approved" && !state.completed) advanceStep(1);
+  }, [state.currentStep, state.completed, advanceStep]);
 
   // After completion, /quiz redirects to /quiz/approved (mirrors Titan).
   if (state.completed) return <Navigate to="/quiz/approved" replace />;
@@ -80,12 +89,12 @@ export default function TRTQuiz() {
   const totalScore = state.totalScore;
   const bracket = tierBracketLabel(totalScore);
 
-  const handleStep1Submit = () => setStep("processing");
+  const handleStep1Submit = () => advanceStep("processing");
 
   const handleStep2Submit = () => {
     const dq = state.safetyConditions.some((id) => id !== "none");
     setContact({}); // touch persistence
-    setStep(3);
+    advanceStep(3);
     // store disqualified flag inline by markCompleted call later
     void dq; // captured inline at submit
   };
@@ -93,7 +102,7 @@ export default function TRTQuiz() {
   const handleStep3Submitted = () => {
     const dq = state.safetyConditions.some((id) => id !== "none");
     markCompleted(dq);
-    setStep("finalizing");
+    advanceStep("finalizing");
   };
 
   return (
@@ -116,7 +125,7 @@ export default function TRTQuiz() {
           headline="Analyzing my assessment"
           subtext="Mapping symptoms to clinical patterns."
           durationMs={2500}
-          onDone={() => setStep(2)}
+          onDone={() => advanceStep(2)}
         />
       ) : null}
 
