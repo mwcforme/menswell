@@ -58,22 +58,44 @@ export const TRTFAQ = () => {
                     style={{ color: "#1a1a2e", fontFamily: "Inter, sans-serif" }}
                   >
                     <p>{f.a}</p>
-                    <p className="mt-3">
+                    {i === 0 ? (
+                      // First FAQ is the insurance/cost objection — highest intent after reading this answer.
+                      // Full CTA button, not a text link.
                       <button
                         onClick={scrollToForm}
-                        className="inline-flex items-center gap-1 font-bold cursor-pointer underline underline-offset-4"
+                        className="mt-4 w-full uppercase font-bold cursor-pointer inline-flex items-center justify-center rounded-lg"
                         style={{
-                          color: "#000033",
-                          background: "none",
-                          border: "none",
-                          padding: 0,
+                          height: 52,
+                          background: "var(--brand-cta)",
+                          color: "#FFFFFF",
+                          fontSize: 15,
+                          letterSpacing: "0.07em",
                           fontFamily: "Inter, sans-serif",
-                          fontSize: "inherit",
+                          border: "none",
                         }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
                       >
-                        <span aria-hidden="true" style={{ color: "var(--brand-cta)" }}>→</span> {COPY.cta.bookConsultInline}
+                        {COPY.cta.bookConsult}
                       </button>
-                    </p>
+                    ) : (
+                      <p className="mt-3">
+                        <button
+                          onClick={scrollToForm}
+                          className="inline-flex items-center gap-1 font-bold cursor-pointer underline underline-offset-4"
+                          style={{
+                            color: "#000033",
+                            background: "none",
+                            border: "none",
+                            padding: 0,
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "inherit",
+                          }}
+                        >
+                          <span aria-hidden="true" style={{ color: "var(--brand-cta)" }}>→</span> {COPY.cta.bookConsultInline}
+                        </button>
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
