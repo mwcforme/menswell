@@ -2,9 +2,9 @@ import { Check, Star } from "lucide-react";
 import { TRTHeroForm } from "@/components/landing/trt/TRTHeroForm";
 
 const trustChecks = [
-  "In-person Virginia visits — not an app",
+  "In-person Virginia visits, not an app",
   "Sildenafil, Tadalafil, TriMix, PT-141",
-  "Billed discreetly — not as an ED clinic",
+  "Billed discreetly, not as an ED clinic",
   "No-cost consult, same-day labs",
 ];
 
@@ -75,7 +75,7 @@ export const EDHero = () => {
           >
             ED Treatment
             <br />
-            <span style={{ color: COLORS.orange }}>In Virginia — In Person</span>
+            <span style={{ color: COLORS.orange }}>In Virginia. In Person.</span>
           </h1>
 
           <p
@@ -87,7 +87,7 @@ export const EDHero = () => {
               lineHeight: 1.5,
             }}
           >
-            A Virginia physician diagnoses the cause. Not a pill subscription — a real protocol. Oral medications, TriMix, and PT-141. No waiting room anxiety, no awkward conversations.
+            A Virginia physician diagnoses the cause. Not a pill subscription. A real protocol. Oral medications, TriMix, and PT-141. No waiting room anxiety, no awkward conversations.
           </p>
 
           <div

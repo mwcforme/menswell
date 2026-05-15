@@ -7,7 +7,7 @@ import { COPY } from "@/data/copy";
 const trustChecks = [
   "Same or next-day appointments",
   "Face-to-face physician, every visit",
-  "No-cost consult — no insurance needed",
+  "No-cost consult, no insurance needed",
 ];
 
 const COLORS = {
@@ -106,7 +106,7 @@ export const TRTHero = () => {
           >
             Testosterone Therapy
             <br />
-            <span style={{ color: COLORS.orange }}>in Virginia — Same-Day Labs</span>
+            <span style={{ color: COLORS.orange }}>in Virginia. Same-Day Labs.</span>
           </h1>
 
           <p

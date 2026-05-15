@@ -119,7 +119,7 @@ const BookLetsTalk = () => {
                 margin: "0 auto",
               }}
             >
-              Call or text us. A real person will match you with the right visit — no phone tree, no runaround.
+              Call or text us. A real person will match you with the right visit. No phone tree, no runaround.
             </p>
           </div>
 

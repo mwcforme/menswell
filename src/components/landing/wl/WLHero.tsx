@@ -3,7 +3,7 @@ import { TRTHeroForm } from "@/components/landing/trt/TRTHeroForm";
 
 const trustChecks = [
   "Semaglutide \u0026 tirzepatide, in-person",
-  "Dose adjusted at every visit — not auto-refilled",
+  "Dose adjusted at every visit, not auto-refilled",
   "Face-to-face Virginia physician",
   "FSA and HSA accepted",
 ];

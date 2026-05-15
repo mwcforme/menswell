@@ -41,7 +41,7 @@ const IdentityCapture = ({ onComplete }: { onComplete: (first: string, last: str
         style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)" }}
       >
         <p style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
-          One more thing — who are we booking for?
+          One more thing: who are we booking for?
         </p>
         <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: 14, marginBottom: 20 }}>
           So we can send your confirmation and remind you before your visit.
@@ -173,7 +173,7 @@ const BookSchedule = () => {
                     <p style={{ color: "rgba(255,255,255,0.90)", fontFamily: "Inter, sans-serif", fontSize: 14, lineHeight: 1.45, fontStyle: "italic", margin: 0 }}>
                       &ldquo;Booked online, walked in same day. Had labs back before I left.&rdquo;
                     </p>
-                    <p style={{ color: "rgba(255,255,255,0.45)", fontFamily: "Inter, sans-serif", fontSize: 12, marginTop: 4 }}>James R. &mdash; Richmond, VA</p>
+                    <p style={{ color: "rgba(255,255,255,0.45)", fontFamily: "Inter, sans-serif", fontSize: 12, marginTop: 4 }}>James R., Richmond VA</p>
                   </div>
                 </div>
                 <div className="flex-shrink-0 flex items-center gap-2 sm:text-right">
