@@ -400,106 +400,136 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
               No remaining days this week. Tap Next.
             </div>
           ) : (
-            <div
-              className="flex gap-2 overflow-x-auto"
-              style={{
-                scrollSnapType: "x mandatory",
-                WebkitOverflowScrolling: "touch",
-                paddingBottom: 4,
-                scrollbarWidth: "none",
-              }}
-            >
-              {days.map((d) => {
-                const key = ymd(d);
-                const actualCount = slotsByDay[key]?.length || 0;
-                const count = actualCount;
-                const isSunday = isSundayInTimeZone(d, TIMEZONE);
-                const available = actualCount > 0 && !isSunday;
-                const selected = selectedDay === key;
-                const isToday = isTodayET(d);
-                const isTomorrow = isTomorrowET(d);
-                const scarce = available && count > 0 && count <= 3;
-                const badgeText = !loading
-                  ? isSunday
-                    ? "Closed"
-                    : !available
-                      ? "Full"
+            <div style={{ position: "relative" }}>
+              <div
+                ref={dayStripRef}
+                onScroll={(e) => {
+                  const el = e.currentTarget;
+                  setShowLeftFade(el.scrollLeft > 4);
+                  setShowRightFade(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+                }}
+                className="flex gap-2 overflow-x-auto"
+                style={{
+                  scrollSnapType: "x mandatory",
+                  WebkitOverflowScrolling: "touch",
+                  paddingBottom: 4,
+                  scrollbarWidth: "none",
+                }}
+              >
+                {days.map((d) => {
+                  const key = ymd(d);
+                  const actualCount = slotsByDay[key]?.length || 0;
+                  const count = actualCount;
+                  const isSunday = isSundayInTimeZone(d, TIMEZONE);
+                  const isToday = isTodayET(d);
+                  // Hide today's tile entirely if it has no availability — never
+                  // contradict the "same-day" promise with a "Full" badge.
+                  if (isToday && !loading && actualCount === 0) return null;
+                  const available = actualCount > 0 && !isSunday;
+                  const selected = selectedDay === key;
+                  const isTomorrow = isTomorrowET(d);
+                  const scarce = available && count > 0 && count <= 3;
+                  const badgeText = !loading
+                    ? isSunday
+                      ? "Closed"
+                      : !available
+                        ? "Full"
+                        : scarce
+                          ? `Only ${count} left`
+                          : `${count} slots`
+                    : "···";
+                  const badgeColor = selected
+                    ? "rgba(255,255,255,0.85)"
+                    : isSunday || !available
+                      ? MUTED
                       : scarce
-                        ? `Only ${count} left`
-                        : `${count} slots`
-                  : "···";
-                const badgeColor = selected
-                  ? "rgba(255,255,255,0.85)"
-                  : isSunday || !available
-                    ? MUTED
-                    : scarce
-                      ? "#FFB37A"
-                      : "rgba(255,255,255,0.85)";
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    disabled={isSunday || !available}
-                    aria-pressed={selected}
-                    aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
-                    onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
-                    style={{
-                      flex: "0 0 92px",
-                      minWidth: 92,
-                      scrollSnapAlign: "start",
-                      background: selected ? ORANGE : isSunday || !available ? "#F1F2F6" : INK,
-                      border: "none",
-                      borderRadius: 12,
-                      padding: "8px 4px 10px",
-                      color: selected ? "#FFFFFF" : isSunday || !available ? MUTED : "#FFFFFF",
-                      cursor: isSunday || !available ? "not-allowed" : "pointer",
-                      textAlign: "center",
-                      transition: "background-color 120ms ease",
-                      position: "relative",
-                      opacity: !available && !selected ? 0.55 : 1,
-                    }}
-                  >
-                    {/* iOS-style: filled accent is the single selection cue */}
-                    {/* TODAY / TOMORROW pill */}
-                    {(isToday || isTomorrow) && (
-                      <div
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 800,
-                          letterSpacing: "0.04em",
-                          padding: "1px 4px",
-                          borderRadius: 999,
-                          display: "inline-block",
-                          marginBottom: 4,
-                          maxWidth: "100%",
-                          background: isToday && !selected ? ORANGE : "transparent",
-                          color: "#FFFFFF",
-                          border: isTomorrow && !selected ? `1px solid rgba(255,255,255,0.7)` : "none",
-                        }}
-                      >
-                        {isToday ? "TODAY" : "TMRW"}
-                      </div>
-                    )}
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
-                      {fmtDayShort(d)}
-                    </div>
-                    <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
-                      {fmtMonthDay(d)}
-                    </div>
-                    <div
+                        ? "#FFB37A"
+                        : "rgba(255,255,255,0.85)";
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      disabled={isSunday || !available}
+                      aria-pressed={selected}
+                      aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
+                      onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
                       style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: badgeColor,
-                        marginTop: 6,
-                        letterSpacing: "0.04em",
+                        flex: "0 0 92px",
+                        minWidth: 92,
+                        scrollSnapAlign: "start",
+                        background: selected ? ORANGE : isSunday || !available ? "#F1F2F6" : INK,
+                        border: "none",
+                        borderRadius: 12,
+                        padding: "8px 4px 10px",
+                        color: selected ? "#FFFFFF" : isSunday || !available ? MUTED : "#FFFFFF",
+                        cursor: isSunday || !available ? "not-allowed" : "pointer",
+                        textAlign: "center",
+                        transition: "background-color 120ms ease",
+                        position: "relative",
+                        opacity: !available && !selected ? 0.55 : 1,
                       }}
                     >
-                      {badgeText}
-                    </div>
-                  </button>
-                );
-              })}
+                      {(isToday || isTomorrow) && (
+                        <div
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 800,
+                            letterSpacing: "0.04em",
+                            padding: "1px 4px",
+                            borderRadius: 999,
+                            display: "inline-block",
+                            marginBottom: 4,
+                            maxWidth: "100%",
+                            background: isToday && !selected ? ORANGE : "transparent",
+                            color: "#FFFFFF",
+                            border: isTomorrow && !selected ? `1px solid rgba(255,255,255,0.7)` : "none",
+                          }}
+                        >
+                          {isToday ? "TODAY" : "TMRW"}
+                        </div>
+                      )}
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", color: selected ? "rgba(255,255,255,0.85)" : isSunday || !available ? MUTED : "rgba(255,255,255,0.75)", marginBottom: 2 }}>
+                        {fmtDayShort(d)}
+                      </div>
+                      <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 18, letterSpacing: "0.02em" }}>
+                        {fmtMonthDay(d)}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: badgeColor,
+                          marginTop: 6,
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        {badgeText}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Edge fade affordances — show that more dates exist off-screen. */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute", left: 0, top: 0, bottom: 4, width: 28,
+                  pointerEvents: "none",
+                  background: `linear-gradient(to right, ${SURFACE}, rgba(255,255,255,0))`,
+                  opacity: showLeftFade ? 1 : 0,
+                  transition: "opacity 150ms ease",
+                }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute", right: 0, top: 0, bottom: 4, width: 28,
+                  pointerEvents: "none",
+                  background: `linear-gradient(to left, ${SURFACE}, rgba(255,255,255,0))`,
+                  opacity: showRightFade ? 1 : 0,
+                  transition: "opacity 150ms ease",
+                }}
+              />
             </div>
           )}
           {loadError && (
