@@ -5,11 +5,9 @@ import { trackCro } from "@/hooks/useAnalytics";
 import { COPY } from "@/data/copy";
 
 const trustChecks = [
-  "No referral needed",
-  "Same/next-day visits",
-  "Face-to-face physician",
-  "Licensed VA providers",
-  COPY.badge.noCostConsult,
+  "Same or next-day appointments",
+  "Face-to-face physician, every visit",
+  "No-cost initial consult",
 ];
 
 const COLORS = {
@@ -158,20 +156,7 @@ export const TRTHero = () => {
             ))}
           </ul>
 
-          {/* Credibility strip */}
-          <p
-            className="mt-5 uppercase"
-            style={{
-              color: "rgba(245,240,235,0.55)",
-              fontFamily: "Inter, sans-serif",
-              fontSize: 11,
-              letterSpacing: "0.10em",
-              lineHeight: 1.6,
-              maxWidth: 640,
-            }}
-          >
-            Board-certified physicians · Licensed by the Virginia Board of Medicine · 10,000+ men treated since 2019
-          </p>
+
 
           {/* Mobile primary CTA — hidden; form is directly below on mobile */}
 
