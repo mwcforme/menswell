@@ -721,12 +721,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                       onClick={confirmCtl.cancelRedirect}
                       style={{
                         background: "transparent",
-                        border: "1px solid #FCA5A5",
+                        border: "1px solid #B91C1C",
                         color: "#7F1D1D",
                         borderRadius: 6,
                         padding: "4px 10px",
                         fontSize: 11,
-                        fontWeight: 600,
+                        fontWeight: 700,
                         textTransform: "uppercase",
                         letterSpacing: "0.06em",
                         cursor: "pointer",
@@ -773,7 +773,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                 border: 0, borderRadius: 12, fontSize: 15, fontWeight: 700,
                 letterSpacing: "0.06em", textTransform: "uppercase",
                 cursor: submitting || confirmCtl.redirect ? "wait" : "pointer",
-                opacity: submitting || confirmCtl.redirect ? 0.6 : 1,
+                opacity: submitting || confirmCtl.redirect ? 0.85 : 1,
                 fontFamily: "Oswald, Inter, sans-serif",
                 display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8,
                 boxShadow: "0 10px 24px -10px rgba(232,103,10,0.55)",
