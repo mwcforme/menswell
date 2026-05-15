@@ -2,7 +2,7 @@ import { Check, Star } from "lucide-react";
 import { TRTHeroForm } from "@/components/landing/trt/TRTHeroForm";
 
 const trustChecks = [
-  "Semaglutide \u0026 tirzepatide, in-person",
+  "Physician-supervised GLP-1 medications",
   "Dose adjusted at every visit, not auto-refilled",
   "Face-to-face Virginia physician",
   "FSA and HSA accepted",
@@ -87,7 +87,7 @@ export const WLHero = () => {
               lineHeight: 1.5,
             }}
           >
-            GLP-1 medications with a physician who adjusts your dose, watches your labs, and shows up for every visit. Not a chatbot. Not a pill in the mail.
+            Physician-supervised weight loss medications with a provider who adjusts your dose, watches your labs, and shows up for every visit. Not a chatbot. Not a pill in the mail.
           </p>
 
           <div

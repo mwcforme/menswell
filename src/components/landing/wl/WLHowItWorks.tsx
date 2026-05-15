@@ -22,7 +22,7 @@ const steps = [
   {
     num: "3",
     title: "Walk Out With A Plan And, If Right For You, Your First Dose",
-    desc: "GLP-1 medications like semaglutide or tirzepatide when clinically appropriate, paired with a sustainable nutrition plan and ongoing monitoring.",
+    desc: "Physician-supervised weight loss medication when clinically appropriate, paired with a sustainable nutrition plan and ongoing monitoring.",
   },
 ];
 

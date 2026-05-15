@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
-    <meta name="googlebot" content="noindex, nofollow" />
-    <meta name="bingbot" content="noindex, nofollow" />
+    <meta name="robots" content="noindex" />
+    <meta name="googlebot" content="noindex" />
+    <meta name="bingbot" content="noindex" />
+    <title>Men's Wellness Centers — TRT, ED &amp; Weight Loss in Virginia</title>
     <meta name="theme-color" content="#0B1029" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -45,6 +46,17 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-KHD64CYC2G', { send_page_view: false, anonymize_ip: true });
+      // Sensitive category pages: redact ad data and enable URL passthrough
+      // to prevent health-condition signals from being used for audience building.
+      (function() {
+        var sensitivePaths = ['/book/', '/quiz', '/ed', '/wl'];
+        var path = window.location.pathname;
+        var isSensitive = sensitivePaths.some(function(p) { return path === p || path.startsWith(p); });
+        if (isSensitive) {
+          gtag('set', 'ads_data_redaction', true);
+          gtag('set', 'url_passthrough', true);
+        }
+      })();
     </script>
 
   <meta name="description" content="Men's Wellness Centers. Virginia's physician-led men's health centers since 2015. Testosterone replacement therapy, ED treatment, and weight loss at our Richmond, Newport News, and Virginia Beach locations.">

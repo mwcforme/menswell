@@ -13,7 +13,7 @@ export const WLManifesto = () => (
         </h2>
 
         <p className="text-base mt-5 leading-[1.7]" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
-          GLP-1 medications work. What changes the outcome is what wraps around them: a physician who knows your labs, a plan that fits your life, and check-ins that catch the small things before they stall your progress.
+          Prescription weight loss medications work. What changes the outcome is what wraps around them: a physician who knows your labs, a plan that fits your life, and check-ins that catch the small things before they stall your progress.
         </p>
         <p className="text-base mt-4 leading-[1.7]" style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif", fontSize: 16 }}>
           That is what you get here. Not a script in the mail. Not a new clinician every visit. A Virginia physician, your numbers, and a plan that adjusts as you do.
@@ -25,7 +25,8 @@ export const WLManifesto = () => (
             "I lost 38 pounds in six months and, more importantly, I kept it off. The difference was the doctor actually adjusting my dose and checking in. It was not a pill in a box."
           </blockquote>
           <figcaption className="mt-3 text-sm" style={{ color: "rgba(255,255,255,0.65)", fontFamily: "Inter, sans-serif" }}>
-            — David K., 54, Norfolk
+            David K., 54, Norfolk
+            <span className="block mt-1" style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", fontStyle: "normal" }}>Results not typical. Individual results vary.</span>
           </figcaption>
         </figure>
 

@@ -3,7 +3,7 @@ import { TRTHeroForm } from "@/components/landing/trt/TRTHeroForm";
 
 const trustChecks = [
   "In-person Virginia visits, not an app",
-  "Sildenafil, Tadalafil, TriMix, PT-141",
+  "Oral medications and injectable therapies",
   "Billed discreetly, not as an ED clinic",
   "No-cost consult, same-day labs",
 ];
@@ -87,7 +87,7 @@ export const EDHero = () => {
               lineHeight: 1.5,
             }}
           >
-            A Virginia physician diagnoses the cause. Not a pill subscription. A real protocol. Oral medications, TriMix, and PT-141. No waiting room anxiety, no awkward conversations.
+            A Virginia physician diagnoses the cause. Not a pill subscription. A real protocol built around your labs, with treatment options that go beyond what online clinics can offer.
           </p>
 
           <div
@@ -144,7 +144,7 @@ export const EDHero = () => {
           <TRTHeroForm
             service="ed"
             heading="Book My Discreet Visit"
-            subheading="Same or next day. 100% confidential."
+            subheading="Same or next day. Private, in-person visit."
             ctaLabel="Book My Discreet Visit"
           />
         </div>

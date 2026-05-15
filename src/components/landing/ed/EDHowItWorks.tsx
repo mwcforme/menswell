@@ -12,7 +12,7 @@ const steps = [
   {
     num: "1",
     title: "Book A Discreet, In-Person Visit",
-    desc: "Pick a Virginia center and time. No referral. No insurance hoops. 100% confidential.",
+    desc: "Pick a Virginia center and time. No referral. No insurance hoops. Private, in-person visit.",
   },
   {
     num: "2",
@@ -22,7 +22,7 @@ const steps = [
   {
     num: "3",
     title: "Treatment That Fits You, From Day One",
-    desc: "Sildenafil, Tadalafil, TriMix, or PT-141 when clinically appropriate. Personalized dosing and ongoing follow-up, not a 30-day pill drop.",
+    desc: "FDA-approved oral and injectable treatments when clinically appropriate. Personalized dosing and ongoing follow-up, not a 30-day pill drop.",
   },
 ];
 

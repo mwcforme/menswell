@@ -63,8 +63,38 @@ export const TRTFooter = () => {
           </div>
         </div>
 
+        {/* Clinic locations */}
+        <div className="mt-10 pt-8 border-t" style={{ borderColor: "var(--c-border-on-dark)" }}>
+          <div
+            className="text-xs font-semibold uppercase mb-4"
+            style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "0.12em" }}
+          >
+            Our Virginia Locations
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs" style={{ color: "rgba(255,255,255,0.60)", fontFamily: "Inter, sans-serif", lineHeight: 1.6 }}>
+            <div>
+              <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600, marginBottom: 2 }}>Richmond</div>
+              <div>4050 Innslake Dr, Suite 360</div>
+              <div>Glen Allen, VA 23060</div>
+              <a href="tel:8043464636" style={{ color: "rgba(255,255,255,0.60)", textDecoration: "none" }}>(804) 346-4636</a>
+            </div>
+            <div>
+              <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600, marginBottom: 2 }}>Newport News</div>
+              <div>827 Diligence Drive, Suite 206</div>
+              <div>Newport News, VA 23606</div>
+              <a href="tel:7578736500" style={{ color: "rgba(255,255,255,0.60)", textDecoration: "none" }}>(757) 873-6500</a>
+            </div>
+            <div>
+              <div style={{ color: "rgba(255,255,255,0.85)", fontWeight: 600, marginBottom: 2 }}>Virginia Beach</div>
+              <div>996 First Colonial Road</div>
+              <div>Virginia Beach, VA 23454</div>
+              <a href="tel:7578066263" style={{ color: "rgba(255,255,255,0.60)", textDecoration: "none" }}>(757) 806-6263</a>
+            </div>
+          </div>
+        </div>
+
         {/* Badge row */}
-        <div className="mt-12 flex justify-center">
+        <div className="mt-10 flex justify-center">
           <a
             href="https://www.legitscript.com/websites/?checker_keywords=menswellnesscenters.com"
             target="_blank"
@@ -75,7 +105,7 @@ export const TRTFooter = () => {
             <img
               src="/images/badges/legitscript.png"
               alt="LegitScript Certified"
-              className="h-20 w-auto"
+              className="h-16 w-auto"
               loading="lazy"
             />
           </a>
