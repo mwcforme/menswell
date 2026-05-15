@@ -22,8 +22,8 @@ const steps = [
   },
   {
     num: "3",
-    title: "Walk Out The Same Day With A Plan",
-    desc: "A personalized plan built around your labs and your goals. Many patients begin treatment the same day, when clinically appropriate.",
+    title: "Walk Out With Your Protocol Locked In",
+    desc: "A plan dialed in to your labs and your goals. Many patients begin treatment the same day, when clinically appropriate.",
   },
 ];
 

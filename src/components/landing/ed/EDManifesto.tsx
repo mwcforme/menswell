@@ -24,7 +24,7 @@ export const EDManifesto = () => (
             "Pills from a website did nothing for two years. One real visit, real labs, the right protocol, and it works. I should have done this a long time ago."
           </blockquote>
           <figcaption className="mt-3 text-sm" style={{ color: "rgba(255,255,255,0.65)", fontFamily: "Inter, sans-serif" }}>
-            — Steve P., 56, Chesapeake
+            Steve P., 56, Chesapeake
           </figcaption>
         </figure>
 

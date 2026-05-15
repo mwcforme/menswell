@@ -123,7 +123,7 @@ function Section1Header({ firstName }: { firstName: string }) {
         Assessment Results
       </h1>
       <p className="mt-4 text-sm md:text-base" style={{ color: "#475569" }}>
-        Based on the symptoms you scored, here is what your assessment suggests, what to expect, and how to move forward. Individual results vary.
+        Based on your symptom scores, here is what the data suggests and what getting dialed in looks like. Individual results vary.
       </p>
     </header>
   );
@@ -284,7 +284,7 @@ function Section5Outcome() {
         className="font-bold uppercase"
         style={{ fontFamily: "Oswald, sans-serif", fontSize: "clamp(24px, 4.5vw, 34px)", letterSpacing: "0.02em", color: "#000814" }}
       >
-        Proven to restore energy, strength, and drive.
+        Most men get their energy, strength, and drive locked in within 6 months.
       </h2>
       <p className="mt-3 text-sm md:text-base" style={{ color: "#475569" }}>
         With clinically supervised TRT, most men reach peak energy, strength, and drive within 6 months.
@@ -339,7 +339,7 @@ function Section6NextSteps() {
   const steps = [
     { n: "01", title: "Schedule my visit", body: "Book a same or next-day in-person evaluation at a Virginia Center.", icon: ClipboardCheck },
     { n: "02", title: "In-person labs and physical", body: "Same-day blood panel and a face-to-face exam with a licensed provider.", icon: FlaskConical },
-    { n: "03", title: "Personalized protocol", body: "If clinically appropriate, a tailored TRT protocol with ongoing monitoring.", icon: Stethoscope },
+    { n: "03", title: "Your protocol, dialed in", body: "If clinically appropriate, a TRT protocol built to your labs with ongoing monitoring.", icon: Stethoscope },
   ];
   return (
     <section className="mt-12">
@@ -389,7 +389,7 @@ function Section7Offer({ ctaHref, ctaLabel, disqualified }: { ctaHref: string; c
           Start TRT in person. First visit on us.
         </h2>
         <p className="mt-3 text-sm md:text-base" style={{ color: "rgba(245,240,235,0.85)" }}>
-          Walk in to a Virginia Men's Wellness Center, get same-day labs, sit face to face with a licensed provider, and walk out with a clear plan.
+          Walk in to a Virginia Men's Wellness Center. Same-day labs. A real conversation with your provider. Walk out with your protocol locked in.
         </p>
 
         <ul className="mt-6 space-y-3">
@@ -397,7 +397,7 @@ function Section7Offer({ ctaHref, ctaLabel, disqualified }: { ctaHref: string; c
             // banned-wording-allow-next-line — medical terminology (unbound vs. bound testosterone)
             { title: "Comprehensive panel", body: "12+ biomarkers including total and free testosterone." },
             { title: "Provider visit", body: "Face to face with a licensed Virginia clinician." },
-            { title: "Personalized protocol", body: "Tailored to your labs, symptoms, and goals." },
+            { title: "Protocol dialed in to you", body: "Built around your labs, symptoms, and goals. Not a generic script." },
           ].map((it) => (
             <li key={it.title} className="flex items-start gap-3">
               <span className="mt-1 w-2 h-2 rounded-full" style={{ background: "#E8670A" }} aria-hidden="true" />
@@ -476,7 +476,7 @@ function Section9WeekByWeek() {
         What to expect, week by week.
       </h2>
       <p className="text-sm md:text-base mb-5" style={{ color: "#475569" }}>
-        Most men feel increased energy and libido in the early weeks. Sharper focus, strength, and vitality build over time. Individual results vary.
+        Most men feel a difference in energy and libido in the early weeks. Strength, focus, and drive get dialed in over time. Individual results vary.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {cols.map((c) => (
