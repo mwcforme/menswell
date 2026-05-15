@@ -53,7 +53,7 @@ export const TRTHeader = ({ minimal = false }: { minimal?: boolean } = {}) => {
           <button
             data-cro="header_book_click"
             onClick={() => { trackCro("header_book_click"); scrollTo("hero-form"); }}
-            className="rounded-full px-5 py-2.5 text-xs font-bold uppercase cursor-pointer transition-colors duration-200"
+            className="rounded-full px-5 py-2.5 text-xs font-bold cursor-pointer transition-colors duration-200"
             style={{
               background: "var(--brand-cta)",
               color: "#FFFFFF",
