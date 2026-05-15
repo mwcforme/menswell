@@ -46,7 +46,6 @@ export const TRTManifesto = () => {
             <figcaption className="mt-3 text-sm" style={{ color: "rgba(255,255,255,0.65)", fontFamily: "Inter, sans-serif" }}>
               <span className="flex items-center gap-2">
                 <span>Mark B., 52, Richmond</span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "rgba(46,204,113,0.12)", color: "var(--c-success-on-dark)", fontSize: 11, fontWeight: 600 }}>✓ Verified</span>
               </span>
               <span className="block mt-1" style={{ fontSize: 11, color: "rgba(255,255,255,0.40)", fontStyle: "normal" }}>Individual results vary.</span>
             </figcaption>
