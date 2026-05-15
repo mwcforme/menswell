@@ -1,7 +1,9 @@
-import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
+import { useEffect } from "react";
+import { MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingStore } from "@/domain/booking/bookingStore";
+import BookedCelebrationCard from "@/components/book/BookedCelebrationCard";
 
 const EXPECT_VIDEO_SRC = "/videos/what-to-expect.mp4";
 
