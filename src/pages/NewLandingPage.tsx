@@ -34,8 +34,8 @@ const NewLandingPage = () => {
       <main className="flex-1">
         <TRTHero />
         <SectionReveal><CredibilityBand /></SectionReveal>
-        <SectionReveal><TRTHowItWorks /></SectionReveal>
         <SectionReveal><TRTManifesto /></SectionReveal>
+        <SectionReveal><TRTHowItWorks /></SectionReveal>
         <SectionReveal><TRTResults /></SectionReveal>
         <SectionReveal><TRTPillars /></SectionReveal>
         <SectionReveal><TRTMarquee /></SectionReveal>
