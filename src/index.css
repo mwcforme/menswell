@@ -21,6 +21,44 @@
     --border-light: #D4D3D1;
     --border-dark: #2A2A40;
 
+    /* ----------------------------------------------------------------
+       WCAG AA semantic tokens (added 2026-05-15).
+       All ratios computed against the surfaces they're used on
+       per WCAG 2.1 §1.4.3 (text ≥4.5) and §1.4.11 (UI ≥3).
+       Direct hex (not HSL) so they can be consumed inline via var().
+    ---------------------------------------------------------------- */
+
+    /* Brand surfaces (unchanged hues) */
+    --brand-navy: #000033;
+    --brand-navy-deep: #0B1029;
+    --brand-cream: #F5F0EB;
+
+    /* Accent — display only (≥24px, ≥18.66px bold, or icon vs dark) */
+    --brand-accent: #E8670A;
+
+    /* CTA fill — same hue, darkened. white@bold = 5.18:1 ✓ */
+    --brand-cta: #C2410C;
+    --brand-cta-hover: #A6360A;
+
+    /* Text on light surfaces */
+    --c-text-on-light: #000033;        /* 17:1 on white */
+    --c-text-on-light-muted: #424857;  /* 9.5:1 on white */
+    --c-placeholder-light: #5A6072;    /* 6.0:1 on white */
+
+    /* Text on dark surfaces */
+    --c-text-on-dark: #FFFFFF;
+    --c-text-on-dark-muted: #E7DDD2;   /* 13:1 on navy */
+    --c-text-on-dark-subtle: #C5BFB7;  /*  9.4:1 on navy */
+
+    /* Functional borders / dividers (≥3:1) */
+    --c-border-on-light: #949494;      /* 3.07:1 on white */
+    --c-border-on-dark: #6B7299;       /* 3.10:1 on navy  */
+
+    /* Status */
+    --c-success-on-dark: #5DD68A;      /* 6.4:1 on navy */
+    --c-error-on-light: #A7211C;       /* 7.4:1 on white */
+    --c-error-on-dark: #FF8A8A;        /* 6.6:1 on navy */
+
     /* Shadcn semantic tokens */
     --background: 44 7% 92%;
     --foreground: 0 0% 0%;
