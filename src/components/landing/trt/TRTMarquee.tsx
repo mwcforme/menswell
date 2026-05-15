@@ -13,37 +13,37 @@ export const TRTMarquee = () => (
   >
     <div
       style={{
-        maxWidth: 900,
+        maxWidth: 960,
         margin: "0 auto",
-        padding: "32px 32px",
+        padding: "52px 40px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        gap: 56,
+        gap: 80,
       }}
     >
       <img
         src="/images/badges/legitscript.png"
         alt="LegitScript Certified"
-        style={{ height: 64, width: "auto", maxWidth: 180, objectFit: "contain" }}
+        style={{ height: 96, width: "auto", maxWidth: 220, objectFit: "contain" }}
         loading="lazy"
       />
 
-      <div aria-hidden="true" style={{ width: 1, height: 48, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
+      <div aria-hidden="true" style={{ width: 1, height: 72, background: "rgba(255,255,255,0.20)", flexShrink: 0 }} />
 
       <img
         src="/images/badges/clia.png"
         alt="CLIA Certified Laboratory"
-        style={{ height: 64, width: "auto", maxWidth: 180, objectFit: "contain" }}
+        style={{ height: 96, width: "auto", maxWidth: 220, objectFit: "contain" }}
         loading="lazy"
       />
 
-      <div aria-hidden="true" style={{ width: 1, height: 48, background: "rgba(255,255,255,0.18)", flexShrink: 0 }} />
+      <div aria-hidden="true" style={{ width: 1, height: 72, background: "rgba(255,255,255,0.20)", flexShrink: 0 }} />
 
       <img
         src="/images/badges/hipaa.png"
         alt="HIPAA Compliant"
-        style={{ height: 64, width: "auto", maxWidth: 180, objectFit: "contain" }}
+        style={{ height: 96, width: "auto", maxWidth: 220, objectFit: "contain" }}
         loading="lazy"
       />
     </div>
