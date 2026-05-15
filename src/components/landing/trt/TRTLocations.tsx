@@ -104,9 +104,9 @@ export const TRTLocations = () => {
                   <button
                     onClick={bookAt(l.slug)}
                     className="font-bold uppercase text-center rounded-full cursor-pointer inline-flex items-center justify-center"
-                    style={{ height: 48, minHeight: 48, background: "var(--brand-cta)", color: "#FFFFFF", fontSize: 19, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif", border: "none" }}
+                    style={{ height: 48, minHeight: 48, background: "var(--brand-cta)", color: "#FFFFFF", fontSize: 15, letterSpacing: "0.06em", fontFamily: "Inter, sans-serif", border: "none" }}
                   >
-                    {COPY.cta.bookConsult}
+                    Book No-Cost Consult
                   </button>
                 </div>
               </div>
