@@ -217,6 +217,19 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
     return () => window.clearInterval(t);
   }, []);
 
+  // Recompute date-strip edge fade visibility whenever the day list re-renders.
+  useEffect(() => {
+    const el = dayStripRef.current;
+    if (!el) return;
+    const update = () => {
+      setShowLeftFade(el.scrollLeft > 4);
+      setShowRightFade(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [slotsByDay, weekStart, loading]);
+
   const cal = CENTER_CALENDARS[location];
 
   // Visible window: 7 days from weekStart.
