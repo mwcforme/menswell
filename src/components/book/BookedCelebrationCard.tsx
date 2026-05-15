@@ -15,10 +15,9 @@ const STORAGE_KEY = "mwc_booking_celebrated";
 
 const buildCalendarLinks = (iso: string, title: string, location: string) => {
   const start = new Date(iso);
-  const end = new Date(start.getTime() + 60 * 60 * 1000); // 60 min
+  const end = new Date(start.getTime() + 60 * 60 * 1000);
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  const google = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(start)}/${fmt(end)}&location=${encodeURIComponent(location)}&details=${encodeURIComponent("Your no-cost consultation at Men's Wellness Centers.")}` ;
-  // ICS blob for Apple/Outlook
+  const google = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(start)}/${fmt(end)}&location=${encodeURIComponent(location)}&details=${encodeURIComponent("Your no-cost consultation at Men's Wellness Centers.")}`;
   const ics = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -52,7 +51,6 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
       return;
     }
 
-    // Card slide-in always plays per mount.
     const t1 = window.setTimeout(() => setAnimateIn(true), 20);
 
     const alreadyCelebrated = sessionStorage.getItem(STORAGE_KEY) === "1";
@@ -65,12 +63,10 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
     firedRef.current = true;
     sessionStorage.setItem(STORAGE_KEY, "1");
 
-    // Check draws after card starts settling.
     const t2 = window.setTimeout(() => setDrawCheck(true), 220);
     const t3 = window.setTimeout(() => setGlow(true), 820);
     const t4 = window.setTimeout(() => setGlow(false), 820 + 1500);
 
-    // Confetti burst.
     const t5 = window.setTimeout(() => {
       try {
         confetti({
@@ -99,9 +95,10 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
     };
   }, []);
 
-  const personalized = firstName && firstName.length >= 2
-    ? `You're all set, ${firstName}.`
-    : "You're all set.";
+  const personalized =
+    firstName && firstName.length >= 2
+      ? `You're all set, ${firstName}.`
+      : "You're all set.";
 
   const calTitle = "MWC Consultation";
   const calLocation = locationAddress || `${locationCity} clinic`;
@@ -111,182 +108,204 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
     <div
       style={{
         background: "#FFFFFF",
-        border: "1px solid rgba(11,16,41,0.10)",
-        borderRadius: 16,
-        padding: "40px 28px",
-        boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
+        border: "1px solid rgba(11,16,41,0.08)",
+        borderRadius: 20,
+        overflow: "hidden",
+        boxShadow: "0 20px 50px rgba(0,0,0,0.28)",
         opacity: animateIn ? 1 : 0,
-        transform: animateIn ? "translateY(0)" : "translateY(12px)",
+        transform: animateIn ? "translateY(0)" : "translateY(16px)",
         transition: "opacity 400ms ease-out, transform 400ms ease-out",
         fontFamily: "Inter, sans-serif",
       }}
-      className="md:!p-[56px_48px] flex flex-col items-center text-center"
     >
-      {/* Animated check */}
+      {/* Green accent bar at top */}
+      <div style={{ height: 5, background: "linear-gradient(90deg, #16A34A 0%, #4ADE80 100%)" }} />
+
       <div
-        aria-hidden
-        style={{
-          position: "relative",
-          width: 64,
-          height: 64,
-          borderRadius: 999,
-          background: "rgba(34,197,94,0.10)",
-          border: "1px solid rgba(34,197,94,0.40)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 20,
-          boxShadow: glow
-            ? "0 0 0 0 rgba(34,197,94,0), 0 0 48px 8px rgba(34,197,94,0.40)"
-            : "0 0 0 0 rgba(34,197,94,0), 0 0 18px 0 rgba(34,197,94,0.12)",
-          transition: "box-shadow 1500ms ease-out",
-        }}
+        className="flex flex-col items-center text-center"
+        style={{ padding: "36px 24px 32px" }}
       >
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M5 12.5L10 17.5L19 7.5"
-            stroke="#22C55E"
-            strokeWidth="2.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {/* Check circle — larger, prominent */}
+        <div
+          aria-hidden
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: 999,
+            background: "rgba(34,197,94,0.10)",
+            border: "2px solid rgba(34,197,94,0.30)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 20,
+            boxShadow: glow
+              ? "0 0 0 10px rgba(34,197,94,0.06), 0 0 40px 6px rgba(34,197,94,0.28)"
+              : "none",
+            transition: "box-shadow 1500ms ease-out",
+          }}
+        >
+          <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M5 12.5L10 17.5L19 7.5"
+              stroke="#22C55E"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{
+                strokeDasharray: 28,
+                strokeDashoffset: drawCheck ? 0 : 28,
+                transition: "stroke-dashoffset 600ms ease-out",
+              }}
+            />
+          </svg>
+        </div>
+
+        {/* Heading */}
+        <h1
+          style={{
+            fontFamily: "Oswald, sans-serif",
+            fontWeight: 700,
+            fontSize: "clamp(26px, 5vw, 38px)",
+            color: "#0B1029",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em",
+            lineHeight: 1.05,
+            marginBottom: 6,
+          }}
+        >
+          Appointment Confirmed
+        </h1>
+
+        <p
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 400,
+            fontSize: 16,
+            color: "#5B6478",
+            marginBottom: 20,
+          }}
+        >
+          {personalized}
+        </p>
+
+        {/* Appointment date/time block — visually distinct */}
+        <div
+          style={{
+            background: "#F8F9FC",
+            border: "1px solid rgba(11,16,41,0.09)",
+            borderRadius: 12,
+            padding: "16px 20px",
+            marginBottom: 20,
+            width: "100%",
+            maxWidth: 440,
+          }}
+        >
+          <p
             style={{
-              strokeDasharray: 28,
-              strokeDashoffset: drawCheck ? 0 : 28,
-              transition: "stroke-dashoffset 600ms ease-out",
-            }}
-          />
-        </svg>
-      </div>
-
-      <h1
-        style={{
-          fontFamily: "Oswald, sans-serif",
-          fontWeight: 600,
-          fontSize: "clamp(28px, 4.4vw, 40px)",
-          color: "#0B1029",
-          textTransform: "uppercase",
-          letterSpacing: "0.04em",
-          lineHeight: 1.1,
-          marginBottom: 12,
-        }}
-      >
-        Appointment Confirmed
-      </h1>
-
-      <p
-        style={{
-          fontFamily: "Inter, sans-serif",
-          fontWeight: 500,
-          fontSize: 18,
-          color: "#3A4258",
-          marginBottom: 14,
-        }}
-      >
-        {personalized}
-      </p>
-
-      <p
-        style={{
-          fontFamily: "Oswald, sans-serif",
-          fontWeight: 600,
-          fontSize: "clamp(20px, 2.6vw, 28px)",
-          color: "#0B1029",
-          letterSpacing: "0.02em",
-          marginBottom: 8,
-          lineHeight: 1.2,
-        }}
-      >
-        {apptTime}
-      </p>
-
-      <p
-        style={{
-          fontFamily: "Inter, sans-serif",
-          fontWeight: 500,
-          fontSize: 16,
-          color: "#5B6478",
-          marginBottom: 22,
-        }}
-      >
-        {locationCity} clinic, in person
-      </p>
-
-      {/* Status pills */}
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6">
-        {[
-          "Confirmation sent",
-          "No-cost, no obligation",
-        ].map((label) => (
-          <span
-            key={label}
-            className="inline-flex items-center gap-1.5 whitespace-nowrap"
-            style={{
-              background: "rgba(34,197,94,0.08)",
-              border: "1px solid rgba(34,197,94,0.30)",
-              color: "#166534",
-              borderRadius: 999,
-              padding: "7px 14px",
-              fontSize: 11,
+              fontFamily: "Oswald, sans-serif",
               fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              fontFamily: "Inter, sans-serif",
+              fontSize: "clamp(19px, 3.5vw, 24px)",
+              color: "#0B1029",
+              letterSpacing: "0.02em",
+              marginBottom: 4,
               lineHeight: 1.2,
             }}
           >
-            <Check size={12} strokeWidth={3} style={{ color: "#22C55E", flexShrink: 0 }} />
-            {label}
-          </span>
-        ))}
-      </div>
-
-      {/* Add to Calendar buttons */}
-      {calLinks && (
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a
-            href={calLinks.google}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2"
+            {apptTime}
+          </p>
+          <p
             style={{
-              background: "#0B1029",
-              color: "#FFFFFF",
-              borderRadius: 8,
-              padding: "11px 20px",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              textDecoration: "none",
               fontFamily: "Inter, sans-serif",
-              whiteSpace: "nowrap",
+              fontWeight: 500,
+              fontSize: 13,
+              color: "#5B6478",
+              margin: 0,
             }}
           >
-            <Calendar size={15} strokeWidth={2.5} />
-            Add to Google Calendar
-          </a>
-          <a
-            href={calLinks.ics}
-            download="mwc-appointment.ics"
-            className="inline-flex items-center gap-2"
-            style={{
-              background: "transparent",
-              color: "#0B1029",
-              border: "1.5px solid rgba(11,16,41,0.25)",
-              borderRadius: 8,
-              padding: "11px 20px",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              textDecoration: "none",
-              fontFamily: "Inter, sans-serif",
-              whiteSpace: "nowrap",
-            }}
-          >
-            <Calendar size={15} strokeWidth={2.5} />
-            Add to Apple / Outlook
-          </a>
+            {locationCity} clinic · In person
+          </p>
         </div>
-      )}
+
+        {/* Status pills */}
+        <div
+          className="flex flex-wrap items-center justify-center gap-2"
+          style={{ marginBottom: 24 }}
+        >
+          {["Confirmation sent", "No-cost, no obligation"].map((label) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-1.5"
+              style={{
+                background: "rgba(22,163,74,0.08)",
+                border: "1px solid rgba(22,163,74,0.22)",
+                color: "#15803D",
+                borderRadius: 999,
+                padding: "5px 12px",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.07em",
+                textTransform: "uppercase",
+                fontFamily: "Inter, sans-serif",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <Check size={11} strokeWidth={3} style={{ color: "#22C55E", flexShrink: 0 }} />
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {/* Add to Calendar — full-width on mobile, side-by-side on sm+ */}
+        {calLinks && (
+          <div
+            className="flex flex-col sm:flex-row gap-3 w-full"
+            style={{ maxWidth: 460 }}
+          >
+            <a
+              href={calLinks.google}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 inline-flex items-center justify-center gap-2"
+              style={{
+                background: "#E8670A",
+                color: "#FFFFFF",
+                borderRadius: 10,
+                padding: "14px 16px",
+                fontSize: 14,
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                textDecoration: "none",
+                fontFamily: "Inter, sans-serif",
+                minHeight: 52,
+              }}
+            >
+              <Calendar size={16} strokeWidth={2.5} />
+              Google Calendar
+            </a>
+            <a
+              href={calLinks.ics}
+              download="mwc-appointment.ics"
+              className="flex-1 inline-flex items-center justify-center gap-2"
+              style={{
+                background: "#FFFFFF",
+                color: "#0B1029",
+                border: "1.5px solid rgba(11,16,41,0.18)",
+                borderRadius: 10,
+                padding: "14px 16px",
+                fontSize: 14,
+                fontWeight: 700,
+                letterSpacing: "0.02em",
+                textDecoration: "none",
+                fontFamily: "Inter, sans-serif",
+                minHeight: 52,
+              }}
+            >
+              <Calendar size={16} strokeWidth={2.5} />
+              Apple / Outlook
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
