@@ -238,7 +238,7 @@ export const TRTFinalCTA = () => {
                 height: 52,
                 background: "var(--brand-cta)",
                 color: "#FFFFFF",
-                fontSize: 14,
+                fontSize: 19,
                 border: "none",
                 letterSpacing: "0.08em",
                 fontFamily: "Inter, sans-serif",
