@@ -506,42 +506,22 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                           : "0 1px 2px rgba(11,16,41,0.04)",
                       }}
                     >
-                      {(isToday || isTomorrow) && (
-                        <div
-                          style={{
-                            fontSize: 9,
-                            fontWeight: 800,
-                            letterSpacing: "0.06em",
-                            padding: "2px 6px",
-                            borderRadius: 999,
-                            display: "inline-block",
-                            marginBottom: 4,
-                            background: selected
-                              ? "rgba(255,255,255,0.22)"
-                              : isToday
-                                ? ORANGE
-                                : "transparent",
-                            color: selected ? "#FFFFFF" : isToday ? "#FFFFFF" : INK,
-                            border: !selected && isTomorrow ? `1px solid ${BORDER}` : "none",
-                          }}
-                        >
-                          {isToday ? "TODAY" : "TMRW"}
-                        </div>
-                      )}
                       <div
                         style={{
                           fontSize: 11,
-                          fontWeight: 700,
+                          fontWeight: 800,
                           letterSpacing: "0.08em",
                           color: selected
                             ? "#FFFFFF"
                             : isSunday || !available
                               ? MUTED
-                              : INK_SOFT,
+                              : isToday || isTomorrow
+                                ? ORANGE
+                                : INK_SOFT,
                           marginBottom: 2,
                         }}
                       >
-                        {fmtDayShort(d)}
+                        {isToday ? "TODAY" : isTomorrow ? "TMRW" : fmtDayShort(d)}
                       </div>
                       <div style={{ fontFamily: "Oswald, Inter, sans-serif", fontWeight: 700, fontSize: 20, letterSpacing: "0.01em", lineHeight: 1.1 }}>
                         {fmtMonthDay(d)}
