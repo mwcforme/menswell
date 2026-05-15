@@ -191,13 +191,13 @@ const BookedCelebrationCard = ({ firstName, apptTime, locationCity }: Props) => 
             key={label}
             className="inline-flex items-center gap-1.5 whitespace-nowrap"
             style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.16)",
-              color: "rgba(255,255,255,0.85)",
+              background: "rgba(255,255,255,0.10)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              color: "#FFFFFF",
               borderRadius: 999,
-              padding: "6px 12px",
+              padding: "7px 14px",
               fontSize: 11,
-              fontWeight: 600,
+              fontWeight: 700,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               fontFamily: "Inter, sans-serif",
