@@ -142,7 +142,7 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
               {first ? `This is your moment, ${first}.` : "This is your moment."}
             </h1>
             <p style={{ fontSize: 15, color: "#6B7280", fontWeight: 400, lineHeight: 1.5 }}>
-              You took the step. We'll take it from here — your consultation is locked in.
+              You took the step. We'll take it from here. Your consultation is locked in.
             </p>
           </div>
         </div>
@@ -167,12 +167,12 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
             {apptTime}
           </span>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,0.60)", fontWeight: 500 }}>
-            {locationCity} clinic &nbsp;·&nbsp; In-person &nbsp;·&nbsp; 60 min
+            {locationCity} clinic · In-person · 60 min
           </span>
         </div>
 
-        {/* Status chips */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 28 }}>
+        {/* Status chips — always horizontal, wrap if needed */}
+        <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 28 }}>
           {["Confirmation sent", "No-cost, no obligation", "Bring photo ID"].map((label) => (
             <span key={label} style={{
               display: "inline-flex", alignItems: "center", gap: 5,
@@ -220,11 +220,11 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
                 borderRadius: 10, padding: "14px 20px",
                 fontSize: 14, fontWeight: 700, letterSpacing: "0.02em",
                 textDecoration: "none", fontFamily: "Inter, sans-serif",
-                minHeight: 52,
+                minHeight: 52, whiteSpace: "nowrap",
               }}
             >
               <Calendar size={16} strokeWidth={2.2} />
-              Apple Calendar / Outlook (.ics)
+              Apple / Outlook (.ics)
             </a>
           </div>
         )}

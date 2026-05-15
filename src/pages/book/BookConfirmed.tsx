@@ -157,7 +157,7 @@ const BookConfirmed = () => {
                 Here's exactly what happens when you walk in.
               </h2>
               <p style={{ fontSize: 15, color: "#5B6478", lineHeight: 1.55, fontWeight: 400 }}>
-                No waiting room anxiety. We'll walk you through labs, a quick exam, and a real conversation with your provider — all in under an hour.
+                No waiting room anxiety. Labs, a quick exam, and a real conversation with your provider. All in under an hour.
               </p>
             </div>
           </div>
