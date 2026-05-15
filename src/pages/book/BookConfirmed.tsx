@@ -86,8 +86,17 @@ const BookConfirmed = () => {
   const mapsQuery = encodeURIComponent(fullAddress);
   const PHONE_DISPLAY = center.phoneDisplay;
   const PHONE_TEL = center.phoneTel;
-  const fullName = [identity?.firstName, identity?.lastName].filter(Boolean).join(" ");
+  const rawFirst = (identity?.firstName ?? "").trim();
+  const rawLast = (identity?.lastName ?? "").trim();
+  const firstName = rawFirst.split(/\s+/)[0] || "";
+  void rawLast;
 
+  // One-time cleanup: clear corrupt persisted identity (no phone AND no email).
+  useEffect(() => {
+    if (identity && !identity.phone && !identity.email) {
+      useBookingStore.setState({ identity: undefined });
+    }
+  }, [identity]);
 
   return (
     <BookLayout page="confirmed" variant="confirmation" title="You're booked | Men's Wellness Centers">
@@ -97,57 +106,12 @@ const BookConfirmed = () => {
       >
         <div className="mx-auto flex flex-col gap-8 md:gap-10" style={{ maxWidth: 1100, fontFamily: "Inter, sans-serif" }}>
 
-          {/* Status Header */}
-          <div className="flex flex-col items-center text-center">
-            <div
-              className="flex items-center justify-center mb-4 md:mb-5"
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 999,
-                background: "rgba(34,197,94,0.10)",
-                border: "1px solid rgba(34,197,94,0.45)",
-                boxShadow: "0 0 24px rgba(34,197,94,0.18)",
-              }}
-            >
-              <CheckCircle2 size={24} strokeWidth={2.5} style={{ color: "#22C55E" }} />
-            </div>
-            <h1
-              style={{
-                fontFamily: "Oswald, sans-serif",
-                fontWeight: 600,
-                fontSize: "clamp(28px, 4.4vw, 40px)",
-                color: "#FFFFFF",
-                textTransform: "uppercase",
-                letterSpacing: "0.04em",
-                lineHeight: 1.1,
-                marginBottom: 10,
-              }}
-            >
-              Appointment Confirmed
-            </h1>
-            <div className="flex flex-col items-center gap-1.5">
-              {fullName && (
-                <span
-                  className="text-base md:text-lg"
-                  style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif", fontWeight: 600 }}
-                >
-                  {fullName}
-                </span>
-              )}
-              <span
-                className="text-lg md:text-xl"
-                style={{
-                  fontFamily: "Oswald, sans-serif",
-                  fontWeight: 500,
-                  letterSpacing: "0.02em",
-                  color: "rgba(255,255,255,0.85)",
-                }}
-              >
-                {apptTime}
-              </span>
-            </div>
-          </div>
+          {/* Celebration Hero Card */}
+          <BookedCelebrationCard
+            firstName={firstName}
+            apptTime={apptTime}
+            locationCity={center.city}
+          />
 
           {/* Two-column grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
