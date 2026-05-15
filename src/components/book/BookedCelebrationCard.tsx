@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Calendar, Check } from "lucide-react";
+import { Calendar, Check, MapPin, Clock } from "lucide-react";
 import confetti from "canvas-confetti";
 
 interface Props {
@@ -60,6 +60,19 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
   }, []);
 
   const first = firstName && firstName.length >= 2 ? firstName : null;
+
+  // Parse ISO into structured parts for the calendar-style block
+  const apptParts = apptIso ? (() => {
+    const d = new Date(apptIso);
+    const tz = "America/New_York";
+    return {
+      dayOfWeek: d.toLocaleDateString("en-US", { weekday: "long", timeZone: tz }),
+      month:     d.toLocaleDateString("en-US", { month: "short", timeZone: tz }).toUpperCase(),
+      day:       d.toLocaleDateString("en-US", { day: "numeric", timeZone: tz }),
+      time:      d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: tz }),
+    };
+  })() : null;
+
   const calLinks = apptIso
     ? buildCalendarLinks(apptIso, "MWC Consultation", locationAddress || `${locationCity} clinic`)
     : null;
@@ -147,28 +160,63 @@ const BookedCelebrationCard = ({ firstName, apptTime, apptIso, locationCity, loc
           </div>
         </div>
 
-        {/* Date / time block — navy background, brand feel */}
+        {/* Appointment card — calendar style */}
         <div style={{
-          background: "#0B1029",
+          border: "1px solid #E5E7EB",
           borderRadius: 12,
-          padding: "18px 22px",
+          overflow: "hidden",
           marginBottom: 20,
           display: "flex",
-          flexDirection: "column",
-          gap: 5,
         }}>
-          <span style={{
-            fontFamily: "Oswald, sans-serif",
-            fontWeight: 700,
-            fontSize: "clamp(18px, 3vw, 22px)",
-            color: "#FFFFFF",
-            letterSpacing: "0.02em",
+          {/* Left: date badge */}
+          <div style={{
+            background: "#0B1029",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px 18px",
+            minWidth: 72,
+            flexShrink: 0,
           }}>
-            {apptTime}
-          </span>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.60)", fontWeight: 500 }}>
-            {locationCity} clinic · In-person · 60 min
-          </span>
+            {apptParts ? (
+              <>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#E8670A", textTransform: "uppercase", lineHeight: 1 }}>
+                  {apptParts.month}
+                </span>
+                <span style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 36, color: "#FFFFFF", lineHeight: 1.05, marginTop: 2 }}>
+                  {apptParts.day}
+                </span>
+                <span style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", fontWeight: 600, letterSpacing: "0.06em", marginTop: 2, textTransform: "uppercase" }}>
+                  {apptParts.dayOfWeek.slice(0, 3)}
+                </span>
+              </>
+            ) : (
+              <Calendar size={28} style={{ color: "#FFFFFF" }} />
+            )}
+          </div>
+
+          {/* Right: details */}
+          <div style={{
+            padding: "14px 16px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 6,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <Clock size={13} strokeWidth={2} style={{ color: "#E8670A", flexShrink: 0 }} />
+              <span style={{ fontFamily: "Oswald, sans-serif", fontWeight: 700, fontSize: 18, color: "#0B1029", letterSpacing: "0.01em" }}>
+                {apptParts ? apptParts.time : apptTime}
+              </span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <MapPin size={13} strokeWidth={2} style={{ color: "#E8670A", flexShrink: 0 }} />
+              <span style={{ fontSize: 13, color: "#5B6478", fontWeight: 500 }}>
+                {locationCity} clinic · In-person · 60 min
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Status chips — always horizontal, wrap if needed */}
