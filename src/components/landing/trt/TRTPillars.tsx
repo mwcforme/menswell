@@ -77,7 +77,7 @@ export const TRTPillars = () => (
             </h3>
             <p
               className="text-sm px-5 pb-6 mt-2 leading-relaxed"
-              style={{ color: "rgba(255,255,255,0.65)", fontFamily: "Inter, sans-serif" }}
+              style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif" }}
             >
               {p.desc}
             </p>
