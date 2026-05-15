@@ -633,7 +633,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                         {time}
                       </span>
                       <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
-                        {ampm} ET
+                        {ampm}
                       </span>
                     </div>
                   </button>
@@ -670,7 +670,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                   const day = new Date(selectedSlot);
                   const dayLabel = day.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: TIMEZONE }).toUpperCase();
                   const { time, ampm } = fmtTimeParts(selectedSlot);
-                  return `Confirm ${dayLabel} · ${time} ${ampm} ET →`;
+                  return `Confirm ${dayLabel} · ${time} ${ampm} →`;
                 })()
               : "Tap a time above to continue"}
           </button>
@@ -699,7 +699,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
             </div>
             {selectedSlot && (
               <div style={{ fontSize: 15, color: INK, marginBottom: 4 }}>
-                {fmtFullDay(new Date(selectedSlot))} · {fmtTimeParts(selectedSlot).time} {fmtTimeParts(selectedSlot).ampm} ET
+                {fmtFullDay(new Date(selectedSlot))} · {fmtTimeParts(selectedSlot).time} {fmtTimeParts(selectedSlot).ampm}
               </div>
             )}
             <div style={{ fontSize: 14, color: MUTED }}>{cal.label}, In-person</div>
