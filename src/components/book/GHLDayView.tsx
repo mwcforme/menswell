@@ -534,7 +534,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                           fontWeight: 700,
                           letterSpacing: "0.08em",
                           color: selected
-                            ? "rgba(255,255,255,0.9)"
+                            ? "#FFFFFF"
                             : isSunday || !available
                               ? MUTED
                               : INK_SOFT,
@@ -551,7 +551,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                           fontSize: 10,
                           fontWeight: 700,
                           color: selected
-                            ? "rgba(255,255,255,0.92)"
+                            ? "#FFFFFF"
                             : isSunday || !available
                               ? MUTED
                               : scarce
@@ -654,7 +654,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
             style={{
               width: "100%", minHeight: 56,
               background: canConfirm ? ORANGE : "#E5E7EB",
-              color: canConfirm ? "#FFFFFF" : "#5B6271",
+              color: canConfirm ? "#FFFFFF" : "#3D4350",
               border: 0, borderRadius: 12, fontSize: 16, fontWeight: 700,
               letterSpacing: "0.06em", textTransform: "uppercase",
               cursor: canConfirm ? "pointer" : "not-allowed",
