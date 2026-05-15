@@ -27,8 +27,8 @@ const NewED = () => { useScrollDepth();
       <main className="flex-1">
         <EDHero />
         <SectionReveal><CredibilityBand /></SectionReveal>
-        <SectionReveal><EDHowItWorks /></SectionReveal>
         <SectionReveal><EDManifesto /></SectionReveal>
+        <SectionReveal><EDHowItWorks /></SectionReveal>
         <SectionReveal><TRTResults /></SectionReveal>
         <SectionReveal><TRTPillars /></SectionReveal>
         <SectionReveal><TRTMarquee /></SectionReveal>

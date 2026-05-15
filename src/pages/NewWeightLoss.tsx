@@ -27,8 +27,8 @@ const NewWeightLoss = () => { useScrollDepth();
       <main className="flex-1">
         <WLHero />
         <SectionReveal><CredibilityBand /></SectionReveal>
-        <SectionReveal><WLHowItWorks /></SectionReveal>
         <SectionReveal><WLManifesto /></SectionReveal>
+        <SectionReveal><WLHowItWorks /></SectionReveal>
         <SectionReveal><TRTResults /></SectionReveal>
         <SectionReveal><TRTPillars /></SectionReveal>
         <SectionReveal><TRTMarquee /></SectionReveal>
