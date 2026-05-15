@@ -375,8 +375,8 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
             aria-label="Next week"
             style={{
               background: SURFACE, color: INK, border: `1px solid ${BORDER}`,
-              borderRadius: 999, padding: "8px 12px",
-              fontSize: 13, fontWeight: 600,
+              borderRadius: 999, padding: "10px 14px",
+              fontSize: 13, fontWeight: 600, minHeight: 44,
               display: "inline-flex", alignItems: "center", gap: 6, cursor: "pointer",
             }}
           >
