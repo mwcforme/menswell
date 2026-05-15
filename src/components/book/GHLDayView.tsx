@@ -162,11 +162,22 @@ const parseFreeSlots = (raw: unknown): Record<string, string[]> => {
   return out;
 };
 
-// Filter out slots that are already in the past (relative to current ET hour on today).
+// Filter out slots that are already in the past (today only) AND any slot
+// outside business hours (clinic closes at 6 PM ET — last bookable start = 5 PM).
+const etHourOf = (iso: string): number => {
+  const s = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIMEZONE, hour: "numeric", hour12: false,
+  }).format(new Date(iso));
+  const n = parseInt(s, 10);
+  return n === 24 ? 0 : n;
+};
 const dropPastSlots = (day: Date, slots: string[]): string[] => {
-  if (!isTodayET(day)) return slots;
-  const cutoffMs = Date.now();
-  return slots.filter((iso) => new Date(iso).getTime() > cutoffMs);
+  const cutoffMs = isTodayET(day) ? Date.now() : 0;
+  return slots.filter((iso) => {
+    const h = etHourOf(iso);
+    if (h < HOUR_MIN || h >= HOUR_MAX) return false; // 8 AM .. 5 PM inclusive
+    return new Date(iso).getTime() > cutoffMs;
+  });
 };
 
 
