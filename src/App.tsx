@@ -55,7 +55,7 @@ const ErrorFallback = ({ resetError }: { resetError: () => void }) => (
         Something went wrong
       </h1>
       <p style={{ opacity: 0.8, marginBottom: 24 }}>
-        Please refresh the page or call us at <a href="tel:8043334434" style={{ color: "#E8670A" }}>(804) XXX-XXXX</a>.
+        Please refresh the page or call us at <a href="tel:+18663444955" style={{ color: "#E8670A" }}>(866) 344-4955</a>.
       </p>
       <button
         type="button"
