@@ -618,9 +618,15 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
       </div>
 
       <Dialog open={modalOpen} onOpenChange={(o) => !submitting && setModalOpen(o)}>
-        <DialogContent className="sm:max-w-md" style={{ background: SURFACE, color: INK, border: `1px solid ${LINE}`, fontFamily: "Inter, sans-serif" }}>
+        <DialogContent
+          className="sm:max-w-md"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={dialogTitleId}
+          style={{ background: SURFACE, color: INK, border: `1px solid ${LINE}`, fontFamily: "Inter, sans-serif" }}
+        >
           <DialogHeader>
-            <DialogTitle style={{ color: INK, fontFamily: "Oswald, Inter, sans-serif", letterSpacing: "0.02em" }}>
+            <DialogTitle id={dialogTitleId} style={{ color: INK, fontFamily: "Oswald, Inter, sans-serif", letterSpacing: "0.02em" }}>
               Confirm your appointment
             </DialogTitle>
           </DialogHeader>
