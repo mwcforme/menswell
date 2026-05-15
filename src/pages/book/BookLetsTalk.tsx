@@ -1,10 +1,26 @@
-import { Phone, MessageSquareText } from "lucide-react";
+import { Phone, MessageSquareText, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import BookLayout from "@/components/book/BookLayout";
-
 
 const PHONE_DISPLAY = "(866) 344-4955";
 const PHONE_TEL = "tel:8663444955";
 const SMS_HREF = "sms:8663444955";
+
+// Business hours: Mon–Sat 9:00 AM – 5:00 PM ET
+const isTeamAvailable = (): boolean => {
+  const now = new Date();
+  const et = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    hour: "numeric",
+    minute: "numeric",
+    weekday: "short",
+    hour12: false,
+  }).formatToParts(now);
+  const day = et.find((p) => p.type === "weekday")?.value ?? "";
+  const hour = parseInt(et.find((p) => p.type === "hour")?.value ?? "0", 10);
+  const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].includes(day);
+  return isWeekday && hour >= 9 && hour < 17;
+};
 
 /**
  * /book/lets-talk — Termination page for the "Something else" symptom path.
@@ -41,36 +57,38 @@ const BookLetsTalk = () => {
         <div className="mx-auto" style={{ maxWidth: 760 }}>
           {/* Header */}
           <div className="text-center mb-8 md:mb-12">
-            <div
-              className="inline-flex items-center gap-2 mb-4 md:mb-5"
-              style={{
-                padding: "6px 12px",
-                borderRadius: 999,
-                background: "rgba(232,103,10,0.12)",
-                border: "1px solid rgba(232,103,10,0.35)",
-                color: "#FFB07A",
-                fontSize: 12,
-                fontWeight: 600,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              <span style={{ width: 6, height: 6, borderRadius: 999, background: "#22C55E" }} />
-              Team available now
-            </div>
+            {isTeamAvailable() && (
+              <div
+                className="inline-flex items-center gap-2 mb-4 md:mb-5"
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: 999,
+                  background: "rgba(232,103,10,0.12)",
+                  border: "1px solid rgba(232,103,10,0.35)",
+                  color: "#FFB07A",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: 999, background: "#22C55E" }} />
+                Team available now
+              </div>
+            )}
             <h1
               style={{
-                fontFamily: "Inter, system-ui, sans-serif",
+                fontFamily: "Oswald, sans-serif",
                 fontWeight: 700,
                 fontSize: "clamp(28px, 5vw, 44px)",
                 color: "#FFFFFF",
-                lineHeight: 1.15,
-                letterSpacing: "-0.02em",
-                textWrap: "balance",
+                lineHeight: 1.1,
+                letterSpacing: "0.01em",
+                textTransform: "uppercase",
                 marginBottom: 12,
-              } as React.CSSProperties}
+              }}
             >
-              Let's talk it through.
+              Let's find the right visit for you.
             </h1>
             <p
               className="text-base md:text-lg"
@@ -78,12 +96,11 @@ const BookLetsTalk = () => {
                 color: "rgba(255,255,255,0.72)",
                 fontWeight: 400,
                 lineHeight: 1.5,
-                maxWidth: 560,
+                maxWidth: 520,
                 margin: "0 auto",
               }}
             >
-              Every man's situation is different. A two-minute call is the
-              fastest way to get matched with the right visit.
+              Call or text us. A real person will match you with the right visit — no phone tree, no runaround.
             </p>
           </div>
 
@@ -121,7 +138,7 @@ const BookLetsTalk = () => {
                     Call us
                   </h2>
                   <p style={{ color: "#5A6478", fontSize: 14, fontWeight: 500, lineHeight: 1.35, marginTop: 2 }}>
-                    A real person picks up. No phone tree.
+                    Mon–Sat, 9am–5pm ET. A real person picks up.
                   </p>
                 </div>
               </div>
@@ -183,7 +200,7 @@ const BookLetsTalk = () => {
                     Prefer to text?
                   </h2>
                   <p style={{ color: "#5A6478", fontSize: 14, fontWeight: 500, lineHeight: 1.35, marginTop: 2 }}>
-                    Same number. Replies in under 10 minutes.
+                    Same number. We reply same day.
                   </p>
                 </div>
               </div>
@@ -211,13 +228,22 @@ const BookLetsTalk = () => {
                 <span>{PHONE_DISPLAY}</span>
               </a>
 
-              <div
-                className="flex items-center justify-center gap-2 mt-3"
-                style={{ color: "#5A6478", fontSize: 13, fontWeight: 500 }}
-              >
-                <span>Standard messaging rates apply</span>
-              </div>
+              <p style={{ color: "#9CA3AF", fontSize: 12, marginTop: 10, textAlign: "center" }}>
+                Replies from (866) 344-4955. Standard messaging rates apply.
+              </p>
             </section>
+          </div>
+
+          {/* Re-entry path for users who want to book online */}
+          <div className="mt-10 text-center">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-70"
+              style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif", textDecoration: "none" }}
+            >
+              <ArrowLeft size={14} />
+              Book online instead
+            </Link>
           </div>
 
         </div>
