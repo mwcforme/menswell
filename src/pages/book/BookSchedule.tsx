@@ -179,7 +179,7 @@ const BookSchedule = () => {
             {/* Next available slot banner */}
             {nextAvailableLabel && (
               <div
-                className="mx-auto w-full"
+                className="mx-auto w-full text-center"
                 style={{ maxWidth: 720 }}
               >
                 <div
