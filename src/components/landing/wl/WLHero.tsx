@@ -144,7 +144,7 @@ export const WLHero = () => {
           <TRTHeroForm
             service="wl"
             heading="See If I Qualify"
-            subheading="Same or next day. Takes 30 seconds."
+            subheading="Same or next day. Takes about a minute."
             ctaLabel="See If I Qualify"
           />
         </div>

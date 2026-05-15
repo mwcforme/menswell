@@ -54,15 +54,17 @@ const BookSchedule = () => {
           <button
             type="button"
             onClick={() => navigate("/book/duration")}
-            className="flex items-center gap-1"
+            className="inline-flex items-center gap-1"
             style={{
               background: "transparent", border: 0, color: "#FFFFFF",
-              fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600,
-              opacity: 0.85, cursor: "pointer", padding: "4px 0",
+              fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600,
+              opacity: 0.85, cursor: "pointer",
+              minHeight: 44, minWidth: 44,
+              padding: "10px 12px", marginLeft: -12,
             }}
             aria-label="Back to previous step"
           >
-            <ArrowLeft size={14} /> Back
+            <ArrowLeft size={16} /> Back
           </button>
           <div
             className="flex gap-1 mt-2"
@@ -137,7 +139,7 @@ const BookSchedule = () => {
               customFields={customFields}
               onBooked={(slotIso) => {
                 setAppointmentTime(slotIso);
-                navigate("/book/confirmed");
+                navigate("/book/confirmed", { state: { appointmentTime: slotIso } });
               }}
             />
           ) : (

@@ -52,7 +52,7 @@ const NewED = () => { useScrollDepth();
       </main>
       <TRTFooter />
       <StickyMobileCTA />
-      <div className="md:hidden" style={{ height: 56 }} aria-hidden="true" />
+      <div className="md:hidden" style={{ height: 80 }} aria-hidden="true" />
     </div>
   );
 };

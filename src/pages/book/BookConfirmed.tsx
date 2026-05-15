@@ -1,4 +1,5 @@
 import { CheckCircle2, MapPin, Play, FlaskConical, ExternalLink, Clock } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingStore } from "@/domain/booking/bookingStore";
 
@@ -72,9 +73,12 @@ const formatAppointment = (raw?: string): string => {
 
 const BookConfirmed = () => {
   const appointmentTime = useBookingStore((s) => s.appointmentTime);
+  const routerLocation = useLocation();
+  const navState = (routerLocation.state || {}) as { appointmentTime?: string };
+  const effectiveAppt = appointmentTime || navState.appointmentTime;
   const location = useBookingStore((s) => s.location);
   const identity = useBookingStore((s) => s.identity);
-  const apptTime = formatAppointment(appointmentTime);
+  const apptTime = formatAppointment(effectiveAppt);
   const center = (location && CENTERS[location]) || DEFAULT_CENTER;
   const fullAddress = `${center.centerName}, ${center.street}, ${center.cityStateZip}`;
   const mapsQuery = encodeURIComponent(fullAddress);
