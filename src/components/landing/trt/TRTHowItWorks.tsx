@@ -135,10 +135,11 @@ export const TRTHowItWorks = () => {
 
           <button
             onClick={scrollToForm}
-            className="mt-10 inline-flex items-center justify-center rounded-full px-8 py-4 font-bold text-sm uppercase cursor-pointer transition-colors duration-200"
+            className="mt-10 inline-flex items-center justify-center rounded-full px-8 py-4 font-bold uppercase cursor-pointer transition-colors duration-200"
             style={{
               background: "var(--brand-cta)",
               color: "#FFFFFF",
+              fontSize: 19,
               letterSpacing: "0.08em",
               fontFamily: "Inter, sans-serif",
               border: "none",
