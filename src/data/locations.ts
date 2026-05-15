@@ -1,6 +1,6 @@
 /**
  * Single source of truth for all 3 Virginia center locations.
- * Phone strings: Newport News has its own line (757-873-6500).
+ * Phone strings: Newport News and Virginia Beach share (757) 806-6263.
  * Virginia Beach shares (757) 806-6263 until a dedicated tracking number is assigned.
  * Hours: Saturday is OPEN. Do not narrow Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM.
  */
