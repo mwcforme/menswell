@@ -26,8 +26,8 @@ const CENTERS: Record<string, CenterInfo> = {
     cityStateZip: "Newport News, VA 23606",
     proximity: "2 min from I-64",
     hours: "Mon-Sat 9:00 AM - 5:00 PM",
-    phoneDisplay: "(757) 806-6263",
-    phoneTel: "tel:7578066263",
+    phoneDisplay: "(757) 873-6500",
+    phoneTel: "tel:7578736500",
   },
   "virginia-beach": {
     city: "Virginia Beach",

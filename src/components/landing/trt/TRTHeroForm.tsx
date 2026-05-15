@@ -32,6 +32,14 @@ interface TRTHeroFormProps {
   ctaLabel?: string;
 }
 
+const VALID_LOCATIONS = ["richmond", "virginia-beach", "newport-news"] as const;
+
+function getLocationFromUrl(): string {
+  if (typeof window === "undefined") return "";
+  const param = new URLSearchParams(window.location.search).get("location") ?? "";
+  return VALID_LOCATIONS.includes(param as typeof VALID_LOCATIONS[number]) ? param : "";
+}
+
 export const TRTHeroForm = ({
   service = "trt",
   heading = COPY.cta.bookConsult,
@@ -41,7 +49,7 @@ export const TRTHeroForm = ({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(() => getLocationFromUrl());
   const [tcpa, setTcpa] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});

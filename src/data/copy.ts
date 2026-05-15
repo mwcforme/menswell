@@ -38,7 +38,7 @@ export const COPY = {
   },
   offer: {
     /** Hero subhead under the H1. */
-    heroSubhead: "Same-day and next-day appointments at 3 Virginia clinics. Book in under 5 minutes. Labs, results, and your care plan – all in one visit.",
+    heroSubhead: "Same-day and next-day appointments at 3 Virginia clinics. Book in under 5 minutes. Labs drawn on-site, results reviewed same visit, and a personalized care plan.",
     /** Final CTA / WL / ED subhead. */
     finalSubhead: "No-cost consult. Same- or next-day visits.",
     /** Manifesto / proof closer. */

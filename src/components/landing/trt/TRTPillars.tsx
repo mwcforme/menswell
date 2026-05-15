@@ -1,6 +1,6 @@
 import imgDoctor from "@/assets/lp/provider-headshot.jpg";
 import imgLobby from "@/assets/lp/onsite-labs-centrifuge.jpg";
-import imgGymConfident from "@/assets/lp/man-gym-confident.jpeg";
+import imgAthletic from "@/assets/lp/man-athletic-smiling.jpeg";
 import imgTeam from "@/assets/lp/mwc-team.webp";
 
 const pillars = [
@@ -17,7 +17,7 @@ const pillars = [
   {
     title: "BUILT FOR MEN",
     desc: "TRT, ED, and weight loss is all we do. Not a side service at a general practice.",
-    image: imgGymConfident,
+    image: imgAthletic,
   },
   {
     title: "ONGOING MONITORING",

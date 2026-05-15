@@ -1,8 +1,7 @@
 /**
  * Single source of truth for all 3 Virginia center locations.
- * Phone strings are seeded EXACTLY as currently rendered in production —
- * the duplicate (757) 806-6263 on Newport News + Virginia Beach is intentional
- * and will be corrected in a follow-up pass.
+ * Phone strings: Newport News has its own line (757-873-6500).
+ * Virginia Beach shares (757) 806-6263 until a dedicated tracking number is assigned.
  * Hours: Saturday is OPEN. Do not narrow Mon–Sat 9:00 AM – 5:00 PM.
  */
 
@@ -59,8 +58,8 @@ export const LOCATIONS: Location[] = [
     address: "827 Diligence Drive, Suite 206",
     cityStateZip: "Newport News, VA 23606",
     fullAddress: "827 Diligence Drive, Suite 206, Newport News, VA 23606",
-    phone: "(757) 806-6263",
-    phoneHref: "tel:7578066263",
+    phone: "(757) 873-6500",
+    phoneHref: "tel:7578736500",
     hours: "Mon–Sat 9:00 AM – 5:00 PM",
     weeklyOpens: "09:00",
     weeklyCloses: "17:00",

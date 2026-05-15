@@ -5,7 +5,7 @@ const symptoms = [
   "Loss of drive and motivation",
   "Difficulty focusing",
   "Stubborn belly fat and muscle loss",
-  '"Normal" labs that do not match how you feel',
+  "Bloodwork that comes back fine, but you still don't feel right",
 ];
 
 const steps = [
@@ -64,7 +64,7 @@ export const TRTHowItWorks = () => {
   );
 
   return (
-    <section id="how-it-works" className="py-10 md:py-20" style={{ background: "#F5F0EB" }}>
+    <section id="how-it-works" className="py-10 md:py-20" style={{ background: "#F5F0EB" }} aria-label="Symptoms and how it works">
       <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-start">
         {/* Left: Symptoms (mobile shown second) */}
         <div className="order-2 md:order-1">
