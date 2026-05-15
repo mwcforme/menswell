@@ -147,7 +147,7 @@
     @apply bg-background text-foreground font-sans;
     font-size: 16px;
     line-height: 1.7;
-    color: var(--text-dark-grey);
+    color: var(--c-text-on-light-muted);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -215,10 +215,11 @@
   }
 }
 
-/* Focus-visible */
+/* Focus-visible — dual-tone ring, visible on both navy and cream */
 :focus-visible {
-  outline: 2px solid var(--bg-black);
+  outline: 2px solid var(--brand-accent);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85);
 }
 
 /* Scrollbar hide */
@@ -256,7 +257,7 @@ select {
 
 input::placeholder,
 textarea::placeholder {
-  color: #888888 !important;
+  color: var(--c-placeholder-light) !important;
 }
 
 /* Form focus states */
