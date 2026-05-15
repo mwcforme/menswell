@@ -168,7 +168,6 @@ export const TRTHeroForm = ({
 
   return (
     <div
-      id="hero-form"
       className="rounded-2xl p-7 md:p-8 w-full"
       style={{
         background: "rgba(255,255,255,0.06)",
