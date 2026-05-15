@@ -33,7 +33,7 @@ export const TRTFAQ = () => {
               <div
                 key={f.q}
                 className="rounded-xl overflow-hidden"
-                style={{ background: "#FFFFFF", border: "1px solid #E5E5EA" }}
+                style={{ background: "#FFFFFF", border: "1px solid var(--c-border-on-light)" }}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
@@ -46,7 +46,7 @@ export const TRTFAQ = () => {
                   <ChevronDown
                     className="h-5 w-5 flex-shrink-0 transition-transform duration-200"
                     style={{
-                      color: "#E8670A",
+                      color: "var(--brand-cta)",
                       transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
                     }}
                   />
@@ -63,7 +63,7 @@ export const TRTFAQ = () => {
                         onClick={scrollToForm}
                         className="inline-flex items-center gap-1 font-semibold cursor-pointer"
                         style={{
-                          color: "#E8670A",
+                          color: "var(--brand-cta)",
                           background: "none",
                           border: "none",
                           padding: 0,

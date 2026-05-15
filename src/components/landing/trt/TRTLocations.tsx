@@ -57,12 +57,12 @@ export const TRTLocations = () => {
           {locations.map((l, idx) => {
             const isOpen = openIdx === idx;
             return (
-              <div key={l.slug} className="rounded-2xl p-6 flex flex-col" style={{ border: "1px solid #E5E5EA", background: "#FFFFFF" }}>
+              <div key={l.slug} className="rounded-2xl p-6 flex flex-col" style={{ border: "1px solid var(--c-border-on-light)", background: "#FFFFFF" }}>
                 <div className="font-bold uppercase" style={{ fontFamily: "Oswald, sans-serif", color: "#000033", fontSize: 22, letterSpacing: "0.02em" }}>
                   {l.city}
                 </div>
-                <div className="text-xs mt-1 mb-3" style={{ color: "#7a7a8e", fontFamily: "Inter, sans-serif" }}>{l.name}</div>
-                <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase" style={{ color: "#E8670A", fontFamily: "Inter, sans-serif", letterSpacing: "0.06em" }}>
+                <div className="text-xs mt-1 mb-3" style={{ color: "var(--c-text-on-light-muted)", fontFamily: "Inter, sans-serif" }}>{l.name}</div>
+                <div className="flex items-center gap-2 mb-4 text-xs font-semibold uppercase" style={{ color: "var(--brand-cta)", fontFamily: "Inter, sans-serif", letterSpacing: "0.06em" }}>
                   <MapPin className="h-3.5 w-3.5" /> {l.driveTime}
                 </div>
 
@@ -84,16 +84,16 @@ export const TRTLocations = () => {
                     className="flex items-start gap-2 hover:opacity-70 transition-opacity"
                     style={{ color: "#1a1a2e", textDecoration: "none" }}
                   >
-                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: "#E8670A" }} />
+                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: "var(--brand-cta)" }} />
                     <div className="underline underline-offset-2">{l.address}<br />{l.cityStateZip}</div>
                   </a>
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 flex-shrink-0" style={{ color: "#E8670A" }} />
+                    <Clock className="h-4 w-4 flex-shrink-0" style={{ color: "var(--brand-cta)" }} />
                     <span>{l.hours}</span>
                   </div>
                 </div>
 
-                <div className="mt-5 pt-5 border-t flex flex-col gap-2" style={{ borderColor: "#E5E5EA" }}>
+                <div className="mt-5 pt-5 border-t flex flex-col gap-2" style={{ borderColor: "var(--c-border-on-light)" }}>
                   <a
                     href={l.phoneHref}
                     className="text-xs font-semibold uppercase text-center rounded-full inline-flex items-center justify-center gap-2"
@@ -104,7 +104,7 @@ export const TRTLocations = () => {
                   <button
                     onClick={bookAt(l.slug)}
                     className="text-xs font-bold uppercase text-center rounded-full cursor-pointer inline-flex items-center justify-center"
-                    style={{ height: 48, minHeight: 48, background: "#E8670A", color: "#FFFFFF", letterSpacing: "0.08em", fontFamily: "Inter, sans-serif", border: "none" }}
+                    style={{ height: 48, minHeight: 48, background: "var(--brand-cta)", color: "#FFFFFF", letterSpacing: "0.08em", fontFamily: "Inter, sans-serif", border: "none" }}
                   >
                     {COPY.cta.bookConsult}
                   </button>

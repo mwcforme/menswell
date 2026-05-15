@@ -18,7 +18,7 @@ const MarqueeContent = () => (
         >
           {item}
         </span>
-        <span style={{ color: "rgba(255,255,255,0.40)" }}>◆</span>
+        <span style={{ color: "rgba(255,255,255,0.65)" }}>◆</span>
       </span>
     ))}
   </>
@@ -27,7 +27,7 @@ const MarqueeContent = () => (
 export const TRTMarquee = () => (
   <section
     className="overflow-hidden"
-    style={{ background: "#E8670A", height: 56 }}
+    style={{ background: "var(--brand-cta)", height: 56 }}
   >
     <div className="flex items-center h-full gap-6 animate-marquee hover:[animation-play-state:paused]">
       <MarqueeContent />

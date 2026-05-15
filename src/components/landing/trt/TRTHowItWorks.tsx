@@ -35,7 +35,7 @@ export const TRTHowItWorks = () => {
     <div
       className="uppercase mb-3"
       style={{
-        color: "#E8670A",
+        color: "var(--brand-cta)",
         fontFamily: "Inter, sans-serif",
         fontSize: 13,
         fontWeight: 700,
@@ -85,8 +85,9 @@ export const TRTHowItWorks = () => {
                     width: 22,
                     height: 22,
                     borderRadius: 999,
-                    background: "rgba(232,103,10,0.12)",
-                    color: "#E8670A",
+                    background: "#FFFFFF",
+                    color: "var(--brand-cta)",
+                    border: "1px solid var(--c-border-on-light)",
                   }}
                 >
                   <Minus className="h-3.5 w-3.5" strokeWidth={3} />
@@ -110,7 +111,7 @@ export const TRTHowItWorks = () => {
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
                     style={{
-                      background: isFinal ? "#E8670A" : "#000033",
+                      background: isFinal ? "var(--brand-cta)" : "#000033",
                       boxShadow: isFinal ? "0 0 0 3px rgba(232,103,10,0.18)" : "0 0 0 2px rgba(232,103,10,0.18)",
                     }}
                   >
@@ -135,14 +136,14 @@ export const TRTHowItWorks = () => {
             onClick={scrollToForm}
             className="mt-10 inline-flex items-center justify-center rounded-full px-8 py-4 font-bold text-sm uppercase cursor-pointer transition-colors duration-200"
             style={{
-              background: "#E8670A",
+              background: "var(--brand-cta)",
               color: "#FFFFFF",
               letterSpacing: "0.08em",
               fontFamily: "Inter, sans-serif",
               border: "none",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#CF5B09"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
           >
             Book My First Visit
           </button>

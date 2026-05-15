@@ -84,8 +84,8 @@ export const TRTFooter = () => {
         </div>
 
         {/* Disclaimers */}
-        <div className="mt-10 pt-8 border-t" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+        <div className="mt-10 pt-8 border-t" style={{ borderColor: "var(--c-border-on-dark)" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "var(--c-text-on-dark-subtle)" }}>
             The information presented on this website is provided for general informational purposes only and is not intended to constitute medical advice, diagnosis, or treatment. Men's Wellness Centers does not provide medical advice through this website. All content is informational in nature only. Men's Wellness Centers operates physical center locations only. Medical services are provided exclusively in person following an individualized evaluation and are rendered by licensed medical professionals exercising independent clinical judgment. Testimonials and reviews reflect individual experiences only and are not intended to represent typical outcomes. Individual results vary.
           </p>
         </div>
@@ -93,7 +93,7 @@ export const TRTFooter = () => {
         {/* Bottom bar */}
         <div
           className="mt-8 pt-6 border-t text-xs uppercase text-center"
-          style={{ borderColor: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.55)", letterSpacing: "0.12em" }}
+          style={{ borderColor: "var(--c-border-on-dark)", color: "var(--c-text-on-dark-subtle)", letterSpacing: "0.12em" }}
         >
           © {year} Men's Wellness Centers. All rights reserved.
         </div>

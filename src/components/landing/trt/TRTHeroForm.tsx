@@ -84,7 +84,7 @@ export const TRTHeroForm = ({
     width: "100%",
     height: 50,
     background: "rgba(11,16,41,0.6)",
-    border: `1px solid ${focused === field ? "#E8670A" : "rgba(245,240,235,0.20)"}`,
+    border: `1px solid ${focused === field ? "var(--brand-accent)" : "var(--c-border-on-dark)"}`,
     borderRadius: 8,
     padding: "0 16px",
     fontSize: 15,
@@ -220,7 +220,7 @@ export const TRTHeroForm = ({
           className="w-full uppercase font-bold cursor-pointer inline-flex items-center justify-center gap-2"
           style={{
             height: 56,
-            background: "#E8670A",
+            background: "var(--brand-cta)",
             color: "#FFFFFF",
             fontSize: 14,
             border: "none",
@@ -232,8 +232,8 @@ export const TRTHeroForm = ({
             cursor: isSubmitting ? "wait" : "pointer",
             transition: "background-color 180ms ease, transform 180ms ease",
           }}
-          onMouseEnter={(e) => { if (!isSubmitting) { e.currentTarget.style.background = "#CF5B09"; e.currentTarget.style.transform = "scale(1.01)"; } }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; e.currentTarget.style.transform = "scale(1)"; }}
+          onMouseEnter={(e) => { if (!isSubmitting) { e.currentTarget.style.background = "var(--brand-cta-hover)"; e.currentTarget.style.transform = "scale(1.01)"; } }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; e.currentTarget.style.transform = "scale(1)"; }}
         >
           {isSubmitting && <Loader2 size={16} className="animate-spin" />}
           {isSubmitting ? "Booking..." : ctaLabel}

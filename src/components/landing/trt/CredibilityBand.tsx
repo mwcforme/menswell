@@ -61,7 +61,7 @@ export const CredibilityBand = () => {
           );
 
           const dividerStyle: React.CSSProperties = {
-            borderRight: i < stats.length - 1 ? "1px solid rgba(255,255,255,0.10)" : "none",
+            borderRight: i < stats.length - 1 ? "1px solid var(--c-border-on-dark)" : "none",
           };
 
           if (s.href) {
