@@ -5,6 +5,7 @@ import { useLeadSubmitController } from "@/domain/leads/useLeadSubmitController"
 import { heroLeadSchema, type HeroLeadInput } from "@/domain/leads/leadFormSchema";
 import { enterBookingFunnel } from "@/domain/booking/bookingEntry";
 import { COPY } from "@/data/copy";
+import { capturePartialLead, markSessionSubmitted } from "@/lib/partialCapture";
 
 const formatPhone = (v: string) => {
   const d = v.replace(/\D/g, "").slice(0, 10);
@@ -76,6 +77,7 @@ export const TRTHeroForm = ({
       };
     },
     onSuccess: (result, v) => {
+      markSessionSubmitted();
       const [first, ...rest] = v.name.trim().split(/\s+/);
       enterBookingFunnel(
         {
@@ -235,7 +237,10 @@ export const TRTHeroForm = ({
             value={phone}
             onChange={(e) => { setPhone(formatPhone(e.target.value)); clearError("phone"); }}
             onFocus={() => setFocused("phone")}
-            onBlur={() => setFocused(null)}
+            onBlur={() => {
+              setFocused(null);
+              void capturePartialLead({ phone, name, email, location, source: "hero-form-blur" });
+            }}
             style={inputBase("phone")}
             autoComplete="tel"
             inputMode="tel"
