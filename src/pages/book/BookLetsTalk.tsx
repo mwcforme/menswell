@@ -157,7 +157,7 @@ const BookLetsTalk = () => {
                     Call us
                   </h2>
                   <p style={{ color: "#5A6478", fontSize: 14, fontWeight: 500, lineHeight: 1.35, marginTop: 2 }}>
-                    Mon–Fri 8am–6pm · Sat 8am–4pm ET. A real person picks up.
+                    Mon–Fri 8am–6pm · Sat 8am–4pm. A real person picks up.
                   </p>
                 </div>
               </div>

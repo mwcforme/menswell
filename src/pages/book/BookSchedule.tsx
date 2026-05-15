@@ -122,7 +122,7 @@ const BookSchedule = () => {
     const d = new Date(nextAvailable);
     const day = d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "America/New_York" });
     const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "America/New_York" });
-    return `${day} at ${time} ET`;
+    return `${day} at ${time}`;
   })() : null;
 
   const handleIdentityComplete = (first: string, last: string, email: string) => {

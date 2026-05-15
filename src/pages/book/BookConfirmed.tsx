@@ -70,7 +70,7 @@ const formatAppointment = (raw?: string): string => {
     hour12: true,
     timeZone: "America/New_York",
   }).format(d);
-  return `${datePart}  ·  ${timePart} ET`;
+  return `${datePart}  ·  ${timePart}`;
 };
 
 const BookConfirmed = () => {
