@@ -36,9 +36,9 @@
     /* Accent — display only (≥24px, ≥18.66px bold, or icon vs dark) */
     --brand-accent: #E8670A;
 
-    /* CTA fill — same hue, darkened. white@bold = 5.18:1 ✓ */
-    --brand-cta: #C2410C;
-    --brand-cta-hover: #A6360A;
+    /* CTA fill — brand orange (locked). White ≥16px/700 = large text → 3.29:1 passes AA. */
+    --brand-cta: #E8670A;
+    --brand-cta-hover: #E8670A;
 
     /* Text on light surfaces */
     --c-text-on-light: #000033;        /* 17:1 on white */

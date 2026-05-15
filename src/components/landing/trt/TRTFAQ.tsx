@@ -61,9 +61,9 @@ export const TRTFAQ = () => {
                     <p className="mt-3">
                       <button
                         onClick={scrollToForm}
-                        className="inline-flex items-center gap-1 font-semibold cursor-pointer"
+                        className="inline-flex items-center gap-1 font-bold cursor-pointer underline underline-offset-4"
                         style={{
-                          color: "var(--brand-cta)",
+                          color: "#000033",
                           background: "none",
                           border: "none",
                           padding: 0,
@@ -71,7 +71,7 @@ export const TRTFAQ = () => {
                           fontSize: "inherit",
                         }}
                       >
-                        → {COPY.cta.bookConsultInline}
+                        <span aria-hidden="true" style={{ color: "var(--brand-cta)" }}>→</span> {COPY.cta.bookConsultInline}
                       </button>
                     </p>
                   </div>

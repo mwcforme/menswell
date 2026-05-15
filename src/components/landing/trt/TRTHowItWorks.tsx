@@ -33,15 +33,16 @@ export const TRTHowItWorks = () => {
 
   const eyebrow = (text: string) => (
     <div
-      className="uppercase mb-3"
+      className="uppercase mb-3 inline-flex items-center gap-2"
       style={{
-        color: "var(--brand-cta)",
+        color: "#000033",
         fontFamily: "Inter, sans-serif",
         fontSize: 13,
         fontWeight: 700,
         letterSpacing: "0.12em",
       }}
     >
+      <span aria-hidden="true" style={{ display: "inline-block", width: 18, height: 2, background: "var(--brand-cta)" }} />
       {text}
     </div>
   );
