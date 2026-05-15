@@ -190,6 +190,10 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
   const [lastReason, setLastReason] = useState<"initial" | "timer" | "focus" | "manual">("initial");
   const [nowTick, setNowTick] = useState<number>(Date.now());
   const confirmBtnRef = useRef<HTMLButtonElement | null>(null);
+  const dayStripRef = useRef<HTMLDivElement | null>(null);
+  const [showLeftFade, setShowLeftFade] = useState(false);
+  const [showRightFade, setShowRightFade] = useState(false);
+  const dialogTitleId = "book-confirm-title";
 
   // Move focus to the confirm button when a slot is picked (a11y + CRO).
   // Focus without auto-scroll, then smooth-scroll into view only if needed,
