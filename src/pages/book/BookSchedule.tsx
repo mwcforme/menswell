@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
@@ -11,9 +12,78 @@ const LOCATION_LABEL: Record<string, string> = {
   "newport-news": "Newport News clinic",
 };
 
+/** Inline name+email capture shown when short hero form was used (firstName === "Guest"). */
+const IdentityCapture = ({ onComplete }: { onComplete: (first: string, last: string, email: string) => void }) => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const fe: Record<string, string> = {};
+    if (!name.trim()) fe.name = "Name is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) fe.email = "Valid email required";
+    if (Object.keys(fe).length) { setErrors(fe); return; }
+    const [first, ...rest] = name.trim().split(/\s+/);
+    onComplete(first || name.trim(), rest.join(" "), email.trim());
+  };
+
+  const inp: React.CSSProperties = {
+    width: "100%", height: 50, borderRadius: 8, border: "1px solid #3A4258",
+    background: "rgba(255,255,255,0.05)", color: "#FFFFFF", fontSize: 16,
+    fontFamily: "Inter, sans-serif", padding: "0 14px", outline: "none",
+  };
+
+  return (
+    <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
+      <div
+        className="rounded-xl p-6"
+        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)" }}
+      >
+        <p style={{ color: "#FFFFFF", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: 17, marginBottom: 4 }}>
+          One more thing — who are we booking for?
+        </p>
+        <p style={{ color: "#9CA3AF", fontFamily: "Inter, sans-serif", fontSize: 14, marginBottom: 20 }}>
+          So we can send your confirmation and remind you before your visit.
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-3" noValidate>
+          <div>
+            <input
+              type="text" placeholder="Your full name" value={name} autoComplete="name"
+              onChange={(e) => { setName(e.target.value); setErrors((p) => { const { name: _, ...r } = p; return r; }); }}
+              style={{ ...inp, borderColor: errors.name ? "#DC2626" : "#3A4258" }}
+            />
+            {errors.name && <p style={{ color: "#DC2626", fontSize: 12, marginTop: 4 }}>{errors.name}</p>}
+          </div>
+          <div>
+            <input
+              type="email" placeholder="Email address" value={email} autoComplete="email" inputMode="email"
+              onChange={(e) => { setEmail(e.target.value); setErrors((p) => { const { email: _, ...r } = p; return r; }); }}
+              style={{ ...inp, borderColor: errors.email ? "#DC2626" : "#3A4258" }}
+            />
+            {errors.email && <p style={{ color: "#DC2626", fontSize: 12, marginTop: 4 }}>{errors.email}</p>}
+          </div>
+          <button
+            type="submit"
+            style={{
+              width: "100%", height: 52, background: "#E8670A", color: "#FFFFFF",
+              border: "none", borderRadius: 8, fontSize: 17, fontWeight: 700,
+              letterSpacing: "0.05em", textTransform: "uppercase", fontFamily: "Inter, sans-serif",
+              cursor: "pointer", marginTop: 4,
+            }}
+          >
+            Continue to Pick a Time →
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const BookSchedule = () => {
   const navigate = useNavigate();
   const identity = useBookingStore((s) => s.identity);
+  const setIdentity = useBookingStore((s) => s.setIdentity);
   const location = useBookingStore((s) => s.location);
   const symptom = useBookingStore((s) => s.symptom);
   const note = useBookingStore((s) => s.note);
@@ -25,18 +95,16 @@ const BookSchedule = () => {
   const setLocation = useBookingStore((s) => s.setLocation);
   const setAppointmentTime = useBookingStore((s) => s.setAppointmentTime);
 
+  // Short form sends firstName="Guest" and empty email — trigger identity capture
+  const needsIdentity = !identity?.firstName || identity.firstName === "Guest" || !identity?.email;
+
   const firstName = identity?.firstName || "";
   const lastName = identity?.lastName || "";
-
-  const heading = firstName ? `${firstName}, pick a time.` : `Pick a time.`;
+  const heading = (firstName && firstName !== "Guest") ? `${firstName}, pick a time.` : "Pick a time.";
 
   const locationLine = location ? LOCATION_LABEL[location] : null;
-  const metaLine = [locationLine, "60-min consult", "No charge today"]
-    .filter(Boolean)
-    .join(" · ");
+  const metaLine = [locationLine, "60-min consult", "No charge today"].filter(Boolean).join(" · ");
 
-  // Structured PHI for the GHL contact custom fields.
-  // PHI: never include in URL or appointment notes — see ghl-proxy validator.
   const customFields = {
     ...(symptom ? { mwc_symptom: symptom } : {}),
     ...(duration ? { mwc_symptom_duration: duration } : {}),
@@ -46,9 +114,15 @@ const BookSchedule = () => {
     ...(lpSlug ? { mwc_lp_slug: lpSlug } : {}),
   };
 
+  const handleIdentityComplete = (first: string, last: string, email: string) => {
+    if (identity) {
+      setIdentity({ ...identity, firstName: first, lastName: last, email });
+    }
+  };
+
   return (
     <BookLayout page="schedule" title="Pick your consult time | Men's Wellness Centers">
-      <div className="px-3 md:px-6 py-2 md:py-8 space-y-2 md:space-y-6 pb-12">
+      <div className="px-3 md:px-6 py-2 md:py-8 space-y-4 md:space-y-6 pb-12">
 
         <div className="mx-auto w-full" style={{ maxWidth: 720 }}>
           <button
@@ -58,123 +132,76 @@ const BookSchedule = () => {
             style={{
               background: "transparent", border: 0, color: "#FFFFFF",
               fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 600,
-              opacity: 0.85, cursor: "pointer",
-              minHeight: 44, minWidth: 44,
+              opacity: 0.85, cursor: "pointer", minHeight: 44, minWidth: 44,
               padding: "10px 12px", marginLeft: -12,
             }}
             aria-label="Back to previous step"
           >
             <ArrowLeft size={16} /> Back
           </button>
-          <div
-            className="flex gap-1 mt-2"
-            role="progressbar"
-            aria-label="Step 3 of 3"
-            aria-valuemin={0}
-            aria-valuemax={3}
-            aria-valuenow={3}
-          >
+          <div className="flex gap-1 mt-2" role="progressbar" aria-label="Step 3 of 3" aria-valuemin={0} aria-valuemax={3} aria-valuenow={3}>
             {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="flex-1"
-                style={{ height: 3, borderRadius: 2, background: "#E8670A" }}
-              />
+              <div key={i} className="flex-1" style={{ height: 3, borderRadius: 2, background: "#E8670A" }} />
             ))}
           </div>
-          <div
-            className="hidden md:block text-center mt-3"
-            style={{
-              fontSize: 12,
-              color: "#FFFFFF",
-              letterSpacing: "0.08em",
-              fontWeight: 700,
-              fontFamily: "Inter, sans-serif",
-              textTransform: "uppercase",
-            }}
-          >
+          <div className="hidden md:block text-center mt-3" style={{ fontSize: 12, color: "#FFFFFF", letterSpacing: "0.08em", fontWeight: 700, fontFamily: "Inter, sans-serif", textTransform: "uppercase" }}>
             Step 3 of 3 · Pick your time
           </div>
         </div>
 
-        <section className="mx-auto text-center" style={{ maxWidth: 720, color: "#FFFFFF" }}>
-          <h1
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(18px, 2.6vw, 26px)",
-              lineHeight: 1.2,
-              letterSpacing: "-0.01em",
-              marginBottom: 4,
-              color: "#FFFFFF",
-              textTransform: "none",
-            }}
-          >
-            {heading}
-          </h1>
-          <p
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontSize: 13,
-              color: "#9CA3AF",
-              lineHeight: 1.4,
-              margin: 0,
-              letterSpacing: "0.01em",
-            }}
-          >
-            {metaLine}
-          </p>
-        </section>
+        {/* Identity capture for short-form users */}
+        {needsIdentity ? (
+          <IdentityCapture onComplete={handleIdentityComplete} />
+        ) : (
+          <>
+            <section className="mx-auto text-center" style={{ maxWidth: 720, color: "#FFFFFF" }}>
+              <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.6vw, 26px)", lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: 4, color: "#FFFFFF" }}>
+                {heading}
+              </h1>
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#9CA3AF", lineHeight: 1.4, margin: 0 }}>
+                {metaLine}
+              </p>
+            </section>
 
-        <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
-          {location && location in CENTER_CALENDARS ? (
-            <GHLDayView
-              location={location as LocationKey}
-              firstName={firstName}
-              lastName={lastName}
-              email={identity?.email}
-              phone={identity?.phone}
-              source={source || "mwc-book-funnel"}
-              urgencyTier={urgencyTier}
-              customFields={customFields}
-              onBooked={(slotIso) => {
-                setAppointmentTime(slotIso);
-                navigate("/book/confirmed", { state: { appointmentTime: slotIso } });
-              }}
-            />
-          ) : (
-            <div style={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 12, padding: 20, fontFamily: "Inter, sans-serif" }}>
-              <div style={{ fontSize: 13, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700, marginBottom: 10 }}>
-                Choose your center
-              </div>
-              <div className="grid gap-2">
-                {(Object.values(CENTER_CALENDARS)).map((c) => (
-                  <button
-                    key={c.key}
-                    type="button"
-                    onClick={() => setLocation(c.key)}
-                    style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid #8B92A0", background: "#FFFFFF", color: "#0B1029", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer" }}
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
+            <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
+              {location && location in CENTER_CALENDARS ? (
+                <GHLDayView
+                  location={location as LocationKey}
+                  firstName={firstName}
+                  lastName={lastName}
+                  email={identity?.email}
+                  phone={identity?.phone}
+                  source={source || "mwc-book-funnel"}
+                  urgencyTier={urgencyTier}
+                  customFields={customFields}
+                  onBooked={(slotIso) => {
+                    setAppointmentTime(slotIso);
+                    navigate("/book/confirmed", { state: { appointmentTime: slotIso } });
+                  }}
+                />
+              ) : (
+                <div style={{ background: "#FFFFFF", border: "1px solid #E5E7EB", borderRadius: 12, padding: 20, fontFamily: "Inter, sans-serif" }}>
+                  <div style={{ fontSize: 13, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.04em", fontWeight: 700, marginBottom: 10 }}>Choose your center</div>
+                  <div className="grid gap-2">
+                    {Object.values(CENTER_CALENDARS).map((c) => (
+                      <button key={c.key} type="button" onClick={() => setLocation(c.key)}
+                        style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid #8B92A0", background: "#FFFFFF", color: "#0B1029", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer" }}>
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            <div className="hidden md:block mx-auto text-center" style={{ maxWidth: 720, color: "#FFFFFF", opacity: 0.85, fontSize: 13, fontFamily: "Inter, sans-serif" }}>
+              Need help?{" "}
+              <a href="tel:8663444955" style={{ color: "#FFFFFF", textDecoration: "underline", fontWeight: 600 }}>
+                Call (866) 344-4955
+              </a>
             </div>
-          )}
-        </section>
-
-        <div
-          className="hidden md:block mx-auto text-center"
-          style={{ maxWidth: 720, color: "#FFFFFF", opacity: 0.85, fontSize: 13, fontFamily: "Inter, sans-serif" }}
-        >
-          Need help picking a time?{" "}
-          <a
-            href="tel:8663444955"
-            style={{ color: "#FFFFFF", textDecoration: "underline", fontWeight: 600 }}
-          >
-            Call (866) 344-4955
-          </a>
-        </div>
+          </>
+        )}
       </div>
     </BookLayout>
   );

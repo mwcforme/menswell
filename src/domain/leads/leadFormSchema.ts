@@ -42,6 +42,19 @@ export const heroLeadSchema = z.object({
 
 export type HeroLeadInput = z.infer<typeof heroLeadSchema>;
 
+/**
+ * Short hero-form schema: phone + location + TCPA only.
+ * Name and email collected downstream at /book/schedule where intent is highest.
+ * CRO: reduces above-fold friction from 5 fields → 3.
+ */
+export const shortHeroLeadSchema = z.object({
+  phone: phoneField,
+  location: locationField,
+  tcpa: tcpaField,
+});
+
+export type ShortHeroLeadInput = z.infer<typeof shortHeroLeadSchema>;
+
 /** Booking-confirm schema: TCPA already collected upstream; fields optional. */
 export const confirmLeadSchema = z.object({
   name: nameField.optional(),

@@ -1,5 +1,5 @@
 import { Check, Star } from "lucide-react";
-import { TRTHeroForm } from "./TRTHeroForm";
+import { TRTHeroFormShort } from "./TRTHeroFormShort";
 import { GBP_REVIEWS_URL } from "@/data/testimonials";
 import { trackCro } from "@/hooks/useAnalytics";
 import { COPY } from "@/data/copy";
@@ -171,7 +171,7 @@ export const TRTHero = () => {
         {/* RIGHT — form. No decoration. DO NOT add borders, accents, or wrappers around the form. */}
         <div id="hero-form" className="w-full flex lg:justify-end">
           <div className="w-full lg:max-w-[440px]">
-            <TRTHeroForm />
+            <TRTHeroFormShort />
           </div>
         </div>
       </div>
