@@ -573,7 +573,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                         {time}
                       </span>
                       <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: active ? "rgba(255,255,255,0.9)" : MUTED }}>
-                        {ampm}
+                        {ampm} ET
                       </span>
                     </div>
                   </button>
