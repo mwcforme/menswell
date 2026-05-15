@@ -476,7 +476,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                       disabled={isSunday || !available}
                       aria-pressed={selected}
                       aria-label={`${fmtFullDay(d)} — ${isSunday ? "Closed on Sundays" : `${count} times available`}`}
-                      onClick={isSunday ? undefined : () => { setSelectedDay(key); setSelectedSlot(null); }}
+                      onClick={isSunday ? undefined : (e) => {
+                        setSelectedDay(key);
+                        setSelectedSlot(null);
+                        // Scroll partially-visible edge chips fully into view.
+                        e.currentTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+                      }}
                       style={{
                         flex: "0 0 84px",
                         minWidth: 84,
