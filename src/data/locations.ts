@@ -2,7 +2,7 @@
  * Single source of truth for all 3 Virginia center locations.
  * Phone strings: Newport News has its own line (757-873-6500).
  * Virginia Beach shares (757) 806-6263 until a dedicated tracking number is assigned.
- * Hours: Saturday is OPEN. Do not narrow Mon–Sat 9:00 AM – 5:00 PM.
+ * Hours: Saturday is OPEN. Do not narrow Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM.
  */
 
 export interface Location {
@@ -17,8 +17,11 @@ export interface Location {
   phoneHref: string;
   hours: string;
   /** Schedule used by isOpenNow() and openingHoursSpecification JSON-LD */
-  weeklyOpens: "09:00";
-  weeklyCloses: "17:00";
+  weeklyOpens: "08:00";
+  /** Weekday close (Mon–Fri) */
+  weeklyCloses: "18:00";
+  /** Saturday close */
+  weeklyClosesSat: "16:00";
   /** Days the center is open (Sun=0..Sat=6). Saturday MUST be in this array. */
   openDays: number[];
   driveTime: string;
@@ -41,9 +44,10 @@ export const LOCATIONS: Location[] = [
     fullAddress: "4050 Innslake Dr, Suite 360, Glen Allen, VA 23060",
     phone: "(804) 346-4636",
     phoneHref: "tel:8043464636",
-    hours: "Mon–Sat 9:00 AM – 5:00 PM",
-    weeklyOpens: "09:00",
-    weeklyCloses: "17:00",
+    hours: "Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM",
+    weeklyOpens: "08:00",
+    weeklyCloses: "18:00",
+    weeklyClosesSat: "16:00",
     openDays: [1, 2, 3, 4, 5, 6],
     driveTime: "5 min from I-64",
     parking: "On-site parking, no charge",
@@ -60,9 +64,10 @@ export const LOCATIONS: Location[] = [
     fullAddress: "827 Diligence Drive, Suite 206, Newport News, VA 23606",
     phone: "(757) 873-6500",
     phoneHref: "tel:7578736500",
-    hours: "Mon–Sat 9:00 AM – 5:00 PM",
-    weeklyOpens: "09:00",
-    weeklyCloses: "17:00",
+    hours: "Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM",
+    weeklyOpens: "08:00",
+    weeklyCloses: "18:00",
+    weeklyClosesSat: "16:00",
     openDays: [1, 2, 3, 4, 5, 6],
     driveTime: "3 min from I-64, Exit 258A",
     parking: "On-site parking, no charge",
@@ -80,9 +85,10 @@ export const LOCATIONS: Location[] = [
     // NOTE: duplicate of Newport News number — preserved verbatim by request.
     phone: "(757) 806-6263",
     phoneHref: "tel:7578066263",
-    hours: "Mon–Sat 9:00 AM – 5:00 PM",
-    weeklyOpens: "09:00",
-    weeklyCloses: "17:00",
+    hours: "Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM",
+    weeklyOpens: "08:00",
+    weeklyCloses: "18:00",
+    weeklyClosesSat: "16:00",
     openDays: [1, 2, 3, 4, 5, 6],
     driveTime: "5 min from I-264",
     parking: "On-site parking, no charge",
@@ -106,8 +112,14 @@ export function getOpenStatus(loc: Location, now: Date = new Date()):
   const opensH = parseInt(loc.weeklyOpens.slice(0, 2), 10);
   const closesH = parseInt(loc.weeklyCloses.slice(0, 2), 10);
 
-  if (loc.openDays.includes(day) && hours >= opensH && hours < closesH) {
-    return { open: true, closesAt: "5:00 PM" };
+  const isSaturday = day === 6;
+  const effectiveClose = isSaturday
+    ? parseInt((loc as Location & { weeklyClosesSat?: string }).weeklyClosesSat?.slice(0, 2) ?? "16", 10)
+    : closesH;
+
+  if (loc.openDays.includes(day) && hours >= opensH && hours < effectiveClose) {
+    const closesLabel = isSaturday ? "4:00 PM" : "6:00 PM";
+    return { open: true, closesAt: closesLabel };
   }
 
   // Find next open day
@@ -115,10 +127,10 @@ export function getOpenStatus(loc: Location, now: Date = new Date()):
     const next = (day + i) % 7;
     if (loc.openDays.includes(next)) {
       const label = i === 1 ? `tomorrow` : DAY_NAMES[next];
-      return { open: false, nextOpenLabel: `Opens ${label} at 9:00 AM` };
+      return { open: false, nextOpenLabel: `Opens ${label} at 8:00 AM` };
     }
   }
-  return { open: false, nextOpenLabel: "Opens at 9:00 AM" };
+  return { open: false, nextOpenLabel: "Opens at 8:00 AM" };
 }
 
 export function getMapsDirectionsUrl(loc: Location): string {

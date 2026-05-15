@@ -11,7 +11,7 @@ const locations = [
     cityStateZip: "Glen Allen, VA 23060",
     phone: "(804) 346-4636",
     phoneHref: "tel:8043464636",
-    hours: "Mon–Sat 9:00 AM – 5:00 PM",
+    hours: "Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM",
     driveTime: "5 min from I-64",
   },
   {
@@ -22,7 +22,7 @@ const locations = [
     cityStateZip: "Newport News, VA 23606",
     phone: "(757) 873-6500",
     phoneHref: "tel:7578736500",
-    hours: "Mon–Sat 9:00 AM – 5:00 PM",
+    hours: "Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM",
     driveTime: "3 min from I-64, Exit 258A",
   },
   {
@@ -33,7 +33,7 @@ const locations = [
     cityStateZip: "Virginia Beach, VA 23454",
     phone: "(757) 806-6263",
     phoneHref: "tel:7578066263",
-    hours: "Mon–Sat 9:00 AM – 5:00 PM",
+    hours: "Mon–Fri 8:00 AM – 6:00 PM · Sat 8:00 AM – 4:00 PM",
     driveTime: "5 min from I-264",
   },
 ];

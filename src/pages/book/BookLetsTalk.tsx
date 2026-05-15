@@ -6,7 +6,7 @@ const PHONE_DISPLAY = "(866) 344-4955";
 const PHONE_TEL = "tel:8663444955";
 const SMS_HREF = "sms:8663444955";
 
-// Business hours: Mon–Sat 9:00 AM – 5:00 PM ET
+// Business hours: Mon–Fri 8:00 AM – 6:00 PM ET, Sat 8:00 AM – 4:00 PM ET
 const isTeamAvailable = (): boolean => {
   const now = new Date();
   const et = new Intl.DateTimeFormat("en-US", {
@@ -18,8 +18,10 @@ const isTeamAvailable = (): boolean => {
   }).formatToParts(now);
   const day = et.find((p) => p.type === "weekday")?.value ?? "";
   const hour = parseInt(et.find((p) => p.type === "hour")?.value ?? "0", 10);
-  const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].includes(day);
-  return isWeekday && hour >= 9 && hour < 17;
+  const isSat = day === "Sat";
+  const isWeekday = ["Mon", "Tue", "Wed", "Thu", "Fri"].includes(day);
+  if (isSat) return hour >= 8 && hour < 16;
+  return isWeekday && hour >= 8 && hour < 18;
 };
 
 /**
@@ -138,7 +140,7 @@ const BookLetsTalk = () => {
                     Call us
                   </h2>
                   <p style={{ color: "#5A6478", fontSize: 14, fontWeight: 500, lineHeight: 1.35, marginTop: 2 }}>
-                    Mon–Sat, 9am–5pm ET. A real person picks up.
+                    Mon–Fri 8am–6pm · Sat 8am–4pm ET. A real person picks up.
                   </p>
                 </div>
               </div>
