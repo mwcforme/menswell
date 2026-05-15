@@ -110,11 +110,12 @@ export const StickyMobileCTA = () => {
         type="button"
         onClick={scrollToForm}
         data-cro="mobile_sticky_book_scroll"
-        className="flex-1 flex items-center justify-center text-[13px] font-bold uppercase cursor-pointer border-none"
+        className="flex-1 flex items-center justify-center font-bold uppercase cursor-pointer border-none"
         style={{
           height: 64,
           background: "var(--brand-cta)",
           color: "#FFFFFF",
+          fontSize: 19,
           fontFamily: "Inter, sans-serif",
           letterSpacing: "0.08em",
         }}
