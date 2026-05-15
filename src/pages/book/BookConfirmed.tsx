@@ -270,7 +270,7 @@ const BookConfirmed = () => {
                     top: 12,
                     left: 12,
                     background: "#FFFFFF",
-                    color: "#1A56DB",
+                    color: "#0B1029",
                     padding: "10px 16px",
                     borderRadius: 8,
                     fontWeight: 600,
@@ -314,13 +314,13 @@ const BookConfirmed = () => {
 
               <div className="p-7 md:p-8 flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <Play size={18} strokeWidth={2.5} style={{ color: "#E8670A" }} />
+                  <Play size={18} strokeWidth={2.5} style={{ color: "#C2410C" }} />
                   <span
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: 11,
                       fontWeight: 700,
-                      color: "#E8670A",
+                      color: "#C2410C",
                       letterSpacing: "0.18em",
                       textTransform: "uppercase",
                     }}
@@ -354,7 +354,7 @@ const BookConfirmed = () => {
           {/* Footer */}
           <p
             className="text-center text-sm md:text-base"
-            style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif" }}
+            style={{ color: "rgba(255,255,255,0.72)", fontFamily: "Inter, sans-serif" }}
           >
             Need to reschedule or running late? Call or text{" "}
             <a
