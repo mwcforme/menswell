@@ -1,4 +1,4 @@
-import imgManifesto from "@/assets/lp/man-athletic-smiling.jpeg";
+import imgManifesto from "@/assets/lp/man-bloodwork-clinic.png";
 import { Quote } from "lucide-react";
 import { COPY } from "@/data/copy";
 
@@ -70,7 +70,7 @@ export const TRTManifesto = () => {
         <div className="order-1 md:order-2">
           <img
             src={imgManifesto}
-            alt="Confident Virginia man after testosterone optimization"
+            alt="Phlebotomist drawing labs for a Virginia man at a Men's Wellness Center"
             className="rounded-2xl object-cover w-full aspect-[4/3] md:aspect-auto md:h-[460px]"
             loading="lazy"
           />
