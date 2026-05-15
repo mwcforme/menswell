@@ -72,16 +72,17 @@ export function StepSymptoms({ symptoms, onChange, onSubmit }: StepSymptomsProps
             letterSpacing: "0.01em",
           }}
         >
-          Take our 60-second assessment{" "}
+          Answer 5 questions.
+          <br />
           <span style={{ color: "#E8670A" }}>
-            to see if TRT is right for you.
+            Find out if low T is behind it.
           </span>
         </h1>
         <p
           className="mt-5 text-base md:text-lg max-w-[600px]"
           style={{ color: "rgba(245,240,235,0.85)" }}
         >
-          MWC's quick assessment looks at lifestyle and symptom patterns to show how closely they align with the signs of low testosterone.
+          Score your symptoms below. We map your results to a clinical severity tier and tell you whether an in-person evaluation makes sense.
         </p>
         <p
           className="mt-4 italic text-sm md:text-[15px] font-medium"

@@ -120,7 +120,7 @@ export const StickyMobileCTA = () => {
           letterSpacing: "0.08em",
         }}
       >
-        {COPY.cta.bookConsult}
+        Book Now — No Cost
       </button>
     </div>
   );

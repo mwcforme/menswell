@@ -14,9 +14,9 @@
 export const COPY = {
   cta: {
     /** Primary booking CTA. Header, hero submit, locations, sticky bar, final CTA. */
-    bookConsult: "Book My Consult",
+    bookConsult: "Book My No-Cost Consult",
     /** Results section CTA. */
-    startConsult: "Start My Consult",
+    startConsult: "Book My No-Cost Consult",
     /** Inline link variant inside FAQ answers. */
     bookConsultInline: "Book a no-cost consult",
     /** ED service final-CTA + ED form card title. */
@@ -34,7 +34,7 @@ export const COPY = {
     /** Stat-card value used in CredibilityBand. */
     offerValue: "No-Cost",
     /** Stat-card label paired with offerValue. */
-    offerLabel: "Initial Consult\nNo Obligation",
+    offerLabel: "Initial Consult\nNo Insurance Needed",
   },
   offer: {
     /** Hero subhead under the H1. */

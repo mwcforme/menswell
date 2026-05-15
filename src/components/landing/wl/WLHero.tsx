@@ -2,8 +2,8 @@ import { Check, Star } from "lucide-react";
 import { TRTHeroForm } from "@/components/landing/trt/TRTHeroForm";
 
 const trustChecks = [
-  "FDA-approved GLP-1 medications",
-  "Labs and bloodwork in-center",
+  "Semaglutide \u0026 tirzepatide, in-person",
+  "Dose adjusted at every visit — not auto-refilled",
   "Face-to-face Virginia physician",
   "FSA and HSA accepted",
 ];
@@ -73,9 +73,9 @@ export const WLHero = () => {
               fontWeight: 700,
             }}
           >
-            Lose The Weight.
+            Medical Weight Loss
             <br />
-            <span style={{ color: COLORS.orange }}>Keep It Off.</span>
+            <span style={{ color: COLORS.orange }}>for Men in Virginia</span>
           </h1>
 
           <p
@@ -87,7 +87,7 @@ export const WLHero = () => {
               lineHeight: 1.5,
             }}
           >
-            Physician-supervised GLP-1 medications like semaglutide and tirzepatide. Real labs, a real plan, and a Virginia doctor who knows your case. No mail-order chatbots.
+            GLP-1 medications with a physician who adjusts your dose, watches your labs, and shows up for every visit. Not a chatbot. Not a pill in the mail.
           </p>
 
           <div

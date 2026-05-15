@@ -2,10 +2,10 @@ import { Check, Star } from "lucide-react";
 import { TRTHeroForm } from "@/components/landing/trt/TRTHeroForm";
 
 const trustChecks = [
-  "Discreet, in-person Virginia visits",
+  "In-person Virginia visits — not an app",
   "Sildenafil, Tadalafil, TriMix, PT-141",
-  "Face-to-face physician, not an app",
-  "Same-day labs and care plan",
+  "Billed discreetly — not as an ED clinic",
+  "No-cost consult, same-day labs",
 ];
 
 const COLORS = {
@@ -73,9 +73,9 @@ export const EDHero = () => {
               fontWeight: 700,
             }}
           >
-            Real Treatment.
+            ED Treatment
             <br />
-            <span style={{ color: COLORS.orange }}>Real Results.</span>
+            <span style={{ color: COLORS.orange }}>In Virginia — In Person</span>
           </h1>
 
           <p
@@ -87,7 +87,7 @@ export const EDHero = () => {
               lineHeight: 1.5,
             }}
           >
-            FDA-approved ED treatments prescribed by a Virginia physician you actually meet. Oral medications, TriMix, and PT-141. Discreet, in-person, and built around what works for you.
+            A Virginia physician diagnoses the cause. Not a pill subscription — a real protocol. Oral medications, TriMix, and PT-141. No waiting room anxiety, no awkward conversations.
           </p>
 
           <div

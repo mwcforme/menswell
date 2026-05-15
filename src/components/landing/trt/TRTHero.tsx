@@ -7,7 +7,7 @@ import { COPY } from "@/data/copy";
 const trustChecks = [
   "Same or next-day appointments",
   "Face-to-face physician, every visit",
-  "No-cost initial consult",
+  "No-cost consult — no insurance needed",
 ];
 
 const COLORS = {
@@ -104,13 +104,13 @@ export const TRTHero = () => {
               fontWeight: 700,
             }}
           >
-            Get Your Energy, Drive,
+            Testosterone Therapy
             <br />
-            <span style={{ color: COLORS.orange }}>and Confidence Back</span>
+            <span style={{ color: COLORS.orange }}>in Virginia — Same-Day Labs</span>
           </h1>
 
           <p
-            className="mt-6 max-w-[560px]"
+            className="mt-6 max-w-[540px]"
             style={{
               color: "rgba(245,240,235,0.85)",
               fontFamily: "Inter, sans-serif",
@@ -118,7 +118,7 @@ export const TRTHero = () => {
               lineHeight: 1.5,
             }}
           >
-            {COPY.offer.heroSubhead}
+            Same-day labs. Real physician. Walk out with a plan.
           </p>
 
           {/* Star rating row — clickable, links to GBP */}

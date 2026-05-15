@@ -1,4 +1,5 @@
 import { Minus } from "lucide-react";
+import { COPY } from "@/data/copy";
 
 const symptoms = [
   "Persistent fatigue",
@@ -147,7 +148,7 @@ export const TRTHowItWorks = () => {
             onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
           >
-            Book My First Visit
+            {COPY.cta.bookConsult}
           </button>
         </div>
       </div>

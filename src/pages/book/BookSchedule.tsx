@@ -154,6 +154,40 @@ const BookSchedule = () => {
           <IdentityCapture onComplete={handleIdentityComplete} />
         ) : (
           <>
+            {/* Trust injection — reinforces commitment at highest-anxiety moment */}
+            <div
+              className="mx-auto w-full rounded-xl px-5 py-4"
+              style={{ maxWidth: 720, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div
+                    style={{
+                      width: 40, height: 40, borderRadius: "50%", flexShrink: 0,
+                      background: "rgba(232,103,10,0.15)", border: "1px solid rgba(232,103,10,0.3)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#E8670A", fontSize: 18, fontWeight: 700,
+                    }}
+                  >J</div>
+                  <div>
+                    <p style={{ color: "rgba(255,255,255,0.90)", fontFamily: "Inter, sans-serif", fontSize: 14, lineHeight: 1.45, fontStyle: "italic", margin: 0 }}>
+                      &ldquo;Booked online, walked in same day. Had labs back before I left.&rdquo;
+                    </p>
+                    <p style={{ color: "rgba(255,255,255,0.45)", fontFamily: "Inter, sans-serif", fontSize: 12, marginTop: 4 }}>James R. &mdash; Richmond, VA</p>
+                  </div>
+                </div>
+                <div className="flex-shrink-0 flex items-center gap-2 sm:text-right">
+                  <span style={{ color: "#E8670A", fontSize: 14, letterSpacing: 1 }}>★★★★★</span>
+                  <span style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif", fontSize: 12, whiteSpace: "nowrap" }}>4.9 &middot; 200+ reviews</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+                <p style={{ color: "rgba(255,255,255,0.55)", fontFamily: "Inter, sans-serif", fontSize: 12, margin: 0 }}>
+                  <span style={{ color: "#2ECC71", fontWeight: 700 }}>No charge today.</span> Your consult is at no cost. No insurance needed.
+                </p>
+              </div>
+            </div>
+
             <section className="mx-auto text-center" style={{ maxWidth: 720, color: "#FFFFFF" }}>
               <h1 style={{ fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: "clamp(18px, 2.6vw, 26px)", lineHeight: 1.2, letterSpacing: "-0.01em", marginBottom: 4, color: "#FFFFFF" }}>
                 {heading}
