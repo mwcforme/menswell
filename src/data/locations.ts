@@ -82,7 +82,7 @@ export const LOCATIONS: Location[] = [
     address: "996 First Colonial Road",
     cityStateZip: "Virginia Beach, VA 23454",
     fullAddress: "996 First Colonial Road, Virginia Beach, VA 23454",
-    // NOTE: duplicate of Newport News number — preserved verbatim by request.
+    // NOTE: Newport News and Virginia Beach share this number.
     phone: "(757) 806-6263",
     phoneHref: "tel:7578066263",
     hours: "Mon–Fri 8am–6pm · Sat 8am–4pm",
