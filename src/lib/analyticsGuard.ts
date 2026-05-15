@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-const GA4_ID = "G-KHD64CYC2G";
+const GA4_ID = "G-286547777";
 
 export function sanitizeAnalyticsForBookingRoute(pathname: string): void {
   if (typeof window === "undefined") return;
