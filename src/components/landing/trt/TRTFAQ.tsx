@@ -63,7 +63,7 @@ export const TRTFAQ = () => {
                       // Full CTA button, not a text link.
                       <button
                         onClick={scrollToForm}
-                        className="mt-4 w-full uppercase font-bold cursor-pointer inline-flex items-center justify-center rounded-lg"
+                        className="mt-4 w-full font-bold cursor-pointer inline-flex items-center justify-center rounded-lg"
                         style={{
                           height: 52,
                           background: "var(--brand-cta)",
