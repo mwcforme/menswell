@@ -173,24 +173,7 @@ export const TRTHero = () => {
             Board-certified physicians · Licensed by the Virginia Board of Medicine · 10,000+ men treated since 2019
           </p>
 
-          {/* Mobile primary CTA (hidden on lg+) */}
-          <button
-            onClick={() => { trackCro("hero_mobile_book"); scrollToForm(); }}
-            data-cro="hero_mobile_book"
-            className="lg:hidden mt-7 w-full uppercase font-bold cursor-pointer"
-            style={{
-              height: 56,
-              background: "var(--brand-cta)",
-              color: "#FFFFFF",
-              fontSize: 19,
-              border: "none",
-              borderRadius: 8,
-              letterSpacing: "0.08em",
-              fontFamily: "Inter, sans-serif",
-            }}
-          >
-            {COPY.cta.bookConsult}
-          </button>
+          {/* Mobile primary CTA — hidden; form is directly below on mobile */}
 
           <div
             className="mt-6"

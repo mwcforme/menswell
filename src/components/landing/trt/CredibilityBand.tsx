@@ -28,7 +28,7 @@ export const CredibilityBand = () => {
 
   return (
     <section style={{ background: "#0A1628" }}>
-      <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4 text-center" style={{ paddingTop: 56, paddingBottom: 56 }}>
+      <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-4 text-center" style={{ paddingTop: 32, paddingBottom: 32 }}>
         {stats.map((s, i) => {
           const inner = (
             <div className="flex flex-col items-center gap-2 px-2">
