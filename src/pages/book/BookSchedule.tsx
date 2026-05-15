@@ -153,7 +153,7 @@ const BookSchedule = () => {
                     key={c.key}
                     type="button"
                     onClick={() => setLocation(c.key)}
-                    style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid #D1D5DB", background: "#FFFFFF", color: "#0B1029", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer" }}
+                    style={{ padding: "14px 16px", borderRadius: 8, border: "1px solid #8B92A0", background: "#FFFFFF", color: "#0B1029", fontSize: 16, fontWeight: 600, textAlign: "left", cursor: "pointer" }}
                   >
                     {c.label}
                   </button>
