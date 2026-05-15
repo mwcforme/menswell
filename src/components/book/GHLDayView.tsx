@@ -721,12 +721,12 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
                       onClick={confirmCtl.cancelRedirect}
                       style={{
                         background: "transparent",
-                        border: "1px solid #FCA5A5",
+                        border: "1px solid #B91C1C",
                         color: "#7F1D1D",
                         borderRadius: 6,
                         padding: "4px 10px",
                         fontSize: 11,
-                        fontWeight: 600,
+                        fontWeight: 700,
                         textTransform: "uppercase",
                         letterSpacing: "0.06em",
                         cursor: "pointer",
