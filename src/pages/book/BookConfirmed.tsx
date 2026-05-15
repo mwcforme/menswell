@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { MapPin, Play, ExternalLink, Clock } from "lucide-react";
+import { MapPin, ExternalLink, Clock } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import BookLayout from "@/components/book/BookLayout";
 import { useBookingStore } from "@/domain/booking/bookingStore";
@@ -114,6 +114,53 @@ const BookConfirmed = () => {
             locationCity={center.city}
             locationAddress={`${center.street}, ${center.cityStateZip}`}
           />
+
+          {/* Video — full-width, directly below celebration card for max emotional impact */}
+          <div
+            style={{
+              background: "#FFFFFF",
+              borderRadius: 16,
+              overflow: "hidden",
+              border: "1px solid #E5E7EB",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.28)",
+            }}
+          >
+            {/* Autoplay muted — draws the eye, no audio surprise */}
+            <div style={{ position: "relative", width: "100%", paddingBottom: "52%", background: "#000" }}>
+              <video
+                src={EXPECT_VIDEO_SRC}
+                autoPlay
+                muted
+                loop={false}
+                playsInline
+                controls
+                preload="metadata"
+                style={{
+                  position: "absolute", inset: 0,
+                  width: "100%", height: "100%",
+                  objectFit: "cover", border: 0,
+                }}
+              />
+            </div>
+            <div style={{ padding: "24px 28px 28px" }}>
+              <p style={{
+                fontSize: 11, fontWeight: 700, letterSpacing: "0.14em",
+                textTransform: "uppercase", color: "#E8670A", marginBottom: 8,
+              }}>
+                2-min watch · Before you arrive
+              </p>
+              <h2 style={{
+                fontFamily: "Oswald, sans-serif", fontWeight: 700,
+                fontSize: "clamp(20px, 2.8vw, 26px)", color: "#0B1029",
+                letterSpacing: "0.01em", marginBottom: 8, textTransform: "none",
+              }}>
+                Here's exactly what happens when you walk in.
+              </h2>
+              <p style={{ fontSize: 15, color: "#5B6478", lineHeight: 1.55, fontWeight: 400 }}>
+                No waiting room anxiety. We'll walk you through labs, a quick exam, and a real conversation with your provider — all in under an hour.
+              </p>
+            </div>
+          </div>
 
           {/* Two-column grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
@@ -236,70 +283,6 @@ const BookConfirmed = () => {
               </div>
             </div>
 
-            {/* Video Card */}
-            <div
-              className="relative flex flex-col overflow-hidden"
-              style={{
-                background: "#FFFFFF",
-                borderRadius: 14,
-                boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
-              }}
-            >
-              <div style={{ position: "relative", width: "100%", paddingBottom: "56.25%", background: "#000" }}>
-                <video
-                  src={EXPECT_VIDEO_SRC}
-                  title="What to expect at your visit"
-                  controls
-                  playsInline
-                  preload="metadata"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    border: 0,
-                  }}
-                />
-              </div>
-
-              <div className="p-7 md:p-8 flex-1">
-                <div className="flex items-center gap-2 mb-3">
-                  <Play size={18} strokeWidth={2.5} style={{ color: "#C2410C" }} />
-                  <span
-                    style={{
-                      fontFamily: "Inter, sans-serif",
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: "#C2410C",
-                      letterSpacing: "0.18em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    2 Min Watch
-                  </span>
-                </div>
-                <h2
-                  style={{
-                    fontFamily: "Oswald, sans-serif",
-                    fontWeight: 600,
-                    fontSize: "clamp(20px, 2.4vw, 26px)",
-                    color: "#0B1029",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.02em",
-                    marginBottom: 10,
-                  }}
-                >
-                  What To Expect
-                </h2>
-                <p
-                  className="text-base md:text-lg"
-                  style={{ color: "#3A4258", lineHeight: 1.5, fontWeight: 500 }}
-                >
-                  A short overview of your check-in and consultation. Bring photo ID. Eat normally. Arrive 10 minutes early.
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Footer */}
