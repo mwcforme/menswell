@@ -1,28 +1,59 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Check, MapPin } from "lucide-react";
 import { COPY } from "@/data/copy";
+
+const ERR = {
+  name: "Please enter your full name",
+  phone: "Please enter a valid 10-digit phone number",
+  email: "Please enter a valid email address",
+  location: "Please select a location",
+  tcpa: "Please agree to receive SMS so we can confirm your appointment",
+} as const;
+const ERROR_RED = "#DC2626";
 
 export const TRTFinalCTA = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [tcpa, setTcpa] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validatePhone = (v: string) => v.replace(/\D/g, "").length >= 10;
+  const refs = {
+    name: useRef<HTMLInputElement>(null),
+    phone: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
+    location: useRef<HTMLSelectElement>(null),
+    tcpa: useRef<HTMLLabelElement>(null),
+  };
+
+  const validatePhone = (v: string) => v.replace(/\D/g, "").length === 10;
   const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+  const clearError = (key: string) => {
+    if (!errors[key]) return;
+    setErrors((p) => { const { [key]: _, ...rest } = p; return rest; });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const errs: Record<string, string> = {};
-    if (!name.trim()) errs.name = "Name is required";
-    if (!email.trim()) errs.email = "Email is required";
-    else if (!validateEmail(email)) errs.email = "Please enter a valid email";
-    if (!phone.trim()) errs.phone = "Phone is required";
-    else if (!validatePhone(phone)) errs.phone = "Please enter a valid phone number";
-    if (!location) errs.location = "Please select a location";
+    if (!name.trim()) errs.name = ERR.name;
+    if (!validatePhone(phone)) errs.phone = ERR.phone;
+    if (!email.trim() || !validateEmail(email)) errs.email = ERR.email;
+    if (!location) errs.location = ERR.location;
+    if (!tcpa) errs.tcpa = ERR.tcpa;
     setErrors(errs);
-    if (Object.keys(errs).length > 0) return;
+    if (Object.keys(errs).length > 0) {
+      const order = ["name", "phone", "email", "location", "tcpa"] as const;
+      const firstKey = order.find((k) => errs[k]);
+      const el = firstKey ? refs[firstKey].current : null;
+      if (el && typeof el.scrollIntoView === "function") {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        if ("focus" in el) (el as HTMLInputElement).focus({ preventScroll: true });
+      }
+      return;
+    }
 
     const params = new URLSearchParams({
       name, email, phone, location, source: "landing-page", service: "trt",
@@ -35,11 +66,11 @@ export const TRTFinalCTA = () => {
     window.location.href = `${urls[location]}?${params.toString()}`;
   };
 
-  const inputStyle: React.CSSProperties = {
+  const inputStyle = (field: string): React.CSSProperties => ({
     width: "100%",
     height: 52,
     background: "#F5F0EB",
-    border: "2px solid var(--c-border-on-light)",
+    border: `2px solid ${errors[field] ? ERROR_RED : "var(--c-border-on-light)"}`,
     borderRadius: 8,
     padding: "0 16px",
     fontSize: 16,
@@ -47,15 +78,15 @@ export const TRTFinalCTA = () => {
     outline: "none",
     fontFamily: "Inter, sans-serif",
     transition: "border-color 200ms ease, box-shadow 200ms ease",
-  };
+  });
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     e.currentTarget.style.borderColor = "var(--brand-cta)";
     e.currentTarget.style.boxShadow = "0 0 0 3px rgba(232,103,10,0.15)";
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    e.currentTarget.style.borderColor = "var(--c-border-on-light)";
+  const handleBlur = (field: string) => (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    e.currentTarget.style.borderColor = errors[field] ? ERROR_RED : "var(--c-border-on-light)";
     e.currentTarget.style.boxShadow = "none";
   };
 
@@ -137,134 +168,166 @@ export const TRTFinalCTA = () => {
           </div>
 
           <div className="order-1 md:order-2">
-        <div
-          className="mx-auto rounded-2xl p-8"
-          style={{
-            background: "#FFFFFF",
-            maxWidth: 480,
-            boxShadow: "0 8px 40px rgba(0,0,0,0.30)",
-          }}
-        >
-          <h3
-            className="font-bold uppercase text-center mb-6"
-            style={{
-              fontFamily: "Oswald, sans-serif",
-              fontSize: "clamp(20px, 3vw, 24px)",
-              color: "#000033",
-              fontWeight: 700,
-            }}
-          >
-            {COPY.cta.bookConsult}
-          </h3>
-
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div>
-              <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                style={inputStyle}
-                className="placeholder:text-[#5A6072]"
-                autoComplete="name"
-              />
-              {errors.name && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.name}</p>}
-            </div>
-
-            <div>
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                onFocus={handleFocus}
-                onBlur={(e) => {
-                  handleBlur(e);
-                  if (phone && !validatePhone(phone)) setErrors((p) => ({ ...p, phone: "Please enter a valid phone number" }));
-                  else setErrors((p) => { const { phone: _, ...rest } = p; return rest; });
-                }}
-                style={inputStyle}
-                className="placeholder:text-[#5A6072]"
-                autoComplete="tel"
-              />
-              {errors.phone && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.phone}</p>}
-            </div>
-
-            <div>
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                style={inputStyle}
-                className="placeholder:text-[#5A6072]"
-                autoComplete="email"
-              />
-              {errors.email && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.email}</p>}
-            </div>
-
-            <div>
-              <select
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                onFocus={handleFocus as any}
-                onBlur={handleBlur as any}
+            <div
+              className="mx-auto rounded-2xl p-8"
+              style={{
+                background: "#FFFFFF",
+                maxWidth: 480,
+                boxShadow: "0 8px 40px rgba(0,0,0,0.30)",
+              }}
+            >
+              <h3
+                className="font-bold uppercase text-center mb-6"
                 style={{
-                  ...inputStyle,
-                  color: location ? "#000033" : "var(--c-placeholder-light)",
-                  appearance: "none",
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A6072' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "right 12px center",
-                  paddingRight: 40,
+                  fontFamily: "Oswald, sans-serif",
+                  fontSize: "clamp(20px, 3vw, 24px)",
+                  color: "#000033",
+                  fontWeight: 700,
                 }}
               >
-                <option value="" disabled>Select Location</option>
-                <option value="richmond">Richmond</option>
-                <option value="newport-news">Newport News</option>
-                <option value="virginia-beach">Virginia Beach</option>
-              </select>
-              {errors.location && <p className="text-xs mt-1 text-left" style={{ color: "var(--c-error-on-light)" }}>{errors.location}</p>}
+                {COPY.cta.bookConsult}
+              </h3>
+
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                <div>
+                  <input
+                    ref={refs.name}
+                    type="text"
+                    placeholder="Name"
+                    value={name}
+                    onChange={(e) => { setName(e.target.value); clearError("name"); }}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur("name")}
+                    style={inputStyle("name")}
+                    className="placeholder:text-[#5A6072]"
+                    autoComplete="name"
+                    aria-invalid={!!errors.name}
+                  />
+                  {errors.name && <p role="alert" className="text-xs mt-1 text-left" style={{ color: ERROR_RED }}>{errors.name}</p>}
+                </div>
+
+                <div>
+                  <input
+                    ref={refs.phone}
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={phone}
+                    onChange={(e) => { setPhone(e.target.value); clearError("phone"); }}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur("phone")}
+                    style={inputStyle("phone")}
+                    className="placeholder:text-[#5A6072]"
+                    autoComplete="tel"
+                    aria-invalid={!!errors.phone}
+                  />
+                  {errors.phone && <p role="alert" className="text-xs mt-1 text-left" style={{ color: ERROR_RED }}>{errors.phone}</p>}
+                </div>
+
+                <div>
+                  <input
+                    ref={refs.email}
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); clearError("email"); }}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur("email")}
+                    style={inputStyle("email")}
+                    className="placeholder:text-[#5A6072]"
+                    autoComplete="email"
+                    aria-invalid={!!errors.email}
+                  />
+                  {errors.email && <p role="alert" className="text-xs mt-1 text-left" style={{ color: ERROR_RED }}>{errors.email}</p>}
+                </div>
+
+                <div>
+                  <select
+                    ref={refs.location}
+                    value={location}
+                    onChange={(e) => { setLocation(e.target.value); clearError("location"); }}
+                    onFocus={handleFocus as never}
+                    onBlur={handleBlur("location") as never}
+                    aria-invalid={!!errors.location}
+                    style={{
+                      ...inputStyle("location"),
+                      color: location ? "#000033" : "var(--c-placeholder-light)",
+                      appearance: "none",
+                      backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235A6072' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                      backgroundRepeat: "no-repeat",
+                      backgroundPosition: "right 12px center",
+                      paddingRight: 40,
+                    }}
+                  >
+                    <option value="" disabled>Select Location</option>
+                    <option value="richmond">Richmond</option>
+                    <option value="newport-news">Newport News</option>
+                    <option value="virginia-beach">Virginia Beach</option>
+                  </select>
+                  {errors.location && <p role="alert" className="text-xs mt-1 text-left" style={{ color: ERROR_RED }}>{errors.location}</p>}
+                </div>
+
+                <label
+                  ref={refs.tcpa}
+                  className="flex items-start gap-3 cursor-pointer select-none"
+                  style={{ minHeight: 44, padding: "8px 0" }}
+                >
+                  <span
+                    className="flex items-center justify-center flex-shrink-0"
+                    style={{ width: 44, height: 44, marginLeft: -10 }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={tcpa}
+                      onChange={(e) => { setTcpa(e.target.checked); clearError("tcpa"); }}
+                      className="rounded cursor-pointer"
+                      style={{
+                        width: 20, height: 20,
+                        accentColor: "#E8670A",
+                        borderColor: errors.tcpa ? ERROR_RED : "var(--c-border-on-light)",
+                      }}
+                      aria-invalid={!!errors.tcpa}
+                    />
+                  </span>
+                  <span style={{ color: "#5A6072", fontSize: 12, lineHeight: 1.45, paddingTop: 4, textAlign: "left" }}>
+                    I agree to receive SMS/calls about my appointment. Reply STOP to opt out. Msg & data rates may apply.
+                  </span>
+                </label>
+                {errors.tcpa && <p role="alert" className="text-xs text-left" style={{ color: ERROR_RED }}>{errors.tcpa}</p>}
+
+                <button
+                  type="submit"
+                  className="w-full rounded-full uppercase font-bold cursor-pointer transition-colors duration-200"
+                  style={{
+                    height: 52,
+                    background: "var(--brand-cta)",
+                    color: "#FFFFFF",
+                    fontSize: 19,
+                    border: "none",
+                    letterSpacing: "0.08em",
+                    fontFamily: "Inter, sans-serif",
+                    marginTop: 8,
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
+                >
+                  {COPY.cta.bookConsult}
+                </button>
+              </form>
+
+              <p className="text-center text-xs mt-4" style={{ color: "var(--c-text-on-light-muted)", fontFamily: "Inter, sans-serif" }}>
+                HIPAA Compliant · No Spam · Book entirely online
+              </p>
+
+              <p className="text-center text-sm mt-3">
+                <a
+                  href="tel:8663444955"
+                  className="font-bold transition-colors duration-200"
+                  style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}
+                >
+                  Or call: 866-344-4955
+                </a>
+              </p>
             </div>
-
-            <button
-              type="submit"
-              className="w-full rounded-full uppercase font-bold cursor-pointer transition-colors duration-200"
-              style={{
-                height: 52,
-                background: "var(--brand-cta)",
-                color: "#FFFFFF",
-                fontSize: 19,
-                border: "none",
-                letterSpacing: "0.08em",
-                fontFamily: "Inter, sans-serif",
-                marginTop: 8,
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
-            >
-              {COPY.cta.bookConsult}
-            </button>
-          </form>
-
-          <p className="text-center text-xs mt-4" style={{ color: "var(--c-text-on-light-muted)", fontFamily: "Inter, sans-serif" }}>
-            HIPAA Compliant · No Spam · Book entirely online
-          </p>
-
-          <p className="text-center text-sm mt-3">
-            <a
-              href="tel:8663444955"
-              className="font-bold transition-colors duration-200"
-              style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}
-            >
-              Or call: 866-344-4955
-            </a>
-          </p>
-        </div>
           </div>
         </div>
       </div>
