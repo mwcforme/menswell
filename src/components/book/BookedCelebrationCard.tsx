@@ -182,28 +182,29 @@ const BookedCelebrationCard = ({ firstName, apptTime, locationCity }: Props) => 
         {locationCity} clinic, in person
       </p>
 
-      <div className="flex flex-wrap items-center justify-center gap-2.5">
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
         {[
-          "Confirmation sent to your phone",
+          "Confirmation sent",
           "No-cost, no obligation",
         ].map((label) => (
           <span
             key={label}
-            className="inline-flex items-center gap-1.5"
+            className="inline-flex items-center gap-1.5 whitespace-nowrap"
             style={{
               background: "rgba(255,255,255,0.06)",
               border: "1px solid rgba(255,255,255,0.16)",
               color: "rgba(255,255,255,0.85)",
               borderRadius: 999,
               padding: "6px 12px",
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: 600,
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               fontFamily: "Inter, sans-serif",
+              lineHeight: 1.2,
             }}
           >
-            <Check size={14} strokeWidth={3} style={{ color: "#22C55E" }} />
+            <Check size={12} strokeWidth={3} style={{ color: "#22C55E", flexShrink: 0 }} />
             {label}
           </span>
         ))}
