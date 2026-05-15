@@ -314,13 +314,13 @@ const BookConfirmed = () => {
 
               <div className="p-7 md:p-8 flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <Play size={18} strokeWidth={2.5} style={{ color: "#E8670A" }} />
+                  <Play size={18} strokeWidth={2.5} style={{ color: "#C2410C" }} />
                   <span
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: 11,
                       fontWeight: 700,
-                      color: "#E8670A",
+                      color: "#C2410C",
                       letterSpacing: "0.18em",
                       textTransform: "uppercase",
                     }}
