@@ -56,6 +56,8 @@ interface Props {
   urgencyTier?: "early" | "urgent" | "building" | "overdue" | "long_overdue" | "flexible" | string;
   customFields?: import("@/services/contracts/ILeadSubmitter").MwcCustomFields;
   onBooked?: (slotIso: string) => void;
+  /** Called once slots load with the earliest available ISO string (or null if none). */
+  onNextAvailable?: (iso: string | null) => void;
 }
 
 // Brand tokens (light surface, navy ink, orange accent).
@@ -181,7 +183,7 @@ const dropPastSlots = (day: Date, slots: string[]): string[] => {
 };
 
 
-const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgencyTier, customFields, onBooked }: Props) => {
+const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgencyTier, customFields, onBooked, onNextAvailable }: Props) => {
   // Anchor "today" to ET, not the visitor's local midnight, so the picker is
   // correct for PT/MT/CT visitors near midnight ET.
   const today = useMemo(() => dateFromEtYmd(todayET()), []);
@@ -322,7 +324,7 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
   const canConfirm = Boolean(selectedSlot);
   const prevDisabled = weekStart <= today;
 
-  // Earliest 2 actually-available slots across the visible window — drives §2 hero card.
+  // Earliest 2 actually-available slots across the visible window.
   const recommendedSlots = useMemo(() => {
     const all: { iso: string; day: Date }[] = [];
     days.forEach((d) => {
@@ -333,8 +335,14 @@ const GHLDayView = ({ location, firstName, lastName, email, phone, source, urgen
     return all.slice(0, 2);
   }, [days, slotsByDay]);
 
-  const showRecommended =
-    urgencyTier === "early" || urgencyTier === "urgent" || urgencyTier === "long_overdue" || urgencyTier === "overdue";
+  // Fire onNextAvailable whenever the earliest slot changes.
+  useEffect(() => {
+    if (loading) return;
+    onNextAvailable?.(recommendedSlots[0]?.iso ?? null);
+  }, [recommendedSlots, loading, onNextAvailable]);
+
+  // Show next-available banner for ALL users — urgency is universal CRO signal
+  const showRecommended = recommendedSlots.length > 0;
 
   // One-tap confirm for the recommended-slot card.
   const confirmDirectly = (iso: string) => {

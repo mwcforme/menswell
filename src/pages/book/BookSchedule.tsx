@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Clock } from "lucide-react";
 import BookLayout from "@/components/book/BookLayout";
 import GHLDayView from "@/components/book/GHLDayView";
 import { useBookingStore } from "@/domain/booking/bookingStore";
@@ -114,6 +114,17 @@ const BookSchedule = () => {
     ...(lpSlug ? { mwc_lp_slug: lpSlug } : {}),
   };
 
+  const [nextAvailable, setNextAvailable] = useState<string | null>(null);
+  const handleNextAvailable = useCallback((iso: string | null) => setNextAvailable(iso), []);
+
+  // Format next-available slot for display
+  const nextAvailableLabel = nextAvailable ? (() => {
+    const d = new Date(nextAvailable);
+    const day = d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric", timeZone: "America/New_York" });
+    const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true, timeZone: "America/New_York" });
+    return `${day} at ${time} ET`;
+  })() : null;
+
   const handleIdentityComplete = (first: string, last: string, email: string) => {
     if (identity) {
       setIdentity({ ...identity, firstName: first, lastName: last, email });
@@ -197,6 +208,27 @@ const BookSchedule = () => {
               </p>
             </section>
 
+            {/* Next available slot banner */}
+            {nextAvailableLabel && (
+              <div
+                className="mx-auto w-full"
+                style={{ maxWidth: 720 }}
+              >
+                <div
+                  className="inline-flex items-center gap-2.5 rounded-full px-4 py-2"
+                  style={{
+                    background: "rgba(46,204,113,0.12)",
+                    border: "1px solid rgba(46,204,113,0.30)",
+                  }}
+                >
+                  <Clock size={14} style={{ color: "#2ECC71", flexShrink: 0 }} />
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600, color: "#FFFFFF" }}>
+                    Next available: <span style={{ color: "#2ECC71" }}>{nextAvailableLabel}</span>
+                  </span>
+                </div>
+              </div>
+            )}
+
             <section className="mx-auto" aria-label="Pick a date and time" style={{ maxWidth: 720 }}>
               {location && location in CENTER_CALENDARS ? (
                 <GHLDayView
@@ -208,6 +240,7 @@ const BookSchedule = () => {
                   source={source || "mwc-book-funnel"}
                   urgencyTier={urgencyTier}
                   customFields={customFields}
+                  onNextAvailable={handleNextAvailable}
                   onBooked={(slotIso) => {
                     setAppointmentTime(slotIso);
                     navigate("/book/confirmed", { state: { appointmentTime: slotIso } });
