@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
     q: "How much weight can I expect to lose?",
     a: "In manufacturer trials, GLP-1 medications like semaglutide and tirzepatide produced an average of 15-20% body weight loss when paired with diet and exercise changes. Your physician will set a realistic target based on your starting labs and health history. Individual results vary.",
-    cta: true,
   },
   {
     q: "Which medications do you prescribe?",
     a: "When clinically appropriate, we prescribe FDA-approved GLP-1 medications including semaglutide and tirzepatide, plus supporting tools like lipotropic injections and metabolic protocols. Selection is based on your labs, history, and goals.",
-    cta: true,
   },
   {
     q: "Does insurance cover this?",
@@ -64,15 +62,23 @@ export const WLFAQ = () => {
                 {isOpen && (
                   <div className="px-5 pb-5 text-sm leading-relaxed" style={{ color: "#1a1a2e", fontFamily: "Inter, sans-serif" }}>
                     <p>{f.a}</p>
-                    {f.cta && (
-                      <button
-                        onClick={scrollToBooking}
-                        className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold uppercase cursor-pointer"
-                        style={{ background: "#E8670A", color: "#FFFFFF", letterSpacing: "0.08em", border: "none" }}
-                      >
-                        See If I Qualify <ArrowRight className="h-3.5 w-3.5" />
-                      </button>
-                    )}
+                    <button
+                      onClick={scrollToBooking}
+                      className="mt-4 w-full font-bold cursor-pointer inline-flex items-center justify-center rounded-lg"
+                      style={{
+                        height: 52,
+                        background: "#E8670A",
+                        color: "#FFFFFF",
+                        fontSize: 15,
+                        letterSpacing: "0.07em",
+                        fontFamily: "Inter, sans-serif",
+                        border: "none",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#cf5a08"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "#E8670A"; }}
+                    >
+                      See If I Qualify
+                    </button>
                   </div>
                 )}
               </div>
