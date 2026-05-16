@@ -158,7 +158,25 @@ export const TRTHero = () => {
 
 
 
-          {/* Mobile primary CTA — hidden; form is directly below on mobile */}
+          {/* Mobile primary CTA — visible on phones only, above the fold */}
+          <button
+            onClick={scrollToForm}
+            className="lg:hidden mt-7 w-full font-bold cursor-pointer inline-flex items-center justify-center rounded-lg"
+            style={{
+              height: 56,
+              background: "var(--brand-cta)",
+              color: "#FFFFFF",
+              fontSize: 17,
+              border: "none",
+              letterSpacing: "0.06em",
+              fontFamily: "Inter, sans-serif",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--brand-cta-hover)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--brand-cta)"; }}
+          >
+            Book My Consultation
+          </button>
+          {/* Mobile primary CTA — hidden on desktop; form is directly alongside */}
 
           <div
             className="mt-6"

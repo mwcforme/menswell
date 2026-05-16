@@ -47,7 +47,7 @@ export const TRTLocations = () => {
   };
 
   return (
-    <section id="locations" style={{ background: "#FFFFFF" }}>
+    <section id="locations" style={{ background: "#FFFFFF", scrollMarginTop: 64 }}>
       <div className="max-w-[1200px] mx-auto px-6 py-16 md:py-24">
         <h2 className="font-bold uppercase text-center" style={{ fontFamily: "Oswald, sans-serif", color: "#000033", fontSize: "clamp(26px, 3vw, 38px)", letterSpacing: "0.02em" }}>
           3 Virginia Centers
@@ -69,8 +69,19 @@ export const TRTLocations = () => {
                 {/* Mobile: collapsed by default */}
                 <button
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="md:hidden flex items-center justify-between w-full text-sm font-semibold uppercase py-2 mb-2 cursor-pointer"
-                  style={{ color: "#000033", fontFamily: "Inter, sans-serif", background: "none", border: "none", letterSpacing: "0.06em" }}
+                  className="md:hidden flex items-center justify-between w-full font-semibold uppercase cursor-pointer"
+                  style={{
+                    color: "#000033",
+                    fontFamily: "Inter, sans-serif",
+                    background: "none",
+                    border: "none",
+                    letterSpacing: "0.06em",
+                    fontSize: 13,
+                    minHeight: 48,
+                    padding: "10px 0",
+                    marginBottom: 4,
+                  }}
+                  aria-expanded={isOpen}
                 >
                   <span>Address &amp; Hours</span>
                   <ChevronDown className="h-4 w-4 transition-transform" style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0)" }} />

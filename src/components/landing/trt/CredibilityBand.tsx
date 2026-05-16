@@ -28,7 +28,7 @@ export const CredibilityBand = () => {
 
   return (
     <section style={{ background: "#0A1628" }}>
-      <div className="max-w-[1200px] mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-4 text-center" style={{ paddingTop: 32, paddingBottom: 32 }}>
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 grid grid-cols-2 md:grid-cols-4 text-center" style={{ paddingTop: 28, paddingBottom: 28, gap: "12px 0" }}>
         {stats.map((s, i) => {
           const inner = (
             <div className="flex flex-col items-center gap-2 px-2">
@@ -60,8 +60,15 @@ export const CredibilityBand = () => {
             </div>
           );
 
+          // On mobile (2-col grid): right border on col 0, bottom border on row 0
+          // On desktop (4-col): right border on all except last
+          const isLastInRow = (i + 1) % 2 === 0;
+          const isFirstRow = i < 2;
           const dividerStyle: React.CSSProperties = {
-            borderRight: i < stats.length - 1 ? "1px solid var(--c-border-on-dark)" : "none",
+            borderRight: !isLastInRow ? "1px solid var(--c-border-on-dark)" : "none",
+            borderBottom: isFirstRow ? "1px solid var(--c-border-on-dark)" : "none",
+            paddingTop: 16,
+            paddingBottom: 16,
           };
 
           if (s.href) {

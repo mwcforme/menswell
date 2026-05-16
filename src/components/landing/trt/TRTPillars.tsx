@@ -42,7 +42,8 @@ export const TRTPillars = () => (
         AND WEIGHT LOSS, UNDER ONE ROOF.
       </h2>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      {/* Mobile: horizontal scroll strip. Desktop: 4-col grid. */}
+      <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {pillars.map((p) => (
           <div
             key={p.title}
@@ -51,20 +52,12 @@ export const TRTPillars = () => (
               background: "rgba(255,255,255,0.10)",
               border: "1px solid rgba(255,255,255,0.18)",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.14)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.30)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255,255,255,0.10)";
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.18)";
-            }}
           >
             <div className="flex justify-center mt-6">
               <img
                 src={p.image}
                 alt={p.title}
-                className="w-[140px] h-[140px] rounded-full object-cover"
+                className="w-[120px] h-[120px] rounded-full object-cover"
                 style={{ border: "3px solid var(--c-border-on-dark)" }}
                 loading="lazy"
               />
@@ -77,6 +70,47 @@ export const TRTPillars = () => (
             </h3>
             <p
               className="text-sm px-5 pb-6 mt-2 leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif" }}
+            >
+              {p.desc}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Mobile-only horizontal scroll cards */}
+      <div
+        className="sm:hidden flex gap-3 overflow-x-auto pb-2"
+        style={{ scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch", marginLeft: -24, marginRight: -24, paddingLeft: 24, paddingRight: 24 }}
+      >
+        {pillars.map((p) => (
+          <div
+            key={p.title}
+            className="rounded-xl overflow-hidden text-center flex-shrink-0"
+            style={{
+              width: 200,
+              background: "rgba(255,255,255,0.10)",
+              border: "1px solid rgba(255,255,255,0.18)",
+              scrollSnapAlign: "start",
+            }}
+          >
+            <div className="flex justify-center mt-5">
+              <img
+                src={p.image}
+                alt={p.title}
+                className="w-[100px] h-[100px] rounded-full object-cover"
+                style={{ border: "3px solid var(--c-border-on-dark)" }}
+                loading="lazy"
+              />
+            </div>
+            <h3
+              className="font-bold text-sm uppercase mt-3 tracking-wide px-3"
+              style={{ fontFamily: "Oswald, sans-serif", color: "#FFFFFF", fontWeight: 700 }}
+            >
+              {p.title}
+            </h3>
+            <p
+              className="text-xs px-4 pb-5 mt-1.5 leading-relaxed"
               style={{ color: "rgba(255,255,255,0.85)", fontFamily: "Inter, sans-serif" }}
             >
               {p.desc}

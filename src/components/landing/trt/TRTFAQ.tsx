@@ -1,17 +1,29 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { TRT_FAQS } from "@/data/faqs";
 import { COPY } from "@/data/copy";
 
 export const TRTFAQ = () => {
   const [open, setOpen] = useState<number | null>(0);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const scrollToForm = () => {
     document.getElementById("hero-form")?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
+  const handleToggle = (i: number) => {
+    const isOpening = open !== i;
+    setOpen(isOpening ? i : null);
+    if (isOpening) {
+      // Small delay so the DOM expands before we scroll
+      window.setTimeout(() => {
+        itemRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
+    }
+  };
+
   return (
-    <section id="faq" style={{ background: "#F5F0EB" }}>
+    <section id="faq" style={{ background: "#F5F0EB", scrollMarginTop: 64 }}>
       <div className="max-w-[820px] mx-auto px-6 py-16 md:py-24">
         <h2
           className="font-bold uppercase text-center"
@@ -32,11 +44,12 @@ export const TRTFAQ = () => {
             return (
               <div
                 key={f.q}
+                ref={(el) => { itemRefs.current[i] = el; }}
                 className="rounded-xl overflow-hidden"
                 style={{ background: "#FFFFFF", border: "1px solid var(--c-border-on-light)" }}
               >
                 <button
-                  onClick={() => setOpen(isOpen ? null : i)}
+                  onClick={() => handleToggle(i)}
                   className="w-full flex items-center justify-between gap-4 text-left px-5 py-4 cursor-pointer"
                   style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}
                   aria-expanded={isOpen}

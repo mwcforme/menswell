@@ -45,8 +45,8 @@ const NewLandingPage = () => {
       </main>
       <TRTFooter />
       <StickyMobileCTA />
-      {/* Spacer so sticky CTA doesn't overlap last section — 72px matches StickyMobileCTA height */}
-      <div className="md:hidden" style={{ height: 72 }} aria-hidden="true" />
+      {/* Spacer so sticky CTA doesn't overlap last section — 60px matches StickyMobileCTA height */}
+      <div className="md:hidden" style={{ height: 60 }} aria-hidden="true" />
     </div>
   );
 };

@@ -12,38 +12,39 @@ export const TRTMarquee = () => (
     }}
   >
     <div
+      className="flex flex-row items-center justify-center flex-wrap"
       style={{
         maxWidth: 960,
         margin: "0 auto",
-        padding: "52px 40px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 80,
+        padding: "36px 24px",
+        gap: "24px 40px",
       }}
     >
       <img
         src="/images/badges/legitscript.png"
         alt="LegitScript Certified"
-        style={{ height: 96, width: "auto", maxWidth: 220, objectFit: "contain" }}
+        className="h-14 md:h-20 w-auto"
+        style={{ maxWidth: 160, objectFit: "contain" }}
         loading="lazy"
       />
 
-      <div aria-hidden="true" style={{ width: 1, height: 72, background: "rgba(255,255,255,0.20)", flexShrink: 0 }} />
+      <div aria-hidden="true" className="hidden sm:block" style={{ width: 1, height: 56, background: "rgba(255,255,255,0.20)", flexShrink: 0 }} />
 
       <img
         src="/images/badges/clia.png"
         alt="CLIA Certified Laboratory"
-        style={{ height: 96, width: "auto", maxWidth: 220, objectFit: "contain" }}
+        className="h-14 md:h-20 w-auto"
+        style={{ maxWidth: 160, objectFit: "contain" }}
         loading="lazy"
       />
 
-      <div aria-hidden="true" style={{ width: 1, height: 72, background: "rgba(255,255,255,0.20)", flexShrink: 0 }} />
+      <div aria-hidden="true" className="hidden sm:block" style={{ width: 1, height: 56, background: "rgba(255,255,255,0.20)", flexShrink: 0 }} />
 
       <img
         src="/images/badges/hipaa.png"
         alt="HIPAA Compliant"
-        style={{ height: 96, width: "auto", maxWidth: 220, objectFit: "contain" }}
+        className="h-14 md:h-20 w-auto"
+        style={{ maxWidth: 160, objectFit: "contain" }}
         loading="lazy"
       />
     </div>

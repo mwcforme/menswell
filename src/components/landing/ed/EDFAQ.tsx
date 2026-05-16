@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 
 const faqs = [
@@ -34,9 +34,20 @@ const faqs = [
 
 export const EDFAQ = () => {
   const [open, setOpen] = useState<number | null>(0);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const scrollToBooking = () => {
     const el = document.getElementById("booking") || document.getElementById("final-cta");
     el?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleToggle = (i: number) => {
+    const isOpening = open !== i;
+    setOpen(isOpening ? i : null);
+    if (isOpening) {
+      window.setTimeout(() => {
+        itemRefs.current[i]?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
+    }
   };
 
   return (
@@ -50,9 +61,9 @@ export const EDFAQ = () => {
           {faqs.map((f, i) => {
             const isOpen = open === i;
             return (
-              <div key={f.q} className="rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E5EA" }}>
+              <div key={f.q} ref={(el) => { itemRefs.current[i] = el; }} className="rounded-xl overflow-hidden" style={{ background: "#FFFFFF", border: "1px solid #E5E5EA" }}>
                 <button
-                  onClick={() => setOpen(isOpen ? null : i)}
+                  onClick={() => handleToggle(i)}
                   className="w-full flex items-center justify-between gap-4 text-left px-5 py-4 cursor-pointer"
                   style={{ color: "#000033", fontFamily: "Inter, sans-serif" }}
                 >

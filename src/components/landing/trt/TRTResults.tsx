@@ -78,8 +78,8 @@ export const TRTResults = () => {
           </p>
           <button
             onClick={scrollToForm}
-            className="inline-flex items-center justify-center rounded-full px-8 font-bold cursor-pointer border-none"
-            style={{ height: 56, minHeight: 56, background: "var(--brand-cta)", color: "#FFFFFF", fontSize: 19, letterSpacing: "0.08em", fontFamily: "Inter, sans-serif" }}
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg px-8 font-bold cursor-pointer border-none"
+            style={{ height: 56, minHeight: 56, background: "var(--brand-cta)", color: "#FFFFFF", fontSize: 17, letterSpacing: "0.07em", fontFamily: "Inter, sans-serif" }}
           >
             {COPY.cta.startConsult}
           </button>
